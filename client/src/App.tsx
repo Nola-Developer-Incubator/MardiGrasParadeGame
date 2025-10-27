@@ -18,9 +18,14 @@ const controls = [
 
 function App() {
   const [touchInput, setTouchInput] = useState<TouchInput>({ x: 0, y: 0 });
+  const [catchAction, setCatchAction] = useState(0);
   
   const handleTouchInput = (input: TouchInput) => {
     setTouchInput(input);
+  };
+  
+  const handleCatchPress = () => {
+    setCatchAction(prev => prev + 1);
   };
   
   return (
@@ -42,13 +47,13 @@ function App() {
           <color attach="background" args={["#0f0f1e"]} />
           
           <Suspense fallback={null}>
-            <GameScene touchInput={touchInput} />
+            <GameScene touchInput={touchInput} catchAction={catchAction} />
           </Suspense>
         </Canvas>
         
         <GameUI />
         <WinScreen />
-        <TouchControls onInput={handleTouchInput} />
+        <TouchControls onInput={handleTouchInput} onCatch={handleCatchPress} />
         <AudioManager />
       </KeyboardControls>
     </div>

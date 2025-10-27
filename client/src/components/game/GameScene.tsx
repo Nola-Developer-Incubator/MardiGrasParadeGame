@@ -18,9 +18,10 @@ interface CatchEffectInstance {
 
 interface GameSceneProps {
   touchInput: TouchInput;
+  catchAction: number;
 }
 
-export function GameScene({ touchInput }: GameSceneProps) {
+export function GameScene({ touchInput, catchAction }: GameSceneProps) {
   const { phase, collectibles, addCatch, toggleCamera } = useParadeGame();
   const { playHit } = useAudio();
   const [playerPosition, setPlayerPosition] = useState(new THREE.Vector3(0, 0.5, 0));
@@ -89,6 +90,7 @@ export function GameScene({ touchInput }: GameSceneProps) {
               collectible={collectible}
               playerPosition={playerPosition}
               onCatch={handleCatch}
+              catchAction={catchAction}
             />
           ))}
           
