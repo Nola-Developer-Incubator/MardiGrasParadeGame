@@ -97,7 +97,7 @@ export function Environment() {
           {Array.from({ length: 3 }, (_, i) => (
             <mesh key={i} position={[building.position[0] > 0 ? -2.01 : 2.01, -building.height / 2 + 1 + i * 1.5, 0]}>
               <boxGeometry args={[0.02, 0.8, 1]} />
-              <meshBasicMaterial color="#ffd700" emissive="#ffd700" emissiveIntensity={1} />
+              <meshStandardMaterial color="#ffd700" emissive="#ffd700" emissiveIntensity={1} />
             </mesh>
           ))}
         </group>
@@ -115,7 +115,7 @@ export function Environment() {
           {/* Lamp light */}
           <mesh position={[0, 2.2, 0]}>
             <sphereGeometry args={[0.3, 8, 8]} />
-            <meshBasicMaterial color="#ffd700" />
+            <meshStandardMaterial color="#ffd700" emissive="#ffd700" emissiveIntensity={1} />
           </mesh>
           <pointLight position={[0, 2.2, 0]} intensity={1} color="#ffd700" distance={8} />
         </group>
