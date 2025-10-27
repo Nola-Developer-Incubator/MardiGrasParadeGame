@@ -7,6 +7,7 @@ interface CollectibleProps {
   collectible: CollectibleType;
   playerPosition: THREE.Vector3;
   onCatch: () => void;
+  catchAction: number;
 }
 
 const COLLECTIBLE_COLORS = {
@@ -17,13 +18,16 @@ const COLLECTIBLE_COLORS = {
 
 const GRAVITY = -15;
 const CATCH_RADIUS = 1.5;
+const GROUND_LEVEL = 0.5;
+const MIN_CATCH_HEIGHT = 0.5;
 
-export function Collectible({ collectible, playerPosition, onCatch }: CollectibleProps) {
+export function Collectible({ collectible, playerPosition, onCatch, catchAction }: CollectibleProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const position = useRef(collectible.position.clone());
   const velocity = useRef(collectible.velocity.clone());
   const { updateCollectible, removeCollectible } = useParadeGame();
   const hasBeenCaught = useRef(false);
+  const previousCatchAction = useRef(catchAction);
   
   useEffect(() => {
     return () => {
@@ -44,7 +48,8 @@ export function Collectible({ collectible, playerPosition, onCatch }: Collectibl
     position.current.add(velocity.current.clone().multiplyScalar(delta));
     
     // Check if on ground
-    if (position.current.y <= 0.3) {
+    const isOnGround = position.current.y <= 0.3;
+    if (isOnGround) {
       position.current.y = 0.3;
       velocity.current.y = 0;
       velocity.current.x *= 0.9; // Friction
@@ -60,14 +65,24 @@ export function Collectible({ collectible, playerPosition, onCatch }: Collectibl
     
     // Check if player is close enough to catch
     const distanceToPlayer = position.current.distanceTo(playerPosition);
-    const isCatchable = distanceToPlayer < CATCH_RADIUS && position.current.y < 2;
+    const isAboveGround = position.current.y >= MIN_CATCH_HEIGHT;
+    const isInRange = distanceToPlayer < CATCH_RADIUS;
+    const isCatchable = isInRange && isAboveGround && position.current.y < 2;
     
     // Highlight if catchable
     if (isCatchable && !hasBeenCaught.current) {
       meshRef.current.scale.setScalar(1 + Math.sin(state.clock.elapsedTime * 10) * 0.2);
       
-      // Auto-catch if very close
+      // Auto-catch if very close (for PC)
       if (distanceToPlayer < 0.8) {
+        hasBeenCaught.current = true;
+        onCatch();
+        removeCollectible(collectible.id);
+      }
+      
+      // Manual catch via button press (for tablets)
+      if (catchAction !== previousCatchAction.current) {
+        previousCatchAction.current = catchAction;
         hasBeenCaught.current = true;
         onCatch();
         removeCollectible(collectible.id);

@@ -8,13 +8,15 @@ export interface TouchInput {
 
 interface TouchControlsProps {
   onInput: (input: TouchInput) => void;
+  onCatch?: () => void;
 }
 
-export function TouchControls({ onInput }: TouchControlsProps) {
+export function TouchControls({ onInput, onCatch }: TouchControlsProps) {
   const isMobile = useIsMobile();
   const joystickRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [stickPosition, setStickPosition] = useState({ x: 0, y: 0 });
+  const [isCatchPressed, setIsCatchPressed] = useState(false);
   
   const joystickSize = 120;
   const stickSize = 50;
@@ -71,34 +73,63 @@ export function TouchControls({ onInput }: TouchControlsProps) {
   
   if (!isMobile) return null;
   
+  const handleCatchPress = () => {
+    setIsCatchPressed(true);
+    if (onCatch) onCatch();
+  };
+  
+  const handleCatchRelease = () => {
+    setIsCatchPressed(false);
+  };
+  
   return (
-    <div className="absolute bottom-20 left-4 pointer-events-auto">
-      <div
-        ref={joystickRef}
-        className="relative bg-black/30 rounded-full border-2 border-white/30 backdrop-blur-sm"
-        style={{ width: joystickSize, height: joystickSize }}
-        onTouchStart={() => setIsDragging(true)}
-      >
-        {/* Joystick base */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-1 h-8 bg-white/20 absolute" />
-          <div className="w-8 h-1 bg-white/20 absolute" />
-        </div>
-        
-        {/* Joystick stick */}
+    <>
+      {/* Movement Joystick */}
+      <div className="absolute bottom-20 left-4 pointer-events-auto">
         <div
-          className="absolute bg-white/70 rounded-full shadow-lg transition-all"
-          style={{
-            width: stickSize,
-            height: stickSize,
-            left: `50%`,
-            top: `50%`,
-            transform: `translate(calc(-50% + ${stickPosition.x}px), calc(-50% + ${stickPosition.y}px))`,
-          }}
+          ref={joystickRef}
+          className="relative bg-black/30 rounded-full border-2 border-white/30 backdrop-blur-sm"
+          style={{ width: joystickSize, height: joystickSize }}
+          onTouchStart={() => setIsDragging(true)}
         >
-          <div className="w-full h-full rounded-full bg-gradient-to-br from-purple-400 to-orange-400" />
+          {/* Joystick base */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-1 h-8 bg-white/20 absolute" />
+            <div className="w-8 h-1 bg-white/20 absolute" />
+          </div>
+          
+          {/* Joystick stick */}
+          <div
+            className="absolute bg-white/70 rounded-full shadow-lg transition-all"
+            style={{
+              width: stickSize,
+              height: stickSize,
+              left: `50%`,
+              top: `50%`,
+              transform: `translate(calc(-50% + ${stickPosition.x}px), calc(-50% + ${stickPosition.y}px))`,
+            }}
+          >
+            <div className="w-full h-full rounded-full bg-gradient-to-br from-purple-400 to-orange-400" />
+          </div>
         </div>
       </div>
-    </div>
+      
+      {/* Catch Button */}
+      <div className="absolute bottom-20 right-4 pointer-events-auto">
+        <button
+          className={`w-28 h-28 rounded-full border-4 border-white/40 backdrop-blur-sm shadow-2xl transition-all flex flex-col items-center justify-center font-bold text-white ${
+            isCatchPressed 
+              ? "bg-gradient-to-br from-purple-600 to-orange-600 scale-90 border-white/60" 
+              : "bg-gradient-to-br from-purple-500 to-orange-500"
+          }`}
+          onTouchStart={handleCatchPress}
+          onTouchEnd={handleCatchRelease}
+          onTouchCancel={handleCatchRelease}
+        >
+          <div className="text-3xl mb-1">🎯</div>
+          <div className="text-sm">CATCH</div>
+        </button>
+      </div>
+    </>
   );
 }
