@@ -1,0 +1,130 @@
+import { useRef, useEffect, useMemo } from "react";
+import { useFrame } from "@react-three/fiber";
+import { useParadeGame } from "@/lib/stores/useParadeGame";
+import * as THREE from "three";
+
+interface ParadeFloatProps {
+  id: string;
+  startZ: number;
+  lane: number; // -1 or 1 for left or right side of street
+  color: string;
+  throwInterval?: number;
+}
+
+export function ParadeFloat({ 
+  id, 
+  startZ, 
+  lane, 
+  color, 
+  throwInterval = 3000 
+}: ParadeFloatProps) {
+  const meshRef = useRef<THREE.Group>(null);
+  const position = useRef(new THREE.Vector3(lane * 5, 1, startZ));
+  const lastThrowTime = useRef(Date.now());
+  const { addCollectible, phase } = useParadeGame();
+  
+  const floatSpeed = 2; // Units per second
+  
+  // Pre-calculate random decorative elements positions
+  const decorations = useMemo(() => {
+    return Array.from({ length: 5 }, (_, i) => ({
+      x: (Math.random() - 0.5) * 1.5,
+      y: Math.random() * 1.5 + 0.5,
+      z: (Math.random() - 0.5) * 2,
+      scale: Math.random() * 0.3 + 0.2,
+    }));
+  }, []);
+  
+  useEffect(() => {
+    console.log(`Parade float ${id} initialized at lane ${lane}`);
+  }, [id, lane]);
+  
+  useFrame((state, delta) => {
+    if (!meshRef.current || phase !== "playing") return;
+    
+    // Move float forward along the street
+    position.current.z += floatSpeed * delta;
+    
+    // Reset float position when it goes too far
+    if (position.current.z > 20) {
+      position.current.z = -30;
+      lastThrowTime.current = Date.now(); // Reset throw timer
+    }
+    
+    meshRef.current.position.copy(position.current);
+    
+    // Gentle bobbing animation
+    meshRef.current.position.y = 1 + Math.sin(state.clock.elapsedTime * 0.5) * 0.1;
+    
+    // Gentle rotation animation
+    meshRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.3) * 0.1;
+    
+    // Throw collectibles at intervals
+    const now = Date.now();
+    if (now - lastThrowTime.current > throwInterval && position.current.z < 10 && position.current.z > -10) {
+      throwCollectible();
+      lastThrowTime.current = now;
+    }
+  });
+  
+  const throwCollectible = () => {
+    const throwTypes = ["beads", "doubloon", "cup"] as const;
+    const randomType = throwTypes[Math.floor(Math.random() * throwTypes.length)];
+    
+    // Create a collectible thrown from the float toward the center of the street
+    const throwDirection = new THREE.Vector3(
+      -lane * (Math.random() * 0.5 + 0.5), // Toward center with some randomness
+      Math.random() * 0.3 + 0.8, // Upward arc
+      Math.random() * 0.4 - 0.2 // Slight forward/backward variance
+    ).normalize();
+    
+    const throwForce = 6;
+    
+    const collectible = {
+      id: `${id}-${Date.now()}-${Math.random()}`,
+      position: position.current.clone(),
+      velocity: throwDirection.multiplyScalar(throwForce),
+      active: true,
+      type: randomType,
+    };
+    
+    addCollectible(collectible);
+    console.log(`Float ${id} threw ${randomType}`);
+  };
+  
+  return (
+    <group ref={meshRef} position={[position.current.x, position.current.y, position.current.z]}>
+      {/* Main float platform */}
+      <mesh castShadow>
+        <boxGeometry args={[2, 1.5, 3]} />
+        <meshStandardMaterial color={color} />
+      </mesh>
+      
+      {/* Decorative elements on the float */}
+      {decorations.map((dec, i) => (
+        <mesh key={i} position={[dec.x, dec.y, dec.z]} castShadow>
+          <sphereGeometry args={[dec.scale, 8, 8]} />
+          <meshStandardMaterial color="#ffd700" metalness={0.6} roughness={0.3} />
+        </mesh>
+      ))}
+      
+      {/* Float wheels */}
+      <mesh position={[-0.8, -0.7, -1]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.3, 0.3, 0.3, 12]} />
+        <meshStandardMaterial color="#2c2c2c" />
+      </mesh>
+      <mesh position={[0.8, -0.7, -1]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.3, 0.3, 0.3, 12]} />
+        <meshStandardMaterial color="#2c2c2c" />
+      </mesh>
+      <mesh position={[-0.8, -0.7, 1]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.3, 0.3, 0.3, 12]} />
+        <meshStandardMaterial color="#2c2c2c" />
+      </mesh>
+      <mesh position={[0.8, -0.7, 1]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.3, 0.3, 0.3, 12]} />
+        <meshStandardMaterial color="#2c2c2c" />
+      </mesh>
+    </group>
+  );
+}
