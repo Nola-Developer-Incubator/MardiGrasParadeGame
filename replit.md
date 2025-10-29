@@ -8,6 +8,18 @@ The application uses a full-stack TypeScript architecture with Express backend, 
 
 ## Recent Changes
 
+**October 29, 2025 - Float-Based Timer System & Gameplay Refinements**
+- Implemented float-based timer: levels end when all floats pass, not when score target is reached
+- Score is now purely informational - tracks player performance but doesn't control level progression
+- Dynamic float generation: Level 1 has 10 floats, Level 2 has 20 floats, increasing by 10 each level
+- Floats spaced 10 units apart starting at Z=-30, each float calls `markFloatPassed()` when reaching Z>20
+- Disabled mouse click controls automatically on mobile/tablet devices (useIsMobile hook)
+- Repositioned obstacles to Z: -16 to -19 (behind main catchable area) for strategic gameplay
+- Added deep throw mechanic: 25% of throws use Z direction -1.2 to -1.7, landing in dense obstacle zone
+- Removed score-based phase transitions from `addCatch` and `incrementMisses` functions
+- Float counting system tracks `totalFloats` and `floatsPassed` to determine level completion
+- Players must navigate entire parade duration (all floats) to advance levels
+
 **October 29, 2025 - Moving Obstacles**
 - Added 4 moving obstacles that patrol back and forth across the street
 - Obstacles include trash cans (rotating boxes) and barriers (orange cylinders)
