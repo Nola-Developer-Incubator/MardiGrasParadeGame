@@ -32,7 +32,7 @@ interface GameSceneProps {
 }
 
 export function GameScene({ touchInput, catchAction }: GameSceneProps) {
-  const { phase, collectibles, addCatch, combo, totalFloats, level } = useParadeGame();
+  const { phase, collectibles, addCatch, combo, totalFloats, level, getFloatSpeed, eliminatePlayer } = useParadeGame();
   const { playHit, playFireworks } = useAudio();
   const { camera, gl } = useThree();
   const isMobile = useIsMobile();
@@ -40,6 +40,42 @@ export function GameScene({ touchInput, catchAction }: GameSceneProps) {
   const [mouseTarget, setMouseTarget] = useState<THREE.Vector3 | null>(null);
   const [catchEffects, setCatchEffects] = useState<CatchEffectInstance[]>([]);
   const [clickMarkers, setClickMarkers] = useState<ClickMarkerInstance[]>([]);
+  const floatStartTime = useState(() => Date.now())[0];
+  
+  // Check for float-player collision
+  useEffect(() => {
+    if (phase !== "playing") return;
+    
+    const checkCollision = () => {
+      const floatSpeed = getFloatSpeed();
+      const elapsedTime = (Date.now() - floatStartTime) / 1000; // seconds
+      const floatX = 5; // Floats are on lane 1 (x = 5)
+      const floatWidth = 2.5; // Float collision width
+      const floatLength = 3; // Float collision length
+      
+      // Check each float position
+      for (let i = 0; i < totalFloats; i++) {
+        const startZ = -30 - (i * 10);
+        const currentZ = startZ + (floatSpeed * elapsedTime);
+        
+        // Only check floats that are near the player area
+        if (currentZ > -20 && currentZ < 20) {
+          // Check if player is too close to this float
+          const distanceX = Math.abs(playerPosition.x - floatX);
+          const distanceZ = Math.abs(playerPosition.z - currentZ);
+          
+          if (distanceX < floatWidth && distanceZ < floatLength) {
+            console.log(`💥 Player hit by float at position (${floatX}, ${currentZ})!`);
+            eliminatePlayer();
+            return;
+          }
+        }
+      }
+    };
+    
+    const interval = setInterval(checkCollision, 100); // Check every 100ms
+    return () => clearInterval(interval);
+  }, [phase, playerPosition, totalFloats, floatStartTime, getFloatSpeed, eliminatePlayer]);
   
   // Play fireworks sound on high combos
   useEffect(() => {
