@@ -18,6 +18,12 @@ export interface PowerUp {
   endTime: number;
 }
 
+interface BotScore {
+  id: string;
+  catches: number;
+  color: string;
+}
+
 interface ParadeGameState {
   phase: GamePhase;
   cameraMode: CameraMode;
@@ -32,12 +38,14 @@ interface ParadeGameState {
   activePowerUps: PowerUp[];
   playerColor: "beads" | "doubloon" | "cup"; // Player's assigned color for bonus points
   missedThrows: number; // Track missed throws for bot gift system
+  botScores: BotScore[]; // Track bot catches
   
   // Actions
   startGame: () => void;
   toggleCamera: () => void;
   addCatch: (collectibleType?: Collectible["type"], bypassPowerUp?: boolean) => void;
   incrementMisses: () => void;
+  addBotCatch: (botId: string) => void;
   addCollectible: (collectible: Collectible) => void;
   updateCollectible: (id: string, updates: Partial<Collectible>) => void;
   removeCollectible: (id: string) => void;
@@ -68,6 +76,7 @@ export const useParadeGame = create<ParadeGameState>()(
     activePowerUps: [],
     playerColor: "beads", // Default color, reassigned on game start
     missedThrows: 0,
+    botScores: [],
     
     startGame: () => {
       console.log("Starting game...");
@@ -75,7 +84,24 @@ export const useParadeGame = create<ParadeGameState>()(
       const colors: Array<"beads" | "doubloon" | "cup"> = ["beads", "doubloon", "cup"];
       const randomColor = colors[Math.floor(Math.random() * colors.length)];
       console.log(`Player color assigned: ${randomColor}`);
-      set({ phase: "playing", playerColor: randomColor });
+      
+      // Initialize bot scores
+      const botColors = ["#ff4444", "#44ff44", "#4444ff", "#ffff44", "#ff44ff", "#44ffff"];
+      const initialBotScores = Array.from({ length: 6 }, (_, i) => ({
+        id: `bot-${i + 1}`,
+        catches: 0,
+        color: botColors[i],
+      }));
+      
+      set({ phase: "playing", playerColor: randomColor, botScores: initialBotScores });
+    },
+    
+    addBotCatch: (botId: string) => {
+      set((state) => ({
+        botScores: state.botScores.map((bot) =>
+          bot.id === botId ? { ...bot, catches: bot.catches + 1 } : bot
+        ),
+      }));
     },
     
     toggleCamera: () => {
@@ -214,6 +240,7 @@ export const useParadeGame = create<ParadeGameState>()(
         activePowerUps: [],
         playerColor: randomColor,
         missedThrows: 0,
+        botScores: [],
         cameraMode: "third-person",
       });
     },

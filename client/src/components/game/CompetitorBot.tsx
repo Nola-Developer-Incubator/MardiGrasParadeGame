@@ -15,7 +15,7 @@ export function CompetitorBot({ id, startX, color }: CompetitorBotProps) {
   const shadowRef = useRef<THREE.Mesh>(null);
   const position = useRef(new THREE.Vector3(startX, 0.5, -12 + Math.random() * 6)); // Start behind center line (-12 to -6)
   const velocity = useRef(new THREE.Vector3());
-  const { collectibles, removeCollectible, phase } = useParadeGame();
+  const { collectibles, removeCollectible, addBotCatch, phase } = useParadeGame();
   
   const moveSpeed = useMemo(() => Math.random() * 1.5 + 2, []); // Varying speeds
   
@@ -61,6 +61,7 @@ export function CompetitorBot({ id, startX, color }: CompetitorBotProps) {
       // "Catch" collectible if close enough
       if (nearestDistance < 0.8 && nearestCollectible.position.y < 1) {
         removeCollectible(nearestCollectible.id);
+        addBotCatch(id);
         console.log(`Bot ${id} caught ${nearestCollectible.type}!`);
       }
     } else {
