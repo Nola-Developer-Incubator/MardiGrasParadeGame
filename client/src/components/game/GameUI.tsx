@@ -9,7 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
 export function GameUI() {
-  const { phase, score, targetScore, level, combo, startGame, activePowerUps, lastCatchTime, playerColor } = useParadeGame();
+  const { phase, score, targetScore, level, combo, startGame, activePowerUps, lastCatchTime, playerColor, botScores } = useParadeGame();
   const { isMuted, toggleMute } = useAudio();
   const [showTutorial, setShowTutorial] = useState(true);
   const [comboVisible, setComboVisible] = useState(false);
@@ -24,6 +24,9 @@ export function GameUI() {
     cup: { name: "Red Cup", color: "#e74c3c" },
   };
   const playerColorInfo = colorDisplayMap[playerColor];
+  
+  // Sort bots by catches (descending)
+  const sortedBots = [...botScores].sort((a, b) => b.catches - a.catches);
   
   // Show combo animation when combo changes
   useEffect(() => {
@@ -242,6 +245,30 @@ export function GameUI() {
               </motion.div>
             )}
           </AnimatePresence>
+          
+          {/* Bot Scores - Bottom Left */}
+          <div className="absolute bottom-4 left-4 pointer-events-auto">
+            <Card className="bg-gradient-to-r from-black/85 to-gray-900/85 border-2 border-gray-500 px-4 py-3">
+              <div className="text-xs text-gray-300 font-semibold mb-2">🤖 BOT CATCHES</div>
+              <div className="space-y-1 max-h-48 overflow-y-auto">
+                {sortedBots.map((bot) => (
+                  <div key={bot.id} className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className="w-3 h-3 rounded-full" 
+                        style={{ 
+                          backgroundColor: bot.color,
+                          boxShadow: `0 0 6px ${bot.color}`
+                        }}
+                      />
+                      <span className="text-xs text-white font-medium">{bot.id}</span>
+                    </div>
+                    <span className="text-sm font-bold text-yellow-300">{bot.catches}</span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
           
           {/* Controls Hint - Bottom Center */}
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">

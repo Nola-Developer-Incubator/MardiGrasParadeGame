@@ -24,16 +24,17 @@ export function GameCamera({ playerPosition }: GameCameraProps) {
     let targetLookAt: THREE.Vector3;
     
     if (cameraMode === "third-person") {
-      // Third-person camera: behind and above the player
+      // Third-person camera: higher and further back to see both player and floats
+      // Position camera behind player but angled to see parade floats ahead
       targetCameraPos = new THREE.Vector3(
-        playerPosition.x,
-        playerPosition.y + 4,
-        playerPosition.z + 6
+        playerPosition.x * 0.3, // Slight side offset to center view
+        playerPosition.y + 8, // Higher up for better overview
+        playerPosition.z + 10 // Further back
       );
       targetLookAt = new THREE.Vector3(
-        playerPosition.x,
-        playerPosition.y + 1,
-        playerPosition.z
+        playerPosition.x * 0.2,
+        playerPosition.y + 0.5,
+        playerPosition.z - 8 // Look ahead toward where floats are
       );
     } else {
       // First-person camera: at player's eye level, looking forward
