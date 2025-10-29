@@ -87,6 +87,9 @@ interface ParadeGameState {
   
   // Inactivity timeout
   endGameDueToInactivity: () => void;
+  
+  // Float collision
+  eliminatePlayer: () => void;
 }
 
 // Combo timing window (milliseconds)
@@ -486,6 +489,11 @@ export const useParadeGame = create<ParadeGameState>()(
     
     endGameDueToInactivity: () => {
       console.log("Game ended due to inactivity (30 seconds without movement)");
+      set({ phase: "won" });
+    },
+    
+    eliminatePlayer: () => {
+      console.log("💥 Player hit by parade float! Eliminated!");
       set({ phase: "won" });
     },
   }))

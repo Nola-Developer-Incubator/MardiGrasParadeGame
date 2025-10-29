@@ -30,7 +30,7 @@ export function Player({ position = [0, 0.5, 0], onPositionChange, touchInput, m
   const playerVelocity = useRef(new THREE.Vector3());
   const playerDirection = useRef(new THREE.Vector3());
   const currentMouseTarget = useRef<THREE.Vector3 | null>(null);
-  const lastMoveTime = useRef(Date.now());
+  const lastMoveTime = useRef<number | null>(null); // null until first movement
   const inactivityWarned = useRef(false);
   
   // Player settings (base values)
@@ -132,7 +132,7 @@ export function Player({ position = [0, 0.5, 0], onPositionChange, touchInput, m
         rotationSpeed * delta
       );
       
-      // Update last move time when player moves
+      // Update last move time when player moves (initialize on first movement)
       lastMoveTime.current = Date.now();
       inactivityWarned.current = false;
     }
@@ -154,9 +154,9 @@ export function Player({ position = [0, 0.5, 0], onPositionChange, touchInput, m
       onPositionChange(playerPosition.current);
     }
     
-    // Check for inactivity timeout (only during playing phase)
+    // Check for inactivity timeout (only during playing phase and after first movement)
     const gamePhase = useParadeGame.getState().phase;
-    if (gamePhase === "playing") {
+    if (gamePhase === "playing" && lastMoveTime.current !== null) {
       const timeSinceLastMove = Date.now() - lastMoveTime.current;
       
       if (timeSinceLastMove >= INACTIVITY_TIMEOUT) {

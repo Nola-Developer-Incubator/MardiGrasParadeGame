@@ -8,7 +8,11 @@ The application uses a full-stack TypeScript architecture with Express backend, 
 
 ## Recent Changes
 
-**October 29, 2025 - Inactivity Timeout**
+**October 29, 2025 - Float Collision & Inactivity Timeout**
+- Players are eliminated if hit by parade floats
+- Collision detection checks player distance from floats every 100ms
+- Float collision zone: 2.5 units width × 3 units length
+- When hit, triggers eliminatePlayer action ending the level
 - Game automatically ends if player stops moving for 30 seconds
 - Inactivity timer resets whenever player moves (keyboard, touch, or mouse input)
 - Only active during "playing" phase (not during tutorial or win screens)
