@@ -10,19 +10,35 @@ interface CompetitorBotProps {
   color: string;
 }
 
+// Simple hash function for consistent bot-collectible preferences
+function hashBotCollectible(botId: string, collectibleId: string): number {
+  let hash = 0;
+  const combined = botId + collectibleId;
+  for (let i = 0; i < combined.length; i++) {
+    hash = ((hash << 5) - hash) + combined.charCodeAt(i);
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash % 100) / 10; // Return value between 0-10
+}
+
 export function CompetitorBot({ id, startX, startZ, color }: CompetitorBotProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const headRef = useRef<THREE.Mesh>(null);
   const shadowRef = useRef<THREE.Mesh>(null);
   const position = useRef(new THREE.Vector3(startX, 0.5, startZ)); // Start at assigned position
   const velocity = useRef(new THREE.Vector3());
-  const { collectibles, removeCollectible, addBotCatch, phase } = useParadeGame();
+  const { 
+    collectibles, 
+    removeCollectible, 
+    addBotCatch, 
+    phase,
+    claimCollectible,
+    releaseCollectibleClaim,
+    getCollectibleClaim,
+  } = useParadeGame();
   
   const moveSpeed = useMemo(() => Math.random() * 1.5 + 2.5, []); // Varying speeds (2.5-4)
-  const targetPreference = useMemo(() => Math.random(), []); // Random preference for target selection
-  const claimedTarget = useRef<string | null>(null); // Claimed collectible ID
-  const targetClaimTime = useRef(0); // When target was claimed
-  const CLAIM_DURATION = 2000; // Stick with a target for 2 seconds
+  const currentTarget = useRef<string | null>(null); // Currently targeting collectible ID
   
   useEffect(() => {
     console.log(`Competitor bot ${id} spawned at (${startX.toFixed(1)}, ${startZ.toFixed(1)})`);
@@ -31,20 +47,28 @@ export function CompetitorBot({ id, startX, startZ, color }: CompetitorBotProps)
   useFrame((state, delta) => {
     if (!meshRef.current || !headRef.current || !shadowRef.current || phase !== "playing") return;
     
-    const now = Date.now();
-    
-    // Check if we still have a valid claimed target
+    // Check if we still have a valid target
     let targetCollectible: typeof collectibles[0] | null = null;
-    const hasValidClaim = claimedTarget.current && (now - targetClaimTime.current) < CLAIM_DURATION;
     
-    if (hasValidClaim) {
-      // Try to find our claimed target
-      targetCollectible = collectibles.find(c => c.id === claimedTarget.current) || null;
+    if (currentTarget.current) {
+      // Try to find our current target
+      const foundTarget = collectibles.find(c => c.id === currentTarget.current);
       
-      // If claimed target is gone or too high, release claim
-      if (!targetCollectible || targetCollectible.position.y > 1.5) {
-        claimedTarget.current = null;
-        targetCollectible = null;
+      // Check if it's still valid (exists, low enough, and still ours)
+      if (foundTarget && foundTarget.position.y < 1.5) {
+        const claim = getCollectibleClaim(foundTarget.id);
+        if (claim && claim.botId === id) {
+          targetCollectible = foundTarget;
+        } else {
+          // Lost claim, release it
+          currentTarget.current = null;
+        }
+      } else {
+        // Target is gone or too high, release it
+        if (currentTarget.current) {
+          releaseCollectibleClaim(currentTarget.current);
+        }
+        currentTarget.current = null;
       }
     }
     
@@ -52,22 +76,29 @@ export function CompetitorBot({ id, startX, startZ, color }: CompetitorBotProps)
     if (!targetCollectible) {
       let bestCollectible: typeof collectibles[0] | null = null;
       let bestScore = -Infinity;
+      const now = Date.now();
       
       for (const collectible of collectibles) {
         // Only consider items that are low enough or on ground
         if (collectible.position.y < 1.5) {
+          // Check existing claim - allow reclaiming if stale (>2s old)
+          const existingClaim = getCollectibleClaim(collectible.id);
+          const claimAge = existingClaim ? (now - existingClaim.claimTime) : Infinity;
+          
+          // Skip only if claimed by another bot AND claim is fresh (<2s)
+          if (existingClaim && existingClaim.botId !== id && claimAge < 2000) {
+            continue; // Skip fresh claims by other bots
+          }
+          
           const distance = position.current.distanceTo(collectible.position);
           
-          // Score based on distance and persistent preference (no per-frame randomness)
+          // Score based on distance and unique bot-collectible preference
           const distanceScore = 20 - distance; // Closer = higher score
           
-          // Use collectible ID hash for consistent per-item bias
-          const itemBias = (collectible.id.charCodeAt(collectible.id.length - 1) % 10) - 5;
+          // Use hash of (botId + collectibleId) for unique per-pair preference
+          const preferenceBonus = hashBotCollectible(id, collectible.id);
           
-          // Individual bot preference (persistent)
-          const preferenceBonus = targetPreference * 4;
-          
-          const totalScore = distanceScore + itemBias + preferenceBonus;
+          const totalScore = distanceScore + preferenceBonus;
           
           if (totalScore > bestScore) {
             bestScore = totalScore;
@@ -76,17 +107,19 @@ export function CompetitorBot({ id, startX, startZ, color }: CompetitorBotProps)
         }
       }
       
-      // Claim the new target
+      // Try to claim the new target
       if (bestCollectible) {
-        targetCollectible = bestCollectible;
-        claimedTarget.current = bestCollectible.id;
-        targetClaimTime.current = now;
+        const claimed = claimCollectible(bestCollectible.id, id);
+        if (claimed) {
+          targetCollectible = bestCollectible;
+          currentTarget.current = bestCollectible.id;
+        }
       }
     }
     
-    // Move toward target collectible
-    const targetDistance = targetCollectible ? position.current.distanceTo(targetCollectible.position) : Infinity;
-    if (targetCollectible && targetDistance < 15) {
+    // Move toward target collectible (always pursue if we have one claimed)
+    if (targetCollectible) {
+      const targetDistance = position.current.distanceTo(targetCollectible.position);
       const direction = new THREE.Vector3()
         .subVectors(targetCollectible.position, position.current)
         .normalize();
@@ -106,7 +139,7 @@ export function CompetitorBot({ id, startX, startZ, color }: CompetitorBotProps)
       if (targetDistance < 0.8 && targetCollectible.position.y < 1) {
         removeCollectible(targetCollectible.id);
         addBotCatch(id);
-        claimedTarget.current = null; // Release claim after catching
+        currentTarget.current = null; // Release target after catching
         console.log(`Bot ${id} caught ${targetCollectible.type}!`);
       }
     } else {

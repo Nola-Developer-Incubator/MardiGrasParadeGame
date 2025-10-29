@@ -24,6 +24,11 @@ interface BotScore {
   color: string;
 }
 
+interface BotClaim {
+  botId: string;
+  claimTime: number;
+}
+
 interface ParadeGameState {
   phase: GamePhase;
   cameraMode: CameraMode;
@@ -39,6 +44,7 @@ interface ParadeGameState {
   playerColor: "beads" | "doubloon" | "cup"; // Player's assigned color for bonus points
   missedThrows: number; // Track missed throws for bot gift system
   botScores: BotScore[]; // Track bot catches
+  botClaims: Record<string, BotClaim>; // Track which bot claimed which collectible
   
   // Actions
   startGame: () => void;
@@ -49,6 +55,9 @@ interface ParadeGameState {
   addCollectible: (collectible: Collectible) => void;
   updateCollectible: (id: string, updates: Partial<Collectible>) => void;
   removeCollectible: (id: string) => void;
+  claimCollectible: (collectibleId: string, botId: string) => boolean;
+  releaseCollectibleClaim: (collectibleId: string) => void;
+  getCollectibleClaim: (collectibleId: string) => BotClaim | null;
   resetGame: () => void;
   nextLevel: () => void;
   getFloatSpeed: () => number;
@@ -77,6 +86,7 @@ export const useParadeGame = create<ParadeGameState>()(
     playerColor: "beads", // Default color, reassigned on game start
     missedThrows: 0,
     botScores: [],
+    botClaims: {},
     
     startGame: () => {
       console.log("Starting game...");
@@ -176,9 +186,49 @@ export const useParadeGame = create<ParadeGameState>()(
     },
     
     removeCollectible: (id) => {
+      set((state) => {
+        // Also remove any claim on this collectible
+        const newClaims = { ...state.botClaims };
+        delete newClaims[id];
+        
+        return {
+          collectibles: state.collectibles.filter((c) => c.id !== id),
+          botClaims: newClaims,
+        };
+      });
+    },
+    
+    claimCollectible: (collectibleId, botId) => {
+      const { botClaims } = get();
+      const existingClaim = botClaims[collectibleId];
+      const now = Date.now();
+      
+      // If already claimed by another bot and claim is still valid (within 2 seconds), deny
+      if (existingClaim && existingClaim.botId !== botId && (now - existingClaim.claimTime) < 2000) {
+        return false; // Claim denied
+      }
+      
+      // Otherwise, allow this bot to claim it
       set((state) => ({
-        collectibles: state.collectibles.filter((c) => c.id !== id),
+        botClaims: {
+          ...state.botClaims,
+          [collectibleId]: { botId, claimTime: now },
+        },
       }));
+      return true; // Claim successful
+    },
+    
+    releaseCollectibleClaim: (collectibleId) => {
+      set((state) => {
+        const newClaims = { ...state.botClaims };
+        delete newClaims[collectibleId];
+        return { botClaims: newClaims };
+      });
+    },
+    
+    getCollectibleClaim: (collectibleId) => {
+      const { botClaims } = get();
+      return botClaims[collectibleId] || null;
     },
     
     nextLevel: () => {
@@ -241,6 +291,7 @@ export const useParadeGame = create<ParadeGameState>()(
         playerColor: randomColor,
         missedThrows: 0,
         botScores: [],
+        botClaims: {},
         cameraMode: "third-person",
       });
     },
