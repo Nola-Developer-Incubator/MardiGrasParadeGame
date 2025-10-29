@@ -8,17 +8,18 @@ The application uses a full-stack TypeScript architecture with Express backend, 
 
 ## Recent Changes
 
-**October 29, 2025 - Aggressive Black/White NPCs**
-- Added 3 aggressive NPCs represented as black/white rotating cubes
-- NPCs patrol the street by moving back and forth (speed: 2 units/sec)
-- When player hits an NPC, it chases the player for exactly 5 seconds
-- Chasing NPCs move faster (3.5 units/sec) but still slower than player base speed (5 units/sec)
-- If chasing NPC catches player, player loses 1 point and combo is broken
-- NPCs turn red when chasing to provide visual feedback
+**October 29, 2025 - Random Wandering NPCs & Obstacles with Level Scaling**
+- Aggressive NPCs now wander randomly around catching area instead of patrolling
+- NPCs pick random targets every 2-5 seconds within bounds (-6.5 to 6.5 x, -15 to 15 z)
+- When player hits an NPC, it chases for exactly 5 seconds (speed: 3.5 units/sec)
+- Chasing NPCs turn red for visual feedback, still slower than player (5 units/sec)
+- If NPC catches player, player loses 1 point and combo is broken
 - 1-second cooldown between collisions prevents rapid damage
-- After 5-second chase expires, NPCs return to patrol behavior
-- NPCs constrained to street boundaries (-6.5 to 6.5 x-axis)
-- Three starting positions: (-4, 0.5, -5), (3, 0.5, 2), (-2, 0.5, -10)
+- **Level-based scaling**: NPCs increase with difficulty (Level 1: 2 NPCs, Level 2: 3 NPCs, etc.)
+- Obstacles converted to sphere shapes (matching competitor bot style)
+- Obstacles wander randomly like NPCs, breaking combos on collision
+- **Obstacle scaling**: 2 + level count (Level 1: 3 obstacles, Level 2: 4 obstacles, etc.)
+- All entities spawn at random positions each level for variety
 
 **October 29, 2025 - Float Collision & Inactivity Timeout**
 - Players are eliminated if hit by parade floats
