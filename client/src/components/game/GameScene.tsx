@@ -13,7 +13,6 @@ import { ClickMarker } from "./ClickMarker";
 import { CompetitorBot } from "./CompetitorBot";
 import { AggressiveNPC } from "./AggressiveNPC";
 import { Obstacle } from "./Obstacle";
-import { TouchInput } from "./TouchControls";
 import * as THREE from "three";
 
 interface CatchEffectInstance {
@@ -27,12 +26,7 @@ interface ClickMarkerInstance {
   position: THREE.Vector3;
 }
 
-interface GameSceneProps {
-  touchInput: TouchInput;
-  catchAction: number;
-}
-
-export function GameScene({ touchInput, catchAction }: GameSceneProps) {
+export function GameScene() {
   const { 
     phase, 
     collectibles, 
@@ -98,9 +92,9 @@ export function GameScene({ touchInput, catchAction }: GameSceneProps) {
     }
   }, [combo, playFireworks]);
   
-  // Handle mouse click for movement (disabled on mobile/tablet)
+  // Handle click/tap for movement on all devices
   useEffect(() => {
-    if (phase !== "playing" || isMobile) return;
+    if (phase !== "playing") return;
     
     const handleClick = (event: MouseEvent) => {
       // Calculate mouse position in normalized device coordinates
@@ -208,7 +202,6 @@ export function GameScene({ touchInput, catchAction }: GameSceneProps) {
       <Player 
         position={[0, 0.5, -8]} 
         onPositionChange={setPlayerPosition} 
-        touchInput={touchInput} 
         mouseTarget={mouseTarget}
         onClearMouseTarget={handleClearMouseTarget}
       />
@@ -282,7 +275,6 @@ export function GameScene({ touchInput, catchAction }: GameSceneProps) {
               collectible={collectible}
               playerPosition={playerPosition}
               onCatch={handleCatch}
-              catchAction={catchAction}
             />
           ))}
           
