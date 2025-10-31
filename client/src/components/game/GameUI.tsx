@@ -125,7 +125,7 @@ export function GameUI() {
                     </div>
                   ) : (
                     <div className="space-y-1 sm:space-y-2">
-                      <p className="text-xs sm:text-sm">• Move: Use joystick</p>
+                      <p className="text-xs sm:text-sm">• Move: Tap screen to move</p>
                       <p className="text-xs sm:text-sm">• Get close to items to catch them</p>
                     </div>
                   )}
@@ -293,7 +293,7 @@ export function GameUI() {
           <div className="hidden md:block absolute bottom-4 left-1/2 transform -translate-x-1/2">
             <div className="bg-black/60 backdrop-blur-sm rounded-lg px-4 py-2 text-white text-sm">
               {isMobile ? (
-                "Joystick to move • 🎯 CATCH button when items glow • Catch fast for combos!"
+                "Tap screen to move • Get close to catch • Catch fast for combos!"
               ) : (
                 <>
                   <kbd className="px-2 py-1 bg-white/20 rounded mx-1">WASD</kbd> or <kbd className="px-2 py-1 bg-white/20 rounded mx-1">Click</kbd> to move • Catch fast for combos!
