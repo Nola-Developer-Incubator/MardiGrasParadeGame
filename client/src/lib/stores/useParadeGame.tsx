@@ -79,6 +79,8 @@ interface ParadeGameState {
   getTotalFloatsForLevel: (level: number) => number;
   resetGame: () => void;
   nextLevel: () => void;
+  getNPCCount: (level: number) => number;
+  getObstacleCount: (level: number) => number;
   getFloatSpeed: () => number;
   getThrowInterval: () => number;
   activatePowerUp: (type: PowerUp["type"]) => void;
@@ -160,9 +162,9 @@ export const useParadeGame = create<ParadeGameState>()(
         color: botColors[i],
       }));
       
-      // Initialize aggressive NPCs (1 + level count, randompositions in catching area)
+      // Initialize aggressive NPCs using casual difficulty scaling
       const currentLevel = get().level;
-      const npcCount = 1 + currentLevel; // Level 1: 2 NPCs, Level 2: 3 NPCs, etc.
+      const npcCount = get().getNPCCount(currentLevel); // Level 1: 0, Levels 2-3: 1, then scales up
       const initialAggressiveNPCs: AggressiveNPC[] = Array.from({ length: npcCount }, (_, i) => ({
         id: `aggressive-${i + 1}`,
         position: [
@@ -332,8 +334,8 @@ export const useParadeGame = create<ParadeGameState>()(
       const newTotalFloats = newLevel * 10; // 10 floats per level
       const newTargetScore = 5 + (newLevel - 1) * 2; // Increase target each level: 5, 7, 9, 11...
       
-      // Generate more aggressive NPCs for higher levels (1 + level count)
-      const npcCount = 1 + newLevel; // Level 2: 3 NPCs, Level 3: 4 NPCs, etc.
+      // Casual difficulty curve for ages 10-80: gentle early levels, ramps up after level 3
+      const npcCount = get().getNPCCount(newLevel);
       const newAggressiveNPCs: AggressiveNPC[] = Array.from({ length: npcCount }, (_, i) => ({
         id: `aggressive-${newLevel}-${i + 1}`,
         position: [
@@ -345,7 +347,7 @@ export const useParadeGame = create<ParadeGameState>()(
         chaseEndTime: null,
       }));
       
-      console.log(`Advancing to level ${newLevel}! ${newTotalFloats} floats, ${npcCount} aggressive NPCs, ${2 + newLevel} obstacles`);
+      console.log(`Advancing to level ${newLevel}! ${newTotalFloats} floats, ${npcCount} aggressive NPCs, ${get().getObstacleCount(newLevel)} obstacles`);
       
       set({
         level: newLevel,
@@ -403,15 +405,41 @@ export const useParadeGame = create<ParadeGameState>()(
       });
     },
     
-    // Dynamic difficulty - increases with level
+    // Dynamic difficulty - casual curve for ages 10-80
+    getNPCCount: (level: number) => {
+      // Level 1: 0 (tutorial, no threats)
+      // Level 2: 1 (gentle introduction)
+      // Level 3: 1 (still learning)
+      // Level 4+: Ramps up gradually
+      if (level === 1) return 0;
+      if (level <= 3) return 1;
+      return Math.floor((level - 2) / 2) + 1; // Level 4: 2, Level 5: 2, Level 6: 3, etc.
+    },
+    
+    getObstacleCount: (level: number) => {
+      // Level 1: 1 (minimal obstacles)
+      // Level 2: 2
+      // Level 3: 2 (keep consistent for learning)
+      // Level 4+: Increase gradually
+      if (level === 1) return 1;
+      if (level <= 3) return 2;
+      return 2 + Math.floor((level - 3) / 2); // Level 4: 2, Level 5: 3, Level 6: 3, etc.
+    },
+    
     getFloatSpeed: () => {
       const { level } = get();
-      return 2 + (level - 1) * 0.3; // Speed increases each level
+      // Slower progression for casual gameplay
+      if (level <= 3) return 2; // Keep constant for early levels
+      return 2 + (level - 3) * 0.2; // Gentler increase after level 3
     },
     
     getThrowInterval: () => {
       const { level } = get();
-      return Math.max(1500, 3000 - (level - 1) * 200); // Throws get more frequent, min 1.5s
+      // Keep early levels relaxed, speed up after level 3
+      if (level === 1) return 3500; // Very relaxed for tutorial
+      if (level === 2) return 3200;
+      if (level === 3) return 3000;
+      return Math.max(2000, 3000 - (level - 3) * 150); // Gradual increase, min 2s
     },
     
     activatePowerUp: (type: PowerUp["type"]) => {
