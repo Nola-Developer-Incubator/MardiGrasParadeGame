@@ -166,6 +166,32 @@ export function Player({ position = [0, 0.5, 0], onPositionChange, mouseTarget, 
         {/* Body */}
         <capsuleGeometry args={[0.3, 1.0, 8, 16]} />
         <meshStandardMaterial color={playerHexColor} emissive={playerHexColor} emissiveIntensity={0.3} />
+        
+        {/* Crown accessory - positioned on top of player as a child so it moves with player */}
+        <group position={[0, 0.7, 0]}>
+          {/* Crown base */}
+          <mesh position={[0, 0, 0]} castShadow>
+            <cylinderGeometry args={[0.35, 0.4, 0.2, 8]} />
+            <meshStandardMaterial color="#FFD700" metalness={0.8} roughness={0.2} emissive="#FFD700" emissiveIntensity={0.5} />
+          </mesh>
+          {/* Crown points */}
+          {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => {
+            const angle = (i / 8) * Math.PI * 2;
+            const x = Math.cos(angle) * 0.35;
+            const z = Math.sin(angle) * 0.35;
+            return (
+              <mesh key={i} position={[x, 0.15, z]} castShadow>
+                <coneGeometry args={[0.08, 0.2, 4]} />
+                <meshStandardMaterial color="#FFD700" metalness={0.8} roughness={0.2} emissive="#FFD700" emissiveIntensity={0.5} />
+              </mesh>
+            );
+          })}
+          {/* Crown jewel */}
+          <mesh position={[0, 0.15, 0]}>
+            <sphereGeometry args={[0.06, 8, 8]} />
+            <meshStandardMaterial color="#FF1493" metalness={1.0} roughness={0.1} emissive="#FF1493" emissiveIntensity={0.8} />
+          </mesh>
+        </group>
       </mesh>
       
       {/* Player shadow indicator on ground - optimized with ref */}
