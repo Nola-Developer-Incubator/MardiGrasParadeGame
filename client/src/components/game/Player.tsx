@@ -2,7 +2,6 @@ import { useRef, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useKeyboardControls } from "@react-three/drei";
 import { useParadeGame } from "@/lib/stores/useParadeGame";
-import { TouchInput } from "./TouchControls";
 import * as THREE from "three";
 
 export enum Controls {
@@ -15,12 +14,11 @@ export enum Controls {
 interface PlayerProps {
   position?: [number, number, number];
   onPositionChange?: (position: THREE.Vector3) => void;
-  touchInput?: TouchInput;
   mouseTarget?: THREE.Vector3 | null;
   onClearMouseTarget?: () => void;
 }
 
-export function Player({ position = [0, 0.5, 0], onPositionChange, touchInput, mouseTarget, onClearMouseTarget }: PlayerProps) {
+export function Player({ position = [0, 0.5, 0], onPositionChange, mouseTarget, onClearMouseTarget }: PlayerProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const shadowRef = useRef<THREE.Mesh>(null);
   const [, getKeys] = useKeyboardControls<Controls>();
@@ -65,21 +63,14 @@ export function Player({ position = [0, 0.5, 0], onPositionChange, touchInput, m
       currentMouseTarget.current = mouseTarget || null;
     }
     
-    // Combine keyboard and touch input
+    // Keyboard input
     let moveX = 0;
     let moveZ = 0;
     
-    // Keyboard input
     if (keys.forward) moveZ -= 1;
     if (keys.back) moveZ += 1;
     if (keys.left) moveX -= 1;
     if (keys.right) moveX += 1;
-    
-    // Touch input (if available)
-    if (touchInput && (Math.abs(touchInput.x) > 0.1 || Math.abs(touchInput.y) > 0.1)) {
-      moveX += touchInput.x;
-      moveZ += touchInput.y;
-    }
     
     // Mouse click movement (only if no keyboard/touch input)
     const hasManualInput = moveX !== 0 || moveZ !== 0;

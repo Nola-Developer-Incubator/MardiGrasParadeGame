@@ -9,7 +9,6 @@ interface CollectibleProps {
   collectible: CollectibleType;
   playerPosition: THREE.Vector3;
   onCatch: (type: CollectibleType["type"]) => void;
-  catchAction: number;
 }
 
 const COLLECTIBLE_COLORS = {
@@ -26,13 +25,12 @@ const CATCH_RADIUS = 1.5;
 const GROUND_LEVEL = 0.5;
 const MIN_CATCH_HEIGHT = 0.5;
 
-export function Collectible({ collectible, playerPosition, onCatch, catchAction }: CollectibleProps) {
+export function Collectible({ collectible, playerPosition, onCatch }: CollectibleProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const position = useRef(collectible.position.clone());
   const velocity = useRef(collectible.velocity.clone());
   const { updateCollectible, removeCollectible, incrementMisses } = useParadeGame();
   const hasBeenCaught = useRef(false);
-  const previousCatchAction = useRef(catchAction);
   const [showHint, setShowHint] = useState(true);
   const [timeOnGround, setTimeOnGround] = useState(0);
   const onGroundStartTime = useRef<number | null>(null);
@@ -117,16 +115,8 @@ export function Collectible({ collectible, playerPosition, onCatch, catchAction 
     if (isCatchable && !hasBeenCaught.current) {
       meshRef.current.scale.setScalar(1 + Math.sin(state.clock.elapsedTime * 10) * 0.2);
       
-      // Auto-catch if very close (for PC)
+      // Auto-catch when player is close
       if (distanceToPlayer < 0.8) {
-        hasBeenCaught.current = true;
-        onCatch(collectible.type);
-        removeCollectible(collectible.id);
-      }
-      
-      // Manual catch via button press (for tablets)
-      if (catchAction !== previousCatchAction.current) {
-        previousCatchAction.current = catchAction;
         hasBeenCaught.current = true;
         onCatch(collectible.type);
         removeCollectible(collectible.id);
