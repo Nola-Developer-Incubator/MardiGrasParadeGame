@@ -236,13 +236,14 @@ export function GameScene({ touchInput, catchAction }: GameSceneProps) {
             );
           })}
           
-          {/* Competitor Bots - spread out across street (x and z positions) */}
-          <CompetitorBot id="bot-1" startX={-5.5} startZ={-13} color="#ff4444" />
-          <CompetitorBot id="bot-2" startX={5} startZ={-10} color="#44ff44" />
-          <CompetitorBot id="bot-3" startX={-2} startZ={-7} color="#4444ff" />
-          <CompetitorBot id="bot-4" startX={3} startZ={-12} color="#ffff44" />
-          <CompetitorBot id="bot-5" startX={-4} startZ={-9} color="#ff44ff" />
-          <CompetitorBot id="bot-6" startX={1} startZ={-8} color="#44ffff" />
+          {/* Competitor Bots - scaled by level for casual gameplay (ages 10-80) */}
+          {/* Level 1-2: 2 bots, Level 3: 3 bots, Level 4+: All 6 bots */}
+          {level >= 1 && <CompetitorBot id="bot-1" startX={-5.5} startZ={-13} color="#ff4444" />}
+          {level >= 1 && <CompetitorBot id="bot-2" startX={5} startZ={-10} color="#44ff44" />}
+          {level >= 3 && <CompetitorBot id="bot-3" startX={-2} startZ={-7} color="#4444ff" />}
+          {level >= 4 && <CompetitorBot id="bot-4" startX={3} startZ={-12} color="#ffff44" />}
+          {level >= 5 && <CompetitorBot id="bot-5" startX={-4} startZ={-9} color="#ff44ff" />}
+          {level >= 6 && <CompetitorBot id="bot-6" startX={1} startZ={-8} color="#44ffff" />}
           
           {/* Aggressive NPCs - black/white squares that chase player when hit */}
           {aggressiveNPCs.map((npc) => (
@@ -259,8 +260,8 @@ export function GameScene({ touchInput, catchAction }: GameSceneProps) {
             />
           ))}
           
-          {/* Moving Obstacles - randomwander around catching area, more with higher levels */}
-          {Array.from({ length: 2 + level }, (_, i) => {
+          {/* Moving Obstacles - gentle in early levels, increases after level 3 */}
+          {Array.from({ length: useParadeGame.getState().getObstacleCount(level) }, (_, i) => {
             const startX = (Math.random() * 13 - 6.5);
             const startZ = (Math.random() * 30 - 15);
             return (
