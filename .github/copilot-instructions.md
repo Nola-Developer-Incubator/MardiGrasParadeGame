@@ -1,8 +1,8 @@
-# GitHub Copilot Instructions for Mardi Gras Parade Simulator
+# GitHub Copilot Instructions for NDI_MardiGrasParade
 
 ## Repository Overview
 
-This is a 3D Mardi Gras parade simulator built with React, Three.js, and Express.js. Players catch collectibles (beads, doubloons, cups) from parade floats in an immersive browser-based experience that celebrates New Orleans culture.
+This is NDI_MardiGrasParade, a 3D Mardi Gras parade experience built with React, Three.js, and Express.js. Players catch collectibles (beads, doubloons, cups) from parade floats in an immersive browser-based experience that celebrates New Orleans culture.
 
 ## Tech Stack
 

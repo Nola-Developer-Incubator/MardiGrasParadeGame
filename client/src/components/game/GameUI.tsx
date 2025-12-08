@@ -111,7 +111,7 @@ export function GameUI() {
             className="absolute inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
           >
             <Card className="bg-purple-900/95 border-2 border-yellow-400 p-4 sm:p-8 max-w-sm sm:max-w-lg mx-4 text-white">
-              <h1 className="text-xl sm:text-3xl font-bold text-yellow-300 mb-3 sm:mb-4 text-center">Mardi Gras Parade</h1>
+              <h1 className="text-xl sm:text-3xl font-bold text-yellow-300 mb-3 sm:mb-4 text-center">NDI_MardiGrasParade</h1>
               
               <div className="space-y-3 sm:space-y-4">
                 <p className="text-sm sm:text-lg text-center">
