@@ -84,11 +84,15 @@ client/
 
 ### Running the Dev Server
 
-The dev server is configured to run on port 5000 (via Express backend):
+The application runs on port 5000 (via Express backend):
 - Backend API: `http://localhost:5000/api/*`
 - Frontend: `http://localhost:5000/*`
 
-Vite's internal dev server runs in middleware mode and is proxied through Express.
+**Architecture Note**: Vite runs in middleware mode and is proxied through the Express server. This means:
+- You always access the app at `http://localhost:5000`
+- Vite's internal port (5173) is not directly accessible
+- Hot Module Replacement (HMR) works seamlessly through the Express proxy
+- Both frontend and backend are served from a single port
 
 ### Path Aliases
 

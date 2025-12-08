@@ -28,6 +28,8 @@ export default defineConfig({
     sourcemap: true,
   },
   server: {
+    // Note: In development, Vite runs in middleware mode via Express on port 5000
+    // This port (5173) is used internally by Vite but not directly accessible
     port: 5173,
     strictPort: false,
     host: true,
