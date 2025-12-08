@@ -6,6 +6,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // put application routes here
   // prefix all routes with /api
 
+  // Lightweight health/readiness endpoint for CI and probes
+  app.get('/health', (_req, res) => {
+    res.json({
+      status: 'ok',
+      uptime: process.uptime(),
+      time: new Date().toISOString(),
+    });
+  });
+
+  // Example API route (kept minimal) - storage can be used for real endpoints
+  app.get('/api/ping', (_req, res) => res.json({ pong: true }));
+
   // use storage to perform CRUD operations on the storage interface
   // e.g. storage.insertUser(user) or storage.getUserByUsername(username)
 
