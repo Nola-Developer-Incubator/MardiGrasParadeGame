@@ -1,10 +1,10 @@
-# Mardi Gras Parade - Unreal Engine Project
+# NDI_MardiGrasParade - Unreal Engine Project
 
 ## ⚠️ DEPRECATED
 
 **This Unreal Engine project is no longer being actively developed.**
 
-The Mardi Gras Parade project has refocused on browser-based development for broader accessibility and immediate playability. 
+NDI_MardiGrasParade has refocused on browser-based development for broader accessibility and immediate playability. 
 
 **For the current active project**, see the main [README.md](../../README.md) in the repository root.
 

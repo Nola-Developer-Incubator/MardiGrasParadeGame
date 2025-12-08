@@ -6,7 +6,7 @@ This directory contains deprecated documentation files that are no longer active
 
 ## 📋 About This Archive
 
-These files represent previous directions and approaches for the Mardi Gras Parade project. They have been archived because:
+These files represent previous directions and approaches for NDI_MardiGrasParade. They have been archived because:
 
 1. **Project refocus** - The project shifted from dual-platform (Web + Unreal) to browser-based only
 2. **Consolidation** - Information was merged into simplified guides
@@ -72,7 +72,7 @@ These files represent previous directions and approaches for the Mardi Gras Para
 
 **Date:** December 8, 2024
 
-**Reason:** Project refocus from dual-platform to browser-based simulator
+**Reason:** Project refocus from dual-platform to browser-based experience
 
 ---
 
