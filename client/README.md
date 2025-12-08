@@ -1,6 +1,6 @@
-# Client Setup - Mardi Gras Parade Game (Web Version)
+# Client Setup - NDI_MardiGrasParade (Web Version)
 
-This directory contains the React/Three.js frontend for the Mardi Gras Parade Game.
+This directory contains the React/Three.js frontend for NDI_MardiGrasParade.
 
 ## 🚀 Quick Start
 

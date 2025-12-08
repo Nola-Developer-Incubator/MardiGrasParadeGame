@@ -1,11 +1,11 @@
-# 🎭 Mardi Gras Parade Simulator
+# 🎭 NDI_MardiGrasParade
 
 [![React](https://img.shields.io/badge/React-18.3-61dafb)](https://reactjs.org/)
 [![Three.js](https://img.shields.io/badge/Three.js-WebGL-black)](https://threejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178c6)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-> **An immersive 3D Mardi Gras parade simulator playable directly in your browser!**
+> **An immersive 3D Mardi Gras parade experience playable directly in your browser!**
 > 
 > Catch beads, doubloons, and cups from parade floats while competing with AI opponents in this celebration of New Orleans culture.
 
@@ -62,7 +62,7 @@ That's it! The simulator will open in your default browser.
 ## 🏗️ Project Structure
 
 ```
-Nola-Developer-Incubator/
+NDI_MardiGrasParade/
 ├── client/                 # React frontend
 │   ├── src/
 │   │   ├── components/
@@ -275,7 +275,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🎉 Let's Celebrate Mardi Gras!
 
-This simulator brings the excitement of Mardi Gras parades to players everywhere. Whether you're familiar with the tradition or experiencing it for the first time, we hope you enjoy catching beads and celebrating!
+NDI_MardiGrasParade brings the excitement of Mardi Gras parades to players everywhere. Whether you're familiar with the tradition or experiencing it for the first time, we hope you enjoy catching beads and celebrating!
 
 **Laissez les bons temps rouler!** (Let the good times roll!)
 
