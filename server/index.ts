@@ -44,7 +44,10 @@ app.use((req, res, next) => {
     const message = err.message || "Internal Server Error";
 
     res.status(status).json({ message });
-    throw err;
+    // NOTE: In development we should not re-throw here — re-throwing crashes the server
+    // and makes the dev experience brittle when Vite or middleware emit transform errors.
+    // Log the error for visibility but don't throw so the server stays up and can recover.
+    console.error('[express] error handler:', err && err.stack ? err.stack : err);
   });
 
   // importantly only setup vite in development and after
