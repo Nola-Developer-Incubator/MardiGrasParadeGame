@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { subscribeWithSelector } from "zustand/middleware";
 import * as THREE from "three";
 
 export type GamePhase = "tutorial" | "playing" | "won" | "ad_offer";
@@ -126,8 +125,7 @@ export const SKIN_PRICES: Record<PlayerSkin, number> = {
   jester: 200,
 };
 
-export const useParadeGame = create<ParadeGameState>()(
-  subscribeWithSelector((set, get) => ({
+export const useParadeGame = create<ParadeGameState>()((set, get) => ({
     phase: "tutorial",
     cameraMode: "third-person",
     score: 0,
@@ -165,13 +163,18 @@ export const useParadeGame = create<ParadeGameState>()(
       const randomColor = colors[Math.floor(Math.random() * colors.length)];
       console.log(`Player color assigned: ${randomColor}`);
       
-      // Initialize bot scores
-      const botColors = ["#ff4444", "#44ff44", "#4444ff", "#ffff44", "#ff44ff", "#44ffff"];
-      const initialBotScores = Array.from({ length: 6 }, (_, i) => ({
-        id: `bot-${i + 1}`,
-        catches: 0,
-        color: botColors[i],
-      }));
+      // Initialize bot scores from config if available
+      let initialBotScores: BotScore[] = [];
+      try {
+        // Note: dynamic import so bundler includes JSON
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const botsConfig: Array<any> = require('@/config/bots.json');
+        initialBotScores = botsConfig.map((b) => ({ id: b.id, catches: 0, color: b.color }));
+      } catch (err) {
+        // Fallback to defaults
+        const botColors = ["#ff4444", "#44ff44", "#4444ff", "#ffff44", "#ff44ff", "#44ffff"];
+        initialBotScores = Array.from({ length: 6 }, (_, i) => ({ id: `test-bot-${i + 1}`, catches: 0, color: botColors[i] }));
+      }
       
       // Initialize aggressive NPCs using casual difficulty scaling
       const currentLevel = get().level;
@@ -195,6 +198,21 @@ export const useParadeGame = create<ParadeGameState>()(
         floatsPassed: 0,
         aggressiveNPCs: initialAggressiveNPCs,
       });
+    },
+    
+    // Replace botScores from runtime config (localStorage override or bundled config)
+    setBotScoresFromConfig: () => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const cfg = require('@/config/bots.json');
+        const override = typeof window !== 'undefined' ? localStorage.getItem('bots.override') : null;
+        const final = override ? JSON.parse(override) : cfg;
+        const botScores = final.map((b: any) => ({ id: b.id, catches: 0, color: b.color }));
+        set({ botScores });
+        console.log('Bot scores reloaded from config');
+      } catch (e) {
+        console.warn('Failed to reload bots from config', e);
+      }
     },
     
     addBotCatch: (botId: string) => {
@@ -628,5 +646,4 @@ export const useParadeGame = create<ParadeGameState>()(
         return { joystickEnabled: newValue };
       });
     },
-  }))
-);
+  }));

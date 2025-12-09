@@ -4,6 +4,11 @@ Date: 2025-12-08
 
 Goal: Improve the visual fidelity and playability of the Mardi Gras Parade Simulator while keeping performance stable across desktop and mobile devices.
 
+## Progress update (2025-12-09)
+- Renamed bot identifiers to `test-bot-#` for easier testing and visibility in UI and logs.
+- Improved audio initialization and mute/unlock handling so background music and SFX respect user gesture/autoplay policies.
+- Added a small utility script `scripts/generate-qr.mjs` and `npm run qr` to create a QR code (terminal + SVG) that points to the dev server (default http://localhost:5000) to make connecting from a phone easier.
+
 Milestone 1 — Immediate stability & polish (1-2 days)
 - Make the default dev profile low-detail to prevent WebGL context loss (already implemented).
 - Replace fallback textures with optimized compressed formats (e.g., WebP/AVIF) and add simple low-res fallbacks.
@@ -39,3 +44,9 @@ Owners & Estimates
 Notes
 - Prioritize instancing and LOD first — they provide large FPS gains with relatively small code changes.
 - Use device emulation and a small set of physical test devices for validation.
+
+## How to test (quick checklist)
+- Bots: Start the game and verify the competitor list shows unique names (King Rex, Queen Zulu, Saint Mardi, Jester Jo, Voodoo Vee, Mambo Mike). Observe logs for `caught` messages showing the display name and persona.
+- Bot behavior: Each bot has a `persona` that affects speed and preference. Observe different movement and idle patterns (aggressive rushes, playful wiggles, sneaky maneuvers).
+- Audio: From the tutorial overlay press `Enable Audio` then `Start Game`. Background music and SFX should play when unmuted. Use the volume toggle in the HUD to mute/unmute — background music will pause when muted and resume when unmuted.
+- Mobile QR: Run `npm run qr` and scan the terminal QR or open `docs/browser-qr.svg` (set env URL if using LAN IP).
