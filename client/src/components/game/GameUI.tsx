@@ -4,7 +4,7 @@ import { useAudio } from "@/lib/stores/useAudio";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { useBotsConfig } from '@/lib/hooks/useBotsConfig';
 import { motion, AnimatePresence } from "framer-motion";
-import { Volume2, VolumeX, ShoppingBag, Heart, DollarSign, Settings } from "lucide-react";
+import { Volume2, VolumeX, ShoppingBag, Heart, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -42,11 +42,13 @@ export function GameUI() {
   };
   const playerColorInfo = colorDisplayMap[playerColor];
   
-  // Sort bots by catches (descending)
-  const sortedBots = [...botScores].sort((a, b) => b.catches - a.catches);
   // Load bot config for display names and personas (runtime override respected)
   const { bots: runtimeBots } = useBotsConfig();
   const botMeta = Object.fromEntries(runtimeBots.map((b: any) => [b.id, b]));
+  // Only show active bots in the HUD (those with minLevel <= current level)
+  const activeBotIds = runtimeBots.filter((b: any) => (typeof b.minLevel === 'number' ? b.minLevel <= level : true)).map((b: any) => b.id);
+  // Sort bots by catches (descending) and filter to active ones
+  const sortedBots = [...botScores].filter((bs) => activeBotIds.includes(bs.id)).sort((a, b) => b.catches - a.catches);
   
   // Show combo animation when combo changes
   useEffect(() => {
@@ -95,21 +97,6 @@ export function GameUI() {
     startGame();
   };
   
-  const handleChimeDonation = () => {
-    const chimeSign = "$nolaDevelopmentIncubator";
-    navigator.clipboard.writeText(chimeSign).then(() => {
-      toast.success("Copied to clipboard!", {
-        description: `Send via Chime Pay Anyone to ${chimeSign}`,
-        duration: 5000,
-      });
-    }).catch(() => {
-      toast.info("Chime Donation", {
-        description: `Send via Chime Pay Anyone to ${chimeSign}`,
-        duration: 5000,
-      });
-    });
-  };
-  
   return (
     <>
       {/* Tutorial Overlay */}
@@ -136,7 +123,8 @@ export function GameUI() {
                   <img
                     src={startLogoPng || startLogoSvg}
                     alt="Mardi Gras Parade Simulator"
-                    className="w-40 sm:w-56 mx-auto mb-3 rounded-md shadow-lg"
+                    className="mx-auto mb-3 rounded-md shadow-lg w-full max-w-[420px] h-auto object-contain max-h-24 sm:max-h-36"
+                    style={{ objectFit: 'contain' }}
                   />
                 </button>
               </div>
@@ -293,14 +281,6 @@ export function GameUI() {
             >
               <Heart size={20} className="mr-2" fill="currentColor" />
               Support Development
-            </Button>
-            <Button
-              onClick={handleChimeDonation}
-              size="lg"
-              className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 border-2 border-yellow-400 text-white font-bold shadow-lg"
-            >
-              <DollarSign size={20} className="mr-2" />
-              Donate via Chime
             </Button>
           </div>
           
