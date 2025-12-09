@@ -10,6 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { CosmeticShop } from "./CosmeticShop";
 import { FirstLevelTutorial } from "./FirstLevelTutorial";
 import { SettingsModal } from "./SettingsModal";
+import { BotAdmin } from "./BotAdmin";
 import { toast } from "sonner";
 import startLogo from "@/assets/start-logo.svg";
 
@@ -23,6 +24,10 @@ export function GameUI() {
   const [, forceUpdate] = useState(0); // For power-up countdown updates
   const [showShop, setShowShop] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showBotAdmin, setShowBotAdmin] = useState(false);
+  const [showPersonaLabels, setShowPersonaLabels] = useState(() => {
+    try { return localStorage.getItem('showBotPersonas') === 'true'; } catch { return false; }
+  });
   const isMobile = useIsMobile();
   
   // Map player color to display info
@@ -35,6 +40,15 @@ export function GameUI() {
   
   // Sort bots by catches (descending)
   const sortedBots = [...botScores].sort((a, b) => b.catches - a.catches);
+  // Load bot config for display names and personas
+  let botsConfig: Array<any> = [];
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    botsConfig = require('@/config/bots.json');
+  } catch (e) {
+    botsConfig = [];
+  }
+  const botMeta = Object.fromEntries(botsConfig.map((b: any) => [b.id, b]));
   
   // Show combo animation when combo changes
   useEffect(() => {
@@ -150,13 +164,30 @@ export function GameUI() {
                   <p className="text-xs sm:text-sm text-yellow-300 font-bold">• Match your color for 3x points!</p>
                 </div>
                 
-                <Button
-                  onClick={handleStartGame}
-                  size="lg"
-                  className="w-full text-base sm:text-xl py-4 sm:py-6 bg-yellow-500 hover:bg-yellow-400 text-purple-900 font-bold"
-                >
-                  Start Game
-                </Button>
+                <div className="space-y-2">
+                  <Button
+                    onClick={() => {
+                      // Ensure audio is unlocked on explicit user action
+                      const { unlockAudio } = useAudio.getState();
+                      unlockAudio();
+                      // If currently muted, unmute for testers
+                      const { isMuted, toggleMute } = useAudio.getState();
+                      if (isMuted) toggleMute();
+                    }}
+                    size="sm"
+                    className="w-full text-sm sm:text-base py-3 bg-purple-700 hover:bg-purple-600 text-white font-bold"
+                  >
+                    Enable Audio
+                  </Button>
+
+                  <Button
+                    onClick={handleStartGame}
+                    size="lg"
+                    className="w-full text-base sm:text-xl py-4 sm:py-6 bg-yellow-500 hover:bg-yellow-400 text-purple-900 font-bold"
+                  >
+                    Start Game
+                  </Button>
+                </div>
               </div>
             </Card>
           </motion.div>
@@ -226,16 +257,31 @@ export function GameUI() {
               >
                 {isMuted ? <VolumeX size={14} className="md:w-[18px] md:h-[18px]" /> : <Volume2 size={14} className="md:w-[18px] md:h-[18px]" />}
               </Button>
-              
-              {isMobile && (
-                <Button
-                  onClick={() => setShowSettings(true)}
-                  size="sm"
-                  className="bg-purple-700 hover:bg-purple-600 border-2 border-yellow-400 text-white p-1 md:p-2"
-                >
-                  <Settings size={14} className="md:w-[18px] md:h-[18px]" />
-                </Button>
-              )}
+              <Button
+                onClick={() => setShowBotAdmin(true)}
+                size="sm"
+                className="bg-gray-700 hover:bg-gray-600 border-2 border-yellow-400 text-white p-1 md:p-2 ml-2"
+              >
+                Admin
+              </Button>
+              <Button
+                onClick={() => { setShowPersonaLabels(v => { const next = !v; try { localStorage.setItem('showBotPersonas', String(next)); } catch {} return next; }); }}
+                size="sm"
+                className="bg-gray-700 hover:bg-gray-600 border-2 border-yellow-400 text-white p-1 md:p-2 ml-2"
+              >
+                {showPersonaLabels ? 'Hide Personas' : 'Show Personas'}
+              </Button>
+              <Button
+                onClick={() => {
+                  // Hot reload config: update store and dispatch update event
+                  try { (useParadeGame as any).getState().setBotScoresFromConfig(); } catch (e) { console.warn('Failed to call setBotScoresFromConfig', e); }
+                  try { window.dispatchEvent(new Event('bots:updated')); } catch (e) {}
+                }}
+                size="sm"
+                className="bg-blue-700 hover:bg-blue-600 border-2 border-yellow-400 text-white p-1 md:p-2 ml-2"
+              >
+                Reload config
+              </Button>
             </div>
           </div>
           
@@ -299,21 +345,25 @@ export function GameUI() {
             <Card className="bg-black/40 backdrop-blur-md border-2 border-gray-400 shadow-2xl px-4 py-3">
               <div className="text-sm text-gray-200 font-black mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">🤖 COMPETITOR CATCHES</div>
               <div className="space-y-1.5 max-h-48 overflow-y-auto">
-                {sortedBots.map((bot) => (
-                  <div key={bot.id} className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                      <div 
-                        className="w-4 h-4 rounded-full" 
-                        style={{ 
-                          backgroundColor: bot.color,
-                          boxShadow: `0 0 10px ${bot.color}, inset 0 0 6px rgba(255,255,255,0.4)`
-                        }}
-                      />
-                      <span className="text-xs text-white font-semibold drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{bot.id}</span>
+                {sortedBots.map((bot) => {
+                  const meta = botMeta[bot.id];
+                  const label = meta ? `${meta.name}${showPersonaLabels ? ` (${meta.persona})` : ''}` : bot.id;
+                  return (
+                    <div key={bot.id} className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className="w-4 h-4 rounded-full" 
+                          style={{ 
+                            backgroundColor: bot.color,
+                            boxShadow: `0 0 10px ${bot.color}, inset 0 0 6px rgba(255,255,255,0.4)`
+                          }}
+                        />
+                        <span className="text-xs text-white font-semibold drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{label}</span>
+                      </div>
+                      <span className="text-base font-black text-yellow-300 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{bot.catches}</span>
                     </div>
-                    <span className="text-base font-black text-yellow-300 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{bot.catches}</span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </Card>
           </div>
@@ -335,6 +385,8 @@ export function GameUI() {
       
       {/* Cosmetic Shop Modal */}
       {showShop && <CosmeticShop onClose={() => setShowShop(false)} />}
+      {/* Bot Admin Modal */}
+      {showBotAdmin && <BotAdmin isOpen={showBotAdmin} onClose={() => setShowBotAdmin(false)} />}
       
       {/* Settings Modal */}
       <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />

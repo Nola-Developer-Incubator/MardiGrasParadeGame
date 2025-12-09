@@ -1,93 +1,72 @@
 import { create } from "zustand";
+import { Howl, Howler } from "howler";
+
+interface HowlHandles {
+  background?: Howl | null;
+  hit?: Howl | null;
+  success?: Howl | null;
+}
 
 interface AudioState {
-  backgroundMusic: HTMLAudioElement | null;
-  hitSound: HTMLAudioElement | null;
-  successSound: HTMLAudioElement | null;
+  howls: HowlHandles;
   isMuted: boolean;
-  
-  // Setter functions
-  setBackgroundMusic: (music: HTMLAudioElement) => void;
-  setHitSound: (sound: HTMLAudioElement) => void;
-  setSuccessSound: (sound: HTMLAudioElement) => void;
-  
-  // Control functions
+  setHowls: (handles: HowlHandles) => void;
   toggleMute: () => void;
   playHit: () => void;
   playSuccess: () => void;
   playFireworks: () => void;
+  unlockAudio: () => void;
 }
 
 export const useAudio = create<AudioState>((set, get) => ({
-  backgroundMusic: null,
-  hitSound: null,
-  successSound: null,
-  isMuted: true, // Start muted by default
-  
-  setBackgroundMusic: (music) => set({ backgroundMusic: music }),
-  setHitSound: (sound) => set({ hitSound: sound }),
-  setSuccessSound: (sound) => set({ successSound: sound }),
-  
-  toggleMute: () => {
+  howls: { background: null, hit: null, success: null },
+  isMuted: true,
+  setHowls: (handles) => {
+    // Apply mute state immediately
     const { isMuted } = get();
-    const newMutedState = !isMuted;
-    
-    // Just update the muted state
-    set({ isMuted: newMutedState });
-    
-    // Log the change
-    console.log(`Sound ${newMutedState ? 'muted' : 'unmuted'}`);
+    if (handles.background) handles.background.mute(isMuted);
+    if (handles.hit) handles.hit.mute(isMuted);
+    if (handles.success) handles.success.mute(isMuted);
+    set({ howls: handles });
   },
-  
+  toggleMute: () => {
+    const { isMuted, howls } = get();
+    const newMuted = !isMuted;
+    // Global Howler mute also available
+    Howler.mute(newMuted);
+    set({ isMuted: newMuted });
+    console.log(`Sound ${newMuted ? 'muted' : 'unmuted'}`);
+  },
   playHit: () => {
-    const { hitSound, isMuted } = get();
-    if (hitSound) {
-      // If sound is muted, don't play anything
-      if (isMuted) {
-        console.log("Hit sound skipped (muted)");
-        return;
-      }
-      
-      // Clone the sound to allow overlapping playback
-      const soundClone = hitSound.cloneNode() as HTMLAudioElement;
-      soundClone.volume = 0.3;
-      soundClone.play().catch(error => {
-        console.log("Hit sound play prevented:", error);
-      });
-    }
+    const { howls, isMuted } = get();
+    if (isMuted) return console.log('Hit skipped (muted)');
+    if (howls.hit) howls.hit.play();
   },
-  
   playSuccess: () => {
-    const { successSound, isMuted } = get();
-    if (successSound) {
-      // If sound is muted, don't play anything
-      if (isMuted) {
-        console.log("Success sound skipped (muted)");
-        return;
-      }
-      
-      successSound.currentTime = 0;
-      successSound.play().catch(error => {
-        console.log("Success sound play prevented:", error);
-      });
-    }
+    const { howls, isMuted } = get();
+    if (isMuted) return console.log('Success skipped (muted)');
+    if (howls.success) howls.success.play();
   },
-  
   playFireworks: () => {
-    const { successSound, isMuted } = get();
-    if (successSound) {
-      // If sound is muted, don't play anything
-      if (isMuted) {
-        console.log("Fireworks sound skipped (muted)");
-        return;
+    const { howls, isMuted } = get();
+    if (isMuted) return console.log('Fireworks skipped (muted)');
+    if (howls.success) howls.success.play();
+  },
+  unlockAudio: () => {
+    // With Howler, a user gesture will make audio playable; we can resume audio context
+    try {
+      if ((Howler as any).ctx && (Howler as any).ctx.state === 'suspended') {
+        (Howler as any).ctx.resume().catch(() => {});
       }
-      
-      // Play fireworks sound (using success sound with higher volume for celebration)
-      const soundClone = successSound.cloneNode() as HTMLAudioElement;
-      soundClone.volume = 0.6;
-      soundClone.play().catch(error => {
-        console.log("Fireworks sound play prevented:", error);
-      });
+      // Try a short play of SFX to unlock
+      const { howls } = get();
+      if (howls.hit) howls.hit.play();
+      if (howls.success) howls.success.play();
+      // Expose debug flag for automated tests
+      try { (window as any).__audioUnlocked = true; } catch (e) {}
+      console.log('Attempted to unlock Howler audio via user gesture');
+    } catch (err) {
+      console.log('unlockAudio failed', err);
     }
   }
 }));

@@ -11,35 +11,36 @@
 
 ---
 
-## 🚀 Quick Start — Test in browser (recommended)
+## 🚀 Quick Start — Minimal (recommended)
 
-Prefer a fast, visual check first? Open the lightweight project landing page or launch the dev server and open the game in your browser immediately.
+Use these short steps for a fast local dev test. For mobile testing, generate a QR (see below).
 
-Note: You can also click the start logo on the game's tutorial overlay to open the project landing page in a new browser tab.
-
-1) Open the project landing page (static):
-- Open `docs/website/index.html` in your browser, or serve it quickly:
+1) Install (first time only):
 
 ```powershell
-# from repo root
-python -m http.server 8081 -d docs/website
-# then open http://127.0.0.1:8081 in your browser
+npm install
 ```
 
-2) Start the dev server and auto-open the game in your browser (recommended):
-- In one terminal run:
+2) Start the dev server:
 
 ```powershell
 npm run dev
 ```
 
-- In another terminal, run the helper which will wait for the server health endpoint and open your default browser automatically:
+3) Open the game in your browser:
+
+ - Desktop: http://localhost:5000
+ - Mobile: Run `npm run qr` and scan the terminal QR or open `docs/browser-qr.svg` (edit URL with env var if needed)
+
+Generate a QR for phones (default URL http://localhost:5000):
 
 ```powershell
-npm run open:browser
+npm run qr
+# or use a LAN IP so your phone can reach your dev machine:
+$env:URL='http://192.168.1.5:5000'; npm run qr
 ```
 
-This helper polls `http://127.0.0.1:5000/health` and opens the page when the server is ready.
+The QR command prints an ASCII QR in terminal and writes `docs/browser-qr.svg` for easy scanning.
 
 ---
 
