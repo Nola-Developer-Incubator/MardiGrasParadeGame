@@ -4,6 +4,8 @@ Date: 2025-12-09
 
 This document provides an in-depth technical overview of the Mardi Gras Parade Simulator codebase, architecture, key systems, and developer workflows.
 
+[Project Link](https://github.com/yourusername/mardi-gras-parade-simulator)
+
 Table of contents
 - Project overview
 - Key folders & files
@@ -70,5 +72,3 @@ Troubleshooting
 
 Contact & contribution notes
 - For code changes, open PRs against `main` and follow conventional commit format. See `docs/CONTRIBUTING.md` for details.
-
-

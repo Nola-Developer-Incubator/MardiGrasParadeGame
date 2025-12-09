@@ -65,6 +65,7 @@
     "howler": "^2.2.4",
     "input-otp": "^1.2.4",
     "lucide-react": "^0.453.0",
+    "marked": "^17.0.1",
     "matter-js": "^0.20.0",
     "memorystore": "^1.6.7",
     "meshline": "^3.3.1",

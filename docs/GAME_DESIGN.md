@@ -2,8 +2,16 @@
 
 Date: 2025-12-09
 
+**Project:** [Mardi Gras Parade Simulator — Repository](https://github.com/FreeLundin/Nola-Developer-Incubator)
+
 ## Vision
 An accessible, browser-based 3D Mardi Gras parade simulator where players catch throws from parade floats while competing with AI bots. The game aims to be family-friendly, playable on desktop and mobile, and emphasize fun mechanics with light strategy via color-matching and power-ups.
+
+> Quick test: [Test now — Open in browser](http://localhost:5000)
+>
+> Scan to open on mobile (QR):
+>
+> ![QR code](../docs/browser-qr.svg)
 
 ## Core mechanics
 - Movement: WASD / arrow keys, click-to-move, and touch controls for mobile.
@@ -63,5 +71,3 @@ An accessible, browser-based 3D Mardi Gras parade simulator where players catch 
 - [ ] Prepare textures and MIP maps
 - [ ] Create audio SFX and background music files
 - [ ] QA asset integration in dev server
-
-

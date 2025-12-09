@@ -2,6 +2,9 @@
 
 Date: 2025-12-09
 
+<!-- Project link for designers -->
+**Project:** [Mardi Gras Parade Simulator — Repository](https://github.com/FreeLundin/Nola-Developer-Incubator)
+
 Purpose: A concise workflow for designers to iterate on art, sound, and level content and verify changes in the running game locally.
 
 1) Get the project running locally
@@ -43,4 +46,3 @@ Purpose: A concise workflow for designers to iterate on art, sound, and level co
 Notes
 - Admin edits are local-only (saved to localStorage). This keeps designers from accidentally committing changes to the repo.
 - For any release or shared changes, coordinate with engineering to update `client/src/config/bots.json` in the repo.
-
