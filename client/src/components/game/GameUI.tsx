@@ -111,23 +111,9 @@ export function GameUI() {
             <Card className="bg-purple-900/95 border-2 border-yellow-400 p-4 sm:p-8 max-w-sm sm:max-w-2xl mx-4 text-white">
               <h1 className="text-xl sm:text-3xl font-bold text-yellow-300 mb-3 sm:mb-4 text-center">Mardi Gras Parade</h1>
 
-              {/* Start menu logo (WebP preferred, PNG fallback). Place before the tutorial copy. */}
-              <div className="flex justify-center">
-                {/* Logo acts as a quick link to open the project landing page in the browser */}
-                <button
-                  type="button"
-                  onClick={() => window.open('/', '_blank', 'noopener,noreferrer')}
-                  aria-label="Open project landing page"
-                  className="p-0 bg-transparent border-0 cursor-pointer"
-                >
-                  <div className="logo-container">
-                    <img
-                      src={startLogoPng || startLogoSvg}
-                      alt="Mardi Gras Parade Simulator"
-                      className="logo rounded-md shadow-lg mb-3 w-full max-w-[200px] sm:max-w-[280px] md:max-w-[360px] lg:max-w-[448px]"
-                    />
-                  </div>
-                </button>
+              {/* Title and quick actions (logo removed per request) */}
+              <div className="flex justify-center mb-2">
+                <div aria-hidden className="w-full max-w-2xl" />
               </div>
               
                <div className="space-y-3 sm:space-y-4">
