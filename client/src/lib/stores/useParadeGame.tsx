@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import * as THREE from "three";
+import { getRuntimeBotsConfig } from '@/lib/hooks/useBotsConfig';
 
 export type GamePhase = "tutorial" | "playing" | "won" | "ad_offer";
 export type CameraMode = "third-person" | "first-person";
@@ -68,7 +69,7 @@ interface ParadeGameState {
   // Actions
   startGame: () => void;
   toggleCamera: () => void;
-  addCatch: (collectibleType?: Collectible["type"], bypassPowerUp?: boolean) => void;
+  addCatch: (collectibleType?: Collectible['type'], bypassPowerUp: boolean = false) => void;
   incrementMisses: () => void;
   addBotCatch: (botId: string) => void;
   addCollectible: (collectible: Collectible) => void;
@@ -125,7 +126,20 @@ export const SKIN_PRICES: Record<PlayerSkin, number> = {
   jester: 200,
 };
 
-export const useParadeGame = create<ParadeGameState>()((set, get) => ({
+export const useParadeGame = create<ParadeGameState>()((set, get) => {
+  // Initialize botScores from runtime config so HUD shows bots immediately
+  const initialBotConfig = ((): Array<any> => {
+    try {
+      const cfg = getRuntimeBotsConfig();
+      if (Array.isArray(cfg)) return cfg;
+    } catch (e) {
+      // ignore
+    }
+    return [];
+  })();
+
+  // Initial state object
+  const initialState: ParadeGameState = {
     phase: "tutorial",
     cameraMode: "third-person",
     score: 0,
@@ -139,23 +153,23 @@ export const useParadeGame = create<ParadeGameState>()((set, get) => ({
     activePowerUps: [],
     playerColor: "beads", // Default color, reassigned on game start
     missedThrows: 0,
-    botScores: [],
+    botScores: Array.isArray(initialBotConfig) && initialBotConfig.length > 0 ? initialBotConfig.map((b: any) => ({ id: b.id, catches: 0, color: b.color })) : [],
     botClaims: {},
     totalFloats: 10, // Start with 10 floats for level 1
     floatsPassed: 0,
     aggressiveNPCs: [],
-    
+
     // Settings state
-    joystickEnabled: typeof window !== 'undefined' 
-      ? localStorage.getItem('joystickEnabled') === 'true' 
+    joystickEnabled: typeof window !== 'undefined'
+      ? localStorage.getItem('joystickEnabled') === 'true'
       : false,
-    
+
     // Monetization state
     coins: 0,
     playerSkin: "default",
     unlockedSkins: ["default"],
     adRewardType: null,
-    
+
     startGame: () => {
       console.log("Starting game...");
       // Randomly assign player color from the three main collectible types
@@ -163,13 +177,13 @@ export const useParadeGame = create<ParadeGameState>()((set, get) => ({
       const randomColor = colors[Math.floor(Math.random() * colors.length)];
       console.log(`Player color assigned: ${randomColor}`);
       
-      // Initialize bot scores from config if available
+      // Initialize bot scores from runtime config (supports local overrides)
       let initialBotScores: BotScore[] = [];
       try {
-        // Note: dynamic import so bundler includes JSON
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const botsConfig: Array<any> = require('@/config/bots.json');
-        initialBotScores = botsConfig.map((b) => ({ id: b.id, catches: 0, color: b.color }));
+        const botsConfig = getRuntimeBotsConfig();
+        if (Array.isArray(botsConfig) && botsConfig.length > 0) {
+          initialBotScores = botsConfig.map((b: any) => ({ id: b.id, catches: 0, color: b.color }));
+        }
       } catch (err) {
         // Fallback to defaults
         const botColors = ["#ff4444", "#44ff44", "#4444ff", "#ffff44", "#ff44ff", "#44ffff"];
@@ -190,9 +204,9 @@ export const useParadeGame = create<ParadeGameState>()((set, get) => ({
         chaseEndTime: null,
       }));
       
-      set({ 
-        phase: "playing", 
-        playerColor: randomColor, 
+      set({
+        phase: "playing",
+        playerColor: randomColor,
         botScores: initialBotScores,
         totalFloats: 10, // Level 1 starts with 10 floats
         floatsPassed: 0,
@@ -203,24 +217,30 @@ export const useParadeGame = create<ParadeGameState>()((set, get) => ({
     // Replace botScores from runtime config (localStorage override or bundled config)
     setBotScoresFromConfig: () => {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const cfg = require('@/config/bots.json');
+        const cfg = getRuntimeBotsConfig();
         const override = typeof window !== 'undefined' ? localStorage.getItem('bots.override') : null;
         const final = override ? JSON.parse(override) : cfg;
-        const botScores = final.map((b: any) => ({ id: b.id, catches: 0, color: b.color }));
+        const botScores = Array.isArray(final) ? final.map((b: any) => ({ id: b.id, catches: 0, color: b.color })) : [];
         set({ botScores });
-        console.log('Bot scores reloaded from config');
+        console.log('Bot scores reloaded from runtime config');
       } catch (e) {
-        console.warn('Failed to reload bots from config', e);
+        console.warn('Failed to reload bots from runtime config', e);
       }
     },
     
     addBotCatch: (botId: string) => {
-      set((state) => ({
-        botScores: state.botScores.map((bot) =>
-          bot.id === botId ? { ...bot, catches: bot.catches + 1 } : bot
-        ),
-      }));
+      set((state) => {
+        const exists = state.botScores.some((b) => b.id === botId);
+        if (!exists) {
+          // Add with initial catch
+          return { botScores: [...state.botScores, { id: botId, catches: 1, color: '#ffffff' }] };
+        }
+        return {
+          botScores: state.botScores.map((bot) =>
+            bot.id === botId ? { ...bot, catches: bot.catches + 1 } : bot
+          ),
+        };
+      });
     },
     
     toggleCamera: () => {
@@ -230,7 +250,7 @@ export const useParadeGame = create<ParadeGameState>()((set, get) => ({
       set({ cameraMode: newMode });
     },
     
-    addCatch: (collectibleType, bypassPowerUp = false) => {
+    addCatch: (collectibleType?: Collectible['type'], bypassPowerUp: boolean = false) => {
       const { score, targetScore, combo, maxCombo, lastCatchTime, totalCatches, hasActivePowerUp, playerColor } = get();
       const now = Date.now();
       const timeSinceLastCatch = now - lastCatchTime;
@@ -274,13 +294,13 @@ export const useParadeGame = create<ParadeGameState>()((set, get) => ({
       }));
     },
     
-    addCollectible: (collectible) => {
+    addCollectible: (collectible: Collectible) => {
       set((state) => ({
         collectibles: [...state.collectibles, collectible],
       }));
     },
     
-    updateCollectible: (id, updates) => {
+    updateCollectible: (id: string, updates: Partial<Collectible>) => {
       set((state) => ({
         collectibles: state.collectibles.map((c) =>
           c.id === id ? { ...c, ...updates } : c
@@ -288,7 +308,7 @@ export const useParadeGame = create<ParadeGameState>()((set, get) => ({
       }));
     },
     
-    removeCollectible: (id) => {
+    removeCollectible: (id: string) => {
       set((state) => {
         // Also remove any claim on this collectible
         const newClaims = { ...state.botClaims };
@@ -301,7 +321,7 @@ export const useParadeGame = create<ParadeGameState>()((set, get) => ({
       });
     },
     
-    claimCollectible: (collectibleId, botId) => {
+    claimCollectible: (collectibleId: string, botId: string) => {
       const { botClaims } = get();
       const existingClaim = botClaims[collectibleId];
       const now = Date.now();
@@ -321,7 +341,7 @@ export const useParadeGame = create<ParadeGameState>()((set, get) => ({
       return true; // Claim successful
     },
     
-    releaseCollectibleClaim: (collectibleId) => {
+    releaseCollectibleClaim: (collectibleId: string) => {
       set((state) => {
         const newClaims = { ...state.botClaims };
         delete newClaims[collectibleId];
@@ -329,7 +349,7 @@ export const useParadeGame = create<ParadeGameState>()((set, get) => ({
       });
     },
     
-    getCollectibleClaim: (collectibleId) => {
+    getCollectibleClaim: (collectibleId: string) => {
       const { botClaims } = get();
       return botClaims[collectibleId] || null;
     },
@@ -646,4 +666,28 @@ export const useParadeGame = create<ParadeGameState>()((set, get) => ({
         return { joystickEnabled: newValue };
       });
     },
-  }));
+  } as unknown as ParadeGameState;
+
+  // Register a global listener so runtime changes to bots (admin UI/localStorage) update store immediately
+  if (typeof window !== 'undefined') {
+    try {
+      const handler = () => {
+        try {
+          const cfg = getRuntimeBotsConfig();
+          if (Array.isArray(cfg)) {
+            const botScores = cfg.map((b: any) => ({ id: b.id, catches: 0, color: b.color }));
+            set({ botScores });
+            console.log('Global bots:updated - refreshed botScores from runtime config');
+          }
+        } catch (e) {
+          console.warn('Failed to refresh botScores from runtime config', e);
+        }
+      };
+      window.addEventListener('bots:updated', handler);
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  return initialState;
+});

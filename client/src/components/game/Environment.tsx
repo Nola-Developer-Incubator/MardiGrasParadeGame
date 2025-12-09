@@ -1,5 +1,4 @@
 import { useMemo, useRef, useState, useEffect } from "react";
-import { useTexture } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { InstanceSetter } from "./InstanceSetter";
@@ -27,23 +26,49 @@ export function Environment() {
   useEffect(() => {
     const loader = new THREE.TextureLoader();
     let mounted = true;
-    try {
-      // Try PNG first, then SVG as a fallback for development flexibility
+    const tryPaths = [
+      '/textures/asphalt.png',
+      '/textures/asphalt.webp',
+      '/textures/asphalt.jpg',
+      '/textures/asphalt.svg',
+    ];
+    let tried = 0;
+    const tryLoad = (path: string) => {
       loader.load(
-        '/textures/asphalt.png',
-        (t) => { if (mounted) setAsphaltTexture(t); },
+        path,
+        (t) => {
+          if (!mounted) return;
+          // Configure texture on success
+          t.wrapS = THREE.RepeatWrapping;
+          t.wrapT = THREE.RepeatWrapping;
+          (t as any).repeat = new THREE.Vector2(3, 10);
+          // Set color space/encoding for better color when supported by this three.js version
+          try {
+            // @ts-ignore - colorSpace exists in newer three versions
+            if ((t as any).colorSpace !== undefined) {
+              // Use SRGB color space constant if available
+              (t as any).colorSpace = (THREE as any).SRGBColorSpace || 'srgb';
+            } else if ((t as any).encoding !== undefined) {
+              // Fallback to encoding constant if present
+              (t as any).encoding = (THREE as any).sRGBEncoding || (t as any).encoding;
+            }
+          } catch (e) {
+            // ignore if the API differs across three versions
+          }
+          setAsphaltTexture(t);
+        },
         undefined,
         (err) => {
-          console.warn('[Environment] failed to load asphalt.png, trying asphalt.svg', err);
-          // Try svg fallback
-          loader.load(
-            '/textures/asphalt.svg',
-            (t2) => { if (mounted) setAsphaltTexture(t2); },
-            undefined,
-            (err2) => { console.warn('[Environment] failed to load asphalt.svg', err2); if (mounted) setAsphaltTexture(undefined); }
-          );
+          console.warn(`[Environment] failed to load ${path}`, err);
+          tried += 1;
+          const next = tryPaths[tried];
+          if (next) tryLoad(next);
+          else if (mounted) setAsphaltTexture(undefined);
         }
       );
+    };
+    try {
+      tryLoad(tryPaths[0]);
     } catch (e) {
       console.warn('[Environment] texture load threw', e);
       setAsphaltTexture(undefined);
