@@ -1,14 +1,23 @@
 # Mardi Gras Parade Simulator
 
 <!-- Project logo (prefer embedded logo if provided) -->
-<p align="center">
+<div style="text-align: center;">
   <picture>
     <source srcset="docs/images/logo-embedded.svg" type="image/svg+xml">
     <img src="docs/images/logo.svg" alt="Mardi Gras Parade Logo" width="420" />
   </picture>
-</p>
+</div>
 
 A browser-based 3D Mardi Gras parade simulator (React + R3F + Howler) – catch throws, compete with bots, and enjoy the parade.
+
+## Governance
+
+See the project governance and contribution guidelines:
+
+- [docs/GOVERNANCE.md](./docs/GOVERNANCE.md)
+- [docs/MAINTAINERS.md](./docs/MAINTAINERS.md)
+- [docs/CODE_OF_CONDUCT.md](./docs/CODE_OF_CONDUCT.md)
+- [docs/AI_GOVERNANCE.md](./docs/AI_GOVERNANCE.md)
 
 <!-- Link to Game Design Document -->
 ## Game Design
