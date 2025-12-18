@@ -163,12 +163,23 @@ else {
   & $node.Source (Join-Path $scriptRoot 'generate-qr.mjs')
 }
 
-# Open in default browser
-Log "Opening default browser to $tunnelUrl"
-Start-Process $tunnelUrl
-
 Log "Done. Server log: $serverLog ; Tunnel log: $tunnelLog ; QR: docs/browser-qr.svg"
 Write-Host "Scan docs/browser-qr.svg or open $tunnelUrl" -ForegroundColor Green
+
+# Use confirm helper to print/copy/open the URL instead of opening twice
+$confirmScript = Join-Path $scriptRoot 'confirm-public-url.ps1'
+if (Test-Path $confirmScript) {
+  try {
+    # Wait up to 30s for the docs file to appear and open in browser
+    & $confirmScript -TimeoutSeconds 30 -OpenBrowser
+  } catch {
+    Write-Host "Failed to run confirm-public-url helper: $_" -ForegroundColor Yellow
+    Write-Host "Opening URL directly as fallback: $tunnelUrl" -ForegroundColor Cyan
+    Start-Process $tunnelUrl
+  }
+} else {
+  Start-Process $tunnelUrl
+}
 
 # Keep script alive while background processes run so logs remain available
 # Wait for cloudflared/localtunnel process to exit (or user Ctrl+C)
