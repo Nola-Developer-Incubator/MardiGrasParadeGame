@@ -54,8 +54,8 @@ jobs:
         env:
           PUBLIC_URL: ${{ env.PUBLIC_URL }}
         run: |
-          # Example: pass PUBLIC_URL to tests; adjust command to your test setup
-          npx playwright test --config=playwright.config.ts || exit 0
+          echo "Running Playwright tests against $PUBLIC_URL"
+          npm run test:playwright || true
 
       - name: Upload CI artifacts (logs + Playwright report)
         uses: actions/upload-artifact@v4
@@ -75,4 +75,3 @@ jobs:
           if [ -f scripts/server-ci.pid ]; then kill -TERM $(cat scripts/server-ci.pid) || true; sleep 2; kill -9 $(cat scripts/server-ci.pid) || true; fi
           if [ -f scripts/tunnel-ci.pid ]; then kill -TERM $(cat scripts/tunnel-ci.pid) || true; sleep 2; kill -9 $(cat scripts/tunnel-ci.pid) || true; fi
           ls -la scripts || true
-
