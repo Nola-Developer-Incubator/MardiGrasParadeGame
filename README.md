@@ -247,6 +247,20 @@ See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for specific guidelines.
 
 ---
 
+## 🚨 Troubleshooting & Public Playtest
+
+If the public playtest URL returns an error (503 or similar):
+
+- Confirm the server is running locally: `npm run dev` (serves on http://localhost:5000)
+- Start the tunnel (if you control Cloudflare/hostname): run the one-click PowerShell script in `scripts/launch-cloudflared.ps1` or run cloudflared manually.
+- Check the health endpoint: `curl http://localhost:5000/health` should return `{ status: 'ok' }`.
+- If the hostname is managed via Cloudflare, ensure DNS is pointed to the tunnel and the hostname is active.
+
+One-click: `powershell -ExecutionPolicy Bypass -File scripts\launch-cloudflared.ps1`
+
+
+---
+
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

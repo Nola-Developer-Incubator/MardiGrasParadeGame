@@ -5,232 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="278ffe03-206f-45dd-ba97-e0376756bdce" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.editorconfig" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/PULL_REQUEST_TEMPLATE.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/ci-playwright.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/gh-pages.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/playwright-ci.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/playwright.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/pr-playwright.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/smoke.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/copilot.data.migration.agent.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/copilot.data.migration.ask.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/copilot.data.migration.ask2agent.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/copilot.data.migration.edit.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/indexLayout.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/archive/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/archive/generated-2025-12-09.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/archive/replit-removed-20251218-055620/.replit" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/archive/replit-removed-20251218-055620/.replit.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/README.md.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/index.html.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/fonts/inter.json.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/geometries/heart.gltf.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/images/start-logo-512.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/images/start-logo.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/images/start-logo.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/sounds/background.mp3.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/sounds/hit.mp3.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/sounds/success.mp3.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/textures/asphalt.png.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/textures/asphalt.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/textures/grass.png.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/textures/sky.png.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/thumbnail.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/App.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/assets/start-logo.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/assets/start-logo.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/assets/start-logo.svg.bak" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/AdRewardScreen.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/AggressiveNPC.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/AudioManager.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/BotAdmin.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/CanvasGuard.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/CatchEffect.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/ClickMarker.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/Collectible.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/CompetitorBot.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/CosmeticShop.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/DevPerf.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/Environment.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/FirstLevelTutorial.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/GameCamera.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/GameScene.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/GameUI.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/GlowingTrail.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/InstanceSetter.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/Obstacle.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/ParadeFloat.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/Player.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/SettingsModal.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/TouchControls.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/TrajectoryHint.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/game/WinScreen.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/DevQRCode.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/ShareButton.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/accordion.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/alert-dialog.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/alert.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/aspect-ratio.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/avatar.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/badge.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/breadcrumb.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/button.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/calendar.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/card.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/carousel.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/chart.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/checkbox.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/collapsible.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/command.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/context-menu.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/dialog.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/drawer.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/dropdown-menu.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/form.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/hover-card.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/input-otp.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/input.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/interface.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/label.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/menubar.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/navigation-menu.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/pagination.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/popover.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/progress.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/radio-group.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/resizable.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/scroll-area.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/select.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/separator.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/sheet.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/sidebar.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/skeleton.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/slider.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/sonner.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/switch.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/table.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/tabs.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/textarea.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/toggle-group.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/toggle.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/tooltip.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/config/bots.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/hooks/use-is-mobile.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/hooks/useLastPublicUrl.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/index.css.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/lib/bots.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/lib/hooks/useBotsConfig.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/lib/queryClient.ts.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/lib/stores/useAudio.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/lib/stores/useGame.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/lib/stores/useParadeGame.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/lib/utils.ts.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/not-found.tsx.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deps_check.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deps_check_pretty.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/AI_GOVERNANCE.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/ASSET_CHECKLIST.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/ASSET_CHECKLIST.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/ASSET_CHECKLIST.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/ASSET_SUBMISSION_TEMPLATE.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/CODE_OF_CONDUCT.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/CONTRIBUTING.md.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/DEPRECATED.md.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/DESIGNER_WORKFLOW.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/DEVELOPMENT_GUIDE.md.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/Designer_Workflow.md.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/GAME_DESIGN.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/GAME_DESIGN.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/GAME_DESIGN_thumb_1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/GAME_DESIGN_thumb_2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/GOVERNANCE.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/Game_Design.md.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/LESSONS_LEARNED.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/MAINTAINERS.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/MIGRATION_SUMMARY.md.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/MardiGrasParadeSim2026.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/MardiGrasParadeSim2026/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/MardiGrasParadeSim2026/redirect.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/NEXT_STEPS.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/OPTIMIZATIONS.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/PLAYTESTING.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/PRODUCT_BACKLOG.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/TECHNICAL_DOCUMENTATION.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/archive/DOCUMENTATION_INDEX.md.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/archive/QUICK_REFERENCE.md.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/archive/QUICK_START_UNREAL.md.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/archive/README.md.backup.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/archive/README.md.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/archive/README_CREATION_COMPLETE.md.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/archive/README_DUAL_PLATFORM.md.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/archive/README_OLD.md.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/archive/RUNNING_BOTH_VERSIONS.md.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/archive/START_HERE.md.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/archive/TASK_TRACKER.md.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/archive/UNREAL_ARCHIVE.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/archive/UNREAL_BLUEPRINT_GUIDE.md.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/archive/UNREAL_CONVERSION_PLAN.md.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/archive/UNREAL_SETUP_COMPLETE.md.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/archive/replit.md.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/browser-qr.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/icons/logo-1024.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/icons/logo-128.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/icons/logo-256.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/icons/logo-32.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/icons/logo-512.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/icons/logo-64.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/images/banner.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/images/logo-embedded.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/images/logo-from-png.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/images/logo-thumbnail.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/images/logo.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/last-public-url.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/launch.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/logo-raster.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/public-qr.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/thumbnail.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/website/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/website/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/website/style.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle.config.ts.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/outdated.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/postcss.config.js.bak.20251218-054244" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ps1/generate-qr.ps1" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ps1/start-public-dev.ps1" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/README-CONVERT-LOGO.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/accept-incoming.ps1" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/archive-generated.mjs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/archive-replit-files.ps1" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/cleanup-generated.mjs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/cloudflared-config.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/confirm-public-url.ps1" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/consolidate-single-location.ps1" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/convert-logo.mjs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/convert-start-logo.mjs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/create-cloudflared-persistent.ps1" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/embed-logo.cjs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/embed-logo.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/find-conditional-hooks.mjs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/find-hooks-after-if.mjs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/generate-design-assets.mjs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/generate-logo-sizes.mjs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/generate-qr.mjs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/headless-playtest.mjs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/headless-puppeteer.mjs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/import-logo-path.mjs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/import-logo.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/md-to-pdf.mjs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/open-browser.mjs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/repair-windows.ps1" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/launch.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/launch-cloudflared.ps1" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -264,26 +44,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;chore/public-playtest-docs&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.github.copilot.settings.mcp.McpConfigurable&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;C:\\Coding_Projects\\MardiGrasParadeSim\\node_modules\\typescript\\lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "git-widget-placeholder": "merged-main",
+    "ignore.virus.scanning.warn.message": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "com.github.copilot.settings.mcp.McpConfigurable",
+    "ts.external.directory.path": "C:\\Coding_Projects\\MardiGrasParadeSim\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="278ffe03-206f-45dd-ba97-e0376756bdce" name="Changes" comment="" />
@@ -299,6 +79,7 @@
       <workItem from="1765766636280" duration="2677000" />
       <workItem from="1765769387550" duration="6013000" />
       <workItem from="1766052624463" duration="16123000" />
+      <workItem from="1766069327596" duration="616000" />
     </task>
     <task id="LOCAL-00001" summary="chore: update dependencies in package.json">
       <option name="closed" value="true" />
@@ -652,7 +433,23 @@
       <option name="project" value="LOCAL" />
       <updated>1766066669768</updated>
     </task>
-    <option name="localTasksCounter" value="45" />
+    <task id="LOCAL-00045" summary="docs(CONTRIBUTING): enhance contribution guidelines with communication best practices and PR expectations">
+      <option name="closed" value="true" />
+      <created>1766069387609</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1766069387609</updated>
+    </task>
+    <task id="LOCAL-00046" summary="feat(migration): add Ask2Agent migration state XML configuration">
+      <option name="closed" value="true" />
+      <created>1766069561007</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1766069561007</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -662,8 +459,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="docs: enhance Mardi Gras Parade Simulator wiki and add redirect functionality" />
-    <MESSAGE value="docs: add AI Governance Policy and Code of Conduct documents" />
     <MESSAGE value="docs: add shareable playtest URL functionality to GameUI" />
     <MESSAGE value="feat(dev): add one-click public dev server helper and QR code generation" />
     <MESSAGE value="feat(assets): update logo SVG with gradient background and enhanced design elements" />
@@ -687,7 +482,9 @@
     <MESSAGE value="chore: update cloudflared credentials path for Windows compatibility" />
     <MESSAGE value="chore(docs): update README for persistent Cloudflare tunnel and add fallback sharing method" />
     <MESSAGE value="docs(design): enhance designer workflow with playtest-focused QA steps and asset submission checklist" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs(design): enhance designer workflow with playtest-focused QA steps and asset submission checklist" />
+    <MESSAGE value="docs(CONTRIBUTING): enhance contribution guidelines with communication best practices and PR expectations" />
+    <MESSAGE value="feat(migration): add Ask2Agent migration state XML configuration" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(migration): add Ask2Agent migration state XML configuration" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
