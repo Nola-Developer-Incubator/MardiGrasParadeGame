@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="278ffe03-206f-45dd-ba97-e0376756bdce" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/scripts/auto-cloudflare.ps1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/playwright/console.spec.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/playwright/basic.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/tests/playwright/basic.spec.ts" afterDir="false" />
-    </list>
+    <list default="true" id="278ffe03-206f-45dd-ba97-e0376756bdce" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -77,15 +72,7 @@
       <workItem from="1765766636280" duration="2677000" />
       <workItem from="1765769387550" duration="6013000" />
       <workItem from="1766052624463" duration="16123000" />
-      <workItem from="1766069327596" duration="6643000" />
-    </task>
-    <task id="LOCAL-00002" summary="feat: implement CanvasGuard for WebGL context management and enhance development experience">
-      <option name="closed" value="true" />
-      <created>1765221127679</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1765221127679</updated>
+      <workItem from="1766069327596" duration="6937000" />
     </task>
     <task id="LOCAL-00003" summary="chore: add various output and log files for development and testing">
       <option name="closed" value="true" />
@@ -471,7 +458,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766073104735</updated>
     </task>
-    <option name="localTasksCounter" value="51" />
+    <task id="LOCAL-00051" summary="feat(scripts): add Auto Cloudflare Tunnel helper for local development and CI">
+      <option name="closed" value="true" />
+      <created>1766090295988</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1766090295988</updated>
+    </task>
+    <option name="localTasksCounter" value="52" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -481,7 +476,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(scripts): add script to convert start-logo.svg to optimized PNG sizes" />
     <MESSAGE value="feat(ci): add Playwright CI workflow and public URL sharing functionality" />
     <MESSAGE value="feat(docs): enhance development guide with one-click cloudflared helper instructions" />
     <MESSAGE value="feat(ci): add Playwright E2E testing workflow with localtunnel fallback" />
@@ -506,7 +500,8 @@
     <MESSAGE value="fix(server): use portable listen signature to avoid ENOTSUP on some platforms" />
     <MESSAGE value="feat(server): implement hardened graceful shutdown with socket tracking and startServer() helper" />
     <MESSAGE value="feat(ui): add admin modal for editing bot names and personas; integrate bot display names in competitor HUD" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(ui): add admin modal for editing bot names and personas; integrate bot display names in competitor HUD" />
+    <MESSAGE value="feat(scripts): add Auto Cloudflare Tunnel helper for local development and CI" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(scripts): add Auto Cloudflare Tunnel helper for local development and CI" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
