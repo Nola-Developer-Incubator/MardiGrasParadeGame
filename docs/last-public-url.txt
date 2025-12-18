@@ -1,1 +1,5 @@
-﻿https://example.test
+﻿2025-12-18 07:14:00Z
+https://mardigrasparadesim2026.busaradigitalstrategy.com
+# Ephemeral fallback (localtunnel): https://hot-lizard-90.loca.lt
+# Note: persistent Cloudflare hostname is preferred; ephemeral URL may change on restart
+
