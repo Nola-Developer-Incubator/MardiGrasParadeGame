@@ -5,9 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="278ffe03-206f-45dd-ba97-e0376756bdce" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.github/workflows/gh-pages.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/gh-pages.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/gh-pages.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,7 +48,7 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "git-widget-placeholder": "merged-main",
+    "git-widget-placeholder": "chore/gh-pages-deploy",
     "ignore.virus.scanning.warn.message": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -76,15 +75,7 @@
       <workItem from="1765766636280" duration="2677000" />
       <workItem from="1765769387550" duration="6013000" />
       <workItem from="1766052624463" duration="16123000" />
-      <workItem from="1766069327596" duration="8492000" />
-    </task>
-    <task id="LOCAL-00004" summary="feat: add minimal static landing page for Mardi Gras Parade Simulator">
-      <option name="closed" value="true" />
-      <created>1765221313534</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1765221313534</updated>
+      <workItem from="1766069327596" duration="9225000" />
     </task>
     <task id="LOCAL-00005" summary="feat: add GitHub Actions workflow to deploy docs to GitHub Pages">
       <option name="closed" value="true" />
@@ -470,7 +461,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766090432093</updated>
     </task>
-    <option name="localTasksCounter" value="53" />
+    <task id="LOCAL-00053" summary="chore(ci): add GitHub Actions workflow for automatic deployment to gh-pages">
+      <option name="closed" value="true" />
+      <created>1766092223805</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1766092223805</updated>
+    </task>
+    <option name="localTasksCounter" value="54" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -480,7 +479,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(docs): enhance development guide with one-click cloudflared helper instructions" />
     <MESSAGE value="feat(ci): add Playwright E2E testing workflow with localtunnel fallback" />
     <MESSAGE value="fix(ci): update Playwright test command to include PUBLIC_URL and improve error handling" />
     <MESSAGE value="feat(docs): add persistent Cloudflare tunnel script and update README instructions" />
@@ -505,7 +503,8 @@
     <MESSAGE value="feat(ui): add admin modal for editing bot names and personas; integrate bot display names in competitor HUD" />
     <MESSAGE value="feat(scripts): add Auto Cloudflare Tunnel helper for local development and CI" />
     <MESSAGE value="chore: clean up workspace.xml by removing unused change entries and updating task summaries" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore: clean up workspace.xml by removing unused change entries and updating task summaries" />
+    <MESSAGE value="chore(ci): add GitHub Actions workflow for automatic deployment to gh-pages" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore(ci): add GitHub Actions workflow for automatic deployment to gh-pages" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
