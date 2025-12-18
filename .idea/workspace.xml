@@ -4,9 +4,24 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="278ffe03-206f-45dd-ba97-e0376756bdce" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.github/workflows/gh-pages.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/gh-pages.yml" afterDir="false" />
+    <list default="true" id="278ffe03-206f-45dd-ba97-e0376756bdce" name="Changes" comment="chore: update workspace.xml to reflect recent changes and clean up task summaries">
+      <change beforePath="$PROJECT_DIR$/.github/workflows/cloudflare-tunnel.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/gh-pages.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/playwright.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/copilot.data.migration.ask2agent.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/indexLayout.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/projectSettingsUpdater.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bots.override.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/favicon-32.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/favicon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/ui/AdminModal.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/CHANGELOG-20251218.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/STATUS.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/launch.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/playwright.config.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/auto-cloudflare.ps1" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,26 +55,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "git-widget-placeholder": "chore/gh-pages-deploy",
-    "ignore.virus.scanning.warn.message": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.github.copilot.settings.mcp.McpConfigurable",
-    "ts.external.directory.path": "C:\\Coding_Projects\\MardiGrasParadeSim\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;chore/gh-pages-deploy&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.github.copilot.settings.mcp.McpConfigurable&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Coding_Projects\\MardiGrasParadeSim\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="278ffe03-206f-45dd-ba97-e0376756bdce" name="Changes" comment="" />
@@ -75,15 +90,7 @@
       <workItem from="1765766636280" duration="2677000" />
       <workItem from="1765769387550" duration="6013000" />
       <workItem from="1766052624463" duration="16123000" />
-      <workItem from="1766069327596" duration="9225000" />
-    </task>
-    <task id="LOCAL-00005" summary="feat: add GitHub Actions workflow to deploy docs to GitHub Pages">
-      <option name="closed" value="true" />
-      <created>1765221626980</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1765221626980</updated>
+      <workItem from="1766069327596" duration="10857000" />
     </task>
     <task id="LOCAL-00006" summary="feat: add &quot;Play Now&quot; button and health check logic to launch game in new tab">
       <option name="closed" value="true" />
@@ -469,7 +476,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766092223805</updated>
     </task>
-    <option name="localTasksCounter" value="54" />
+    <task id="LOCAL-00054" summary="chore(ci): configure GitHub Pages deployment and add polling for activation">
+      <option name="closed" value="true" />
+      <created>1766092992217</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1766092992217</updated>
+    </task>
+    <option name="localTasksCounter" value="55" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -479,8 +494,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(ci): add Playwright E2E testing workflow with localtunnel fallback" />
-    <MESSAGE value="fix(ci): update Playwright test command to include PUBLIC_URL and improve error handling" />
     <MESSAGE value="feat(docs): add persistent Cloudflare tunnel script and update README instructions" />
     <MESSAGE value="feat(scripts): add confirm-public-url helper for improved URL handling" />
     <MESSAGE value="feat(docs): add product backlog and update README for public playtest visibility" />
@@ -504,7 +517,9 @@
     <MESSAGE value="feat(scripts): add Auto Cloudflare Tunnel helper for local development and CI" />
     <MESSAGE value="chore: clean up workspace.xml by removing unused change entries and updating task summaries" />
     <MESSAGE value="chore(ci): add GitHub Actions workflow for automatic deployment to gh-pages" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore(ci): add GitHub Actions workflow for automatic deployment to gh-pages" />
+    <MESSAGE value="chore(ci): configure GitHub Pages deployment and add polling for activation" />
+    <MESSAGE value="chore: update workspace.xml to reflect recent changes and clean up task summaries" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: update workspace.xml to reflect recent changes and clean up task summaries" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
