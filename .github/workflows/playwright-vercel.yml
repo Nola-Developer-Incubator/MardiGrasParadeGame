@@ -12,11 +12,18 @@ jobs:
   playwright-test:
     name: Playwright tests against Vercel playtest
     runs-on: ubuntu-latest
-    env:
-      PLAYTEST_URL: https://mardi-gras-parade-game.vercel.app
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      # Set PLAYTEST_URL from a repository secret if present; otherwise fall back to the Vercel domain
+      - name: Set PLAYTEST_URL (secret or fallback)
+        run: |
+          if [ -z "${{ secrets.PLAYTEST_URL }}" ]; then
+            echo "PLAYTEST_URL=https://mardi-gras-parade-game.vercel.app" >> $GITHUB_ENV
+          else
+            echo "PLAYTEST_URL=${{ secrets.PLAYTEST_URL }}" >> $GITHUB_ENV
+          fi
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -46,4 +53,3 @@ jobs:
         with:
           name: playwright-screenshots
           path: test-results || playwright-report/screenshots || ''
-
