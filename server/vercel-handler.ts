@@ -22,25 +22,47 @@ async function initHandler() {
 
     const app = createApp();
 
-    const serverlessModule = await import('serverless-http');
-    const serverlessFn = serverlessModule && (serverlessModule.default || serverlessModule);
-    if (typeof serverlessFn !== 'function') {
-      throw new Error('serverless-http did not export a function');
+    // Try to import serverless-http; if unavailable, fall back to the raw Express app
+    try {
+      const serverlessModule = await import('serverless-http');
+      const serverlessFn = serverlessModule && (serverlessModule.default || serverlessModule);
+      if (typeof serverlessFn === 'function') {
+        _handler = serverlessFn(app);
+        return _handler;
+      }
+      // If serverless-http didn't export a function, fall through to fallback
+      console.error('[vercel-handler] serverless-http did not export a function; falling back to raw app');
+    } catch (innerErr) {
+      // Common in serverless environments where devDependencies are not installed
+      console.warn('[vercel-handler] failed to import serverless-http; using raw express app as handler', innerErr?.message || innerErr);
+      // fall through to set the raw app as handler
     }
 
-    _handler = serverlessFn(app);
+    // Fallback: use the express app itself as the handler. Vercel will forward the
+    // native Node req/res objects which Express can handle directly.
+    _handler = (req: IncomingMessage & any, res: ServerResponse & any) => {
+      try {
+        // Express apps are functions that accept (req, res)
+        return (app as any)(req, res);
+      } catch (e) {
+        console.error('[vercel-handler] fallback handler error', e);
+        throw e;
+      }
+    };
+
     return _handler;
   } catch (err) {
     // Cache init error to avoid repeated re-init attempts on subsequent invocations
-    _initError = err;
-    console.error('[vercel-handler] initialization error:', err);
-    throw err;
+    _initError = err instanceof Error ? err : new Error(String(err));
+    console.error('[vercel-handler] initialization error:', err && (err.stack || err.message || err));
+    throw _initError;
   }
 }
 
 /**
  * Vercel-compatible default export handler. This function lazily initializes the
- * Express app on first invocation and then delegates to the `serverless-http` handler.
+ * Express app on first invocation and then delegates to the `serverless-http` handler
+ * (or the raw Express app as a fallback).
  */
 export default async function vercelHandler(req: IncomingMessage & any, res: ServerResponse & any) {
   try {
@@ -48,14 +70,14 @@ export default async function vercelHandler(req: IncomingMessage & any, res: Ser
     // handler expects (req, res) like a standard Node http request
     return handler(req, res);
   } catch (err) {
-    console.error('[vercel-handler] invocation error:', err);
+    console.error('[vercel-handler] invocation error:', err && (err.stack || err.message || err));
     try {
       res.statusCode = 500;
       res.setHeader('Content-Type', 'application/json');
       res.end(JSON.stringify({ error: 'Server initialization failed' }));
     } catch (e) {
       // If even responding fails, just log and swallow to avoid crashing the runtime
-      console.error('[vercel-handler] failed to send error response:', e);
+      console.error('[vercel-handler] failed to send error response:', e && (e.stack || e.message || e));
     }
   }
 }
