@@ -4,7 +4,7 @@
   "outputDirectory": "dist/public",
   "builds": [
     {
-      "src": "api/index.js",
+      "src": "api/index.ts",
       "use": "@vercel/node"
     }
   ],
