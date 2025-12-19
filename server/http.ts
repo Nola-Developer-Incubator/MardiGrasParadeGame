@@ -26,13 +26,14 @@ export function withErrorHandler(
       await handler(req, res, next);
     } catch (error) {
       // Log the error with structured information
-      console.error('[API Error]', {
+      console.error(JSON.stringify({
         timestamp: new Date().toISOString(),
         method: req.method,
         path: req.path,
         error: error instanceof Error ? error.message : 'Unknown error',
         stack: error instanceof Error ? error.stack : undefined,
-      });
+        type: 'error',
+      }));
 
       // Return 500 error if response hasn't been sent yet
       if (!res.headersSent) {

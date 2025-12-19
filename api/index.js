@@ -33,36 +33,42 @@ app.use((req, res, next) => {
 
 // Register API routes
 // Add your API routes here with /api prefix
-// Example:
-// app.get('/api/health', (req, res) => {
-//   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+// 
+// Example with environment variable validation:
+// import { requireEnv } from '../server/requireEnv.js';
+// 
+// app.get('/api/db-status', (req, res) => {
+//   try {
+//     // Validate required environment variables
+//     requireEnv(['DATABASE_URL']);
+//     
+//     // Your database logic here
+//     res.json({ status: 'ok', database: 'connected' });
+//   } catch (error) {
+//     console.error(JSON.stringify({
+//       timestamp: new Date().toISOString(),
+//       method: req.method,
+//       path: req.path,
+//       error: error instanceof Error ? error.message : 'Unknown error',
+//       type: 'error'
+//     }));
+//     
+//     if (!res.headersSent) {
+//       res.status(500).json({ 
+//         error: error instanceof Error ? error.message : 'Internal Server Error',
+//         timestamp: new Date().toISOString()
+//       });
+//     }
+//   }
 // });
 
-// Health check endpoint with error handling
+// Health check endpoint
 app.get('/api/health', (req, res) => {
-  try {
-    res.json({ 
-      status: 'ok', 
-      timestamp: new Date().toISOString(),
-      env: process.env.NODE_ENV 
-    });
-  } catch (error) {
-    console.error(JSON.stringify({
-      timestamp: new Date().toISOString(),
-      method: req.method,
-      path: req.path,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-      type: 'error'
-    }));
-    
-    if (!res.headersSent) {
-      res.status(500).json({ 
-        error: 'Internal Server Error',
-        timestamp: new Date().toISOString()
-      });
-    }
-  }
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    env: process.env.NODE_ENV 
+  });
 });
 
 // Serve static files in production with error handling
