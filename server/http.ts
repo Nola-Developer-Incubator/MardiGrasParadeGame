@@ -102,7 +102,7 @@ export function methodGuard(allowedMethods: string[]): RequestHandler {
  * }));
  * ```
  */
-export async function parseRequestBody(req: Request): Promise<any> {
+export async function parseRequestBody(req: Request): Promise<unknown> {
   const contentType = req.headers['content-type'] || '';
   
   // Express middleware should have already parsed JSON
@@ -130,17 +130,23 @@ export async function parseRequestBody(req: Request): Promise<any> {
  * ```
  */
 export function createErrorMiddleware() {
-  return (err: any, req: Request, res: Response, _next: NextFunction) => {
+  return (err: Error | unknown, req: Request, res: Response, _next: NextFunction) => {
     logError(err, req);
     
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || 'Internal Server Error';
+    // Type guard to safely access error properties
+    const isErrorLike = (e: unknown): e is { status?: number; statusCode?: number; message?: string; stack?: string } => {
+      return typeof e === 'object' && e !== null;
+    };
+    
+    const errorObj = isErrorLike(err) ? err : {};
+    const status = errorObj.status || errorObj.statusCode || 500;
+    const message = errorObj.message || 'Internal Server Error';
     
     if (!res.headersSent) {
       res.status(status).json({
         error: message,
-        ...(process.env.NODE_ENV === 'development' && {
-          stack: err.stack,
+        ...(process.env.NODE_ENV === 'development' && errorObj.stack && {
+          stack: errorObj.stack,
         }),
       });
     }

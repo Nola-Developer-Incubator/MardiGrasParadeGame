@@ -46,21 +46,16 @@ app.use((req, res, next) => {
 // Register API routes with error handling
 // All routes are wrapped with try-catch to prevent unhandled errors
 
-// Health check endpoint - wrapped with error handling
-app.get('/api/health', async (req, res, next) => {
-  try {
-    // Verify NODE_ENV is set (optional but recommended)
-    const nodeEnv = process.env.NODE_ENV || 'development';
-    
-    res.json({ 
-      status: 'ok', 
-      timestamp: new Date().toISOString(),
-      env: nodeEnv,
-      runtime: 'nodejs',
-    });
-  } catch (error) {
-    next(error);
-  }
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  const nodeEnv = process.env.NODE_ENV || 'development';
+  
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    env: nodeEnv,
+    runtime: 'nodejs',
+  });
 });
 
 // Serve static files in production

@@ -22,8 +22,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   }));
 
-
-
   // Example of a protected route that requires environment variables
   // Uncomment and modify as needed:
   /*
