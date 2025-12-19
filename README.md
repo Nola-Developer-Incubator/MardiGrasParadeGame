@@ -1,6 +1,6 @@
 # 🎭 NDI_MardiGrasParade
 
-+> Playtest (public): Try the live build: https://mardigrasparadesim2026.busaradigitalstrategy.com — or use one-click launch: [docs/launch.html](./docs/launch.html). Scan `docs/browser-qr.svg` to open on mobile.
++> Playtest (public): Try the live build: https://mardi-gras-parade-game.vercel.app/ — or use one-click launch: [docs/launch.html](./docs/launch.html). Scan `docs/browser-qr.svg` to open on mobile.
 +
 [![React](https://img.shields.io/badge/React-18.3-61dafb)](https://reactjs.org/)
 [![Three.js](https://img.shields.io/badge/Three.js-WebGL-black)](https://threejs.org/)
@@ -29,21 +29,21 @@ npm install
 npm run dev
 
 # Open locally → http://localhost:5000
-# Or open public playtest → https://mardigrasparadesim2026.busaradigitalstrategy.com
+# Or open public playtest → https://mardi-gras-parade-game.vercel.app/
 ```
 
-**Playtest (Vercel)**: You created a Vercel domain — to point Playwright tests and CI at it, set the environment variable `PLAYTEST_URL` to your Vercel URL (example: `https://mardigrasparadesim2026.vercel.app`) in your GitHub Actions workflow or locally before running tests:
+**Playtest (Vercel)**: You created a Vercel domain — to point Playwright tests and CI at it, set the environment variable `PLAYTEST_URL` to your Vercel URL (example: `https://mardi-gras-parade-game.vercel.app`) in your GitHub Actions workflow or locally before running tests:
 
 PowerShell (local test):
 
 ```powershell
-$env:PLAYTEST_URL = 'https://mardigrasparadesim2026.vercel.app'; npx playwright test
+$env:PLAYTEST_URL = 'https://mardi-gras-parade-game.vercel.app'; npx playwright test
 ```
 
 Or on macOS / Linux:
 
 ```bash
-export PLAYTEST_URL='https://mardigrasparadesim2026.vercel.app' && npx playwright test
+export PLAYTEST_URL='https://mardi-gras-parade-game.vercel.app' && npx playwright test
 ```
 
 That's it! The simulator will open in your default browser (or open the public link for a hosted playtest).
@@ -66,7 +66,7 @@ npm install; npm run dev
 powershell -ExecutionPolicy Bypass -File scripts\launch-cloudflared.ps1
 ```
 
-3. The public URL and QR are shown/created by the script; share the URL (example: `https://mardigrasparadesim2026.busaradigitalstrategy.com`).
+3. The public URL and QR are shown/created by the script; share the URL (example: `https://mardi-gras-parade-game.vercel.app`).
 
 Note: You must have a configured Cloudflare tunnel/hostname or cloudflared installed and authenticated for the provided hostname to work.
 
@@ -305,5 +305,3 @@ One-click: `powershell -ExecutionPolicy Bypass -File scripts\launch-cloudflared.
 
 - Graceful shutdown implemented: server now tracks open sockets and destroys lingering connections on shutdown. This improves reliability when restarting under process managers (pm2) or tunnels (cloudflared).
 - Use `startServer()` export from `server/index.ts` for programmatic start/shutdown in tests/CI.
-
----
