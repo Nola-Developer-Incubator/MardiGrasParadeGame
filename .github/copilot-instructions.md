@@ -283,7 +283,7 @@ const texture = useTexture('/textures/my-texture.png');
 
 ## Git Commit Message Format
 
-Follow [Conventional Commits](https://www.conventionalcommits.org/):
+Follow <a href="https://www.conventionalcommits.org/">Conventional Commits</a>:
 
 ```
 type(scope): description
@@ -378,8 +378,8 @@ SESSION_SECRET=your_random_secret_here
 
 ## Resources
 
-- [CONTRIBUTING.md](../docs/CONTRIBUTING.md) - Full contribution guidelines
-- [DEVELOPMENT_GUIDE.md](../docs/DEVELOPMENT_GUIDE.md) - Detailed technical documentation
-- [React Three Fiber Docs](https://docs.pmnd.rs/react-three-fiber)
-- [Three.js Documentation](https://threejs.org/docs)
-- [Drizzle ORM Docs](https://orm.drizzle.team)
+- <a>CONTRIBUTING.md</a> - Full contribution guidelines
+- <a>DEVELOPMENT_GUIDE.md</a> - Detailed technical documentation
+- <a href="https://docs.pmnd.rs/react-three-fiber">React Three Fiber Docs</a>
+- <a href="https://threejs.org/docs">Three.js Documentation</a>
+- <a href="https://orm.drizzle.team">Drizzle ORM Docs</a>
