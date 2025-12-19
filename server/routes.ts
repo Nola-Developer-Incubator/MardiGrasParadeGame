@@ -11,19 +11,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // use storage to perform CRUD operations on the storage interface
   // e.g. storage.insertUser(user) or storage.getUserByUsername(username)
 
-  // Example API route with error handling and env validation
-  // This demonstrates best practices for Vercel serverless functions
-  app.get('/api/status', asyncHandler(async (req, res) => {
-    // Example: Validate environment variables if this route needs them
-    // Uncomment when DATABASE_URL is required for this endpoint:
-    // requireEnv(['DATABASE_URL']);
-    
+  // Example API routes demonstrating error handling and env validation best practices
+  // These show how to use asyncHandler and requireEnv for Vercel serverless functions
+  
+  // Example: Simple route with error handling
+  app.get('/api/game-config', asyncHandler(async (req, res) => {
+    // Returns game configuration data
     res.json({
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-      message: 'Server is running with enhanced error handling'
+      version: '1.0.0',
+      features: ['3d-graphics', 'sound', 'mobile-support'],
+      timestamp: new Date().toISOString()
     });
   }));
+
+  // Example: Route that requires environment variables
+  // Uncomment and customize when you add routes that need DATABASE_URL:
+  /*
+  app.get('/api/leaderboard', asyncHandler(async (req, res) => {
+    requireEnv(['DATABASE_URL']);
+    // Fetch leaderboard data from database
+    // const scores = await storage.getTopScores();
+    res.json({ scores: [] });
+  }));
+  */
 
   const httpServer = createServer(app);
 

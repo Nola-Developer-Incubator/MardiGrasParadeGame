@@ -46,7 +46,7 @@ export function allowMethods(allowedMethods: string[]): RequestHandler {
  * Parse request body based on content-type
  * Returns parsed body or throws descriptive error
  */
-export async function parseRequestBody(req: Request): Promise<any> {
+export async function parseRequestBody(req: Request): Promise<unknown> {
   const contentType = req.headers['content-type'] || '';
   
   // Express middleware should have already parsed JSON/urlencoded

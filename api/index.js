@@ -52,10 +52,6 @@ app.use((req, res, next) => {
 // Health check endpoint with error handling
 app.get('/api/health', (req, res) => {
   try {
-    // Validate critical environment variables (if any are required)
-    // For health check, we just report status
-    const requiredEnvVars = process.env.DATABASE_URL ? ['DATABASE_URL'] : [];
-    
     res.json({ 
       status: 'ok', 
       timestamp: new Date().toISOString(),
