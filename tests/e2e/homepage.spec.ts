@@ -12,4 +12,7 @@ test.describe('Homepage Smoke Test', () => {
     // This helps ensure the page rendered correctly
     await expect(page.locator('body')).toBeVisible();
   });
+test('homepage responds with 200', async ({ page }) => {
+  const response = await page.goto('/');
+  expect(response && response.ok()).toBeTruthy();
 });

@@ -1,24 +1,26 @@
-name: CI
+name: CI - Typecheck, Build, E2E
 
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
   push:
-    branches: [ "main" ]
+    branches: [ main ]
 
 jobs:
-  build-and-test:
-    name: Build and Test
+  build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
       - name: Install dependencies
@@ -45,3 +47,18 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+      - name: TypeScript check
+        run: npm run check
+
+      - name: Build (frontend + server)
+        run: npm run build
+
+      - name: Install Playwright browsers
+        if: success()
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright E2E tests
+        if: success()
+        env:
+          CI: true
+        run: npx playwright test --reporter=github
