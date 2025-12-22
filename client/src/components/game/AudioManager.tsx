@@ -8,9 +8,10 @@ export function AudioManager() {
   const { phase } = useParadeGame();
 
   useEffect(() => {
-    const bg = new Howl({ src: ['/sounds/background.mp3'], loop: true, volume: 0.3 });
-    const hit = new Howl({ src: ['/sounds/hit.mp3'], volume: 0.3 });
-    const success = new Howl({ src: ['/sounds/success.mp3'], volume: 0.5 });
+    const baseUrl = (import.meta.env && (import.meta.env.BASE_URL as string)) || '/';
+    const bg = new Howl({ src: [`${baseUrl}sounds/background.mp3`], loop: true, volume: 0.3 });
+    const hit = new Howl({ src: [`${baseUrl}sounds/hit.mp3`], volume: 0.3 });
+    const success = new Howl({ src: [`${baseUrl}sounds/success.mp3`], volume: 0.5 });
 
     setBackgroundMusic(bg);
     setHitSound(hit);
