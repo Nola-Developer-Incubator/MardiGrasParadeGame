@@ -1,6 +1,9 @@
 # 🎭 NDI_MardiGrasParade
 
-+> Playtest (public): Public demo (replace with your published URL): https://Nola-Developer-Incubator.github.io/MardiGrasParadeGame/
++> Playtest (public): https://Nola-Developer-Incubator.github.io/MardiGrasParadeGame/  
++> Repository: https://github.com/Nola-Developer-Incubator/MardiGrasParadeGame  
++> About (GitHub): https://github.com/Nola-Developer-Incubator/MardiGrasParadeGame#readme  
++> Issues: https://github.com/Nola-Developer-Incubator/MardiGrasParadeGame/issues  
 +> Developer (local): Run the dev server or serve the built site locally
 
 [![React](https://img.shields.io/badge/React-18.3-61dafb)](https://reactjs.org/)
