@@ -124,6 +124,45 @@ If `npx` or `npm exec` is blocked by the PS wrapper, use the `cmd /c` fallback s
 
 ---
 
+## 🔁 How to launch the game in your browser (quick)
+
+Follow one of the two recommended ways below depending on whether you want a local development instance or a public shareable link.
+
+1) Run locally (developer - fast, editable)
+
+- Install dependencies and start the dev server (hot reload):
+
+```powershell
+# from repo root
+npm ci
+npm run dev
+# Open in browser: http://localhost:5000
+```
+
+- If the dev server script is blocked by PowerShell's npm wrapper, run the cmd fallback:
+
+```powershell
+cmd /c "npm ci"
+cmd /c "npm run dev"
+```
+
+2) Use the public shareable GitHub Pages link (no local build required)
+
+- The project publishes the built frontend to GitHub Pages (branch `gh-pages`). After a successful deploy, the canonical public URL is:
+
+  https://Nola-Developer-Incubator.github.io/MardiGrasParadeGame/
+
+- If you see a blank page, try the debug page (bypasses cached index and includes a client error overlay):
+
+  https://Nola-Developer-Incubator.github.io/MardiGrasParadeGame/debug.html
+
+Troubleshooting (cache / service worker)
+
+- If the public page appears blank or loads an older build, clear the browser cache or unregister the service worker for the site: DevTools → Application → Service Workers → Unregister, then reload.
+- Incognito/private windows are useful for quick validation without cached assets.
+
+---
+
 ## 🎮 Game Features
 
 ### Core Gameplay

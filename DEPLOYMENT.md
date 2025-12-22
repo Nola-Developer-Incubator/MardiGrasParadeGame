@@ -2,6 +2,28 @@
 
 This document explains how to publish the frontend and backend of the project.
 
+## How to launch the game in your browser (quick)
+
+- Local development (editable, HMR):
+
+```powershell
+npm ci
+npm run dev
+# Open http://localhost:5000
+```
+
+- Public shareable (no local build): deploy the `dist/public` folder to GitHub Pages (the repo includes a workflow and `deploy:gh-pages` script). The canonical public URL for this repo is:
+
+```
+https://Nola-Developer-Incubator.github.io/MardiGrasParadeGame/
+```
+
+- If you experience a blank page on GitHub Pages: try the debug page which bypasses cached index.
+
+```
+https://Nola-Developer-Incubator.github.io/MardiGrasParadeGame/debug.html
+```
+
 ## Recommended: GitHub Pages (frontend)
 
 The project can publish the frontend build output (`dist/public`) to GitHub Pages using the included workflow `.github/workflows/deploy-gh-pages.yml` or the `deploy:gh-pages` npm script.
