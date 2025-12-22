@@ -21,28 +21,10 @@ async function startServer() {
   const server = createServer(app);
 
   // determine NODE_ENV robustly and default to production when running from built dist
-  // let NODE_ENV = (process.env.NODE_ENV || '').toString().trim();
-  // try {
-  //   // If NODE_ENV is not set and a built public folder exists next to this file, assume production
-  //   const distPublic = path.resolve(__dirname, 'public');
-  //   if (!NODE_ENV && fs.existsSync(distPublic)) {
-  //     NODE_ENV = 'production';
-  //   }
-  // } catch (e) {
-  //   // ignore filesystem checks in exotic environments
-  // }
-  // // If still unset and we're running the compiled bundle (argv includes dist/index.js), assume production
-  // if (!NODE_ENV && isMain && process.argv.some((a) => String(a).endsWith('dist/index.js'))) {
-  //   NODE_ENV = 'production';
-  // }
-  // console.log('server/index.ts starting with NODE_ENV=', NODE_ENV);
-  // if (NODE_ENV !== "production") {
-  //   await setupVite(app, server);
-  // }
+  // (accidental shell command removed here)
 
-  // If NODE_ENV is not set, try to detect production by checking built dist/public or argv.
+  // If NODE_ENV is set, normalize it by trimming whitespace
   if (process.env.NODE_ENV) {
-    // Normalize any existing NODE_ENV (trim whitespace)
     process.env.NODE_ENV = process.env.NODE_ENV.toString().trim();
   }
 
