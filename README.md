@@ -1,8 +1,8 @@
 # 🎭 NDI_MardiGrasParade
 
-+> Playtest (public): Try the live build: https://mardi-gras-parade-game.vercel.app/
++> Playtest (public): Try the live build: https://<your-org-or-username>.github.io/<repository-name>/ (legacy; may be removed)
 +> Developer (local): Run the dev server and open http://localhost:5000
-+
+
 [![React](https://img.shields.io/badge/React-18.3-61dafb)](https://reactjs.org/)
 [![Three.js](https://img.shields.io/badge/Three.js-WebGL-black)](https://threejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178c6)](https://www.typescriptlang.org/)
@@ -16,27 +16,25 @@
 
 ## 🌐 Live Demo
 
-**Ready to deploy to Vercel!** This application is configured for one-click deployment to Vercel, making it publicly accessible to anyone with the deployment URL.
+**Note:** This repository has been migrated away from the previous hosting provider; frontend deploys are now recommended via GitHub Pages. The previous hosting configuration has been archived in `archive/legacy-hosting/` and top-level backups for reference.
 
-📖 **[View Complete Deployment Guide →](README_VERCEL.md)**
+If you still have a working public URL from the previous hosting, you can use it for playtesting, but new deploys should use GitHub Pages (instructions below).
 
-### Deploy Your Own Instance
+### Deploy to GitHub Pages (recommended)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Nola-Developer-Incubator/MardiGrasParadeGame)
+This repo includes a GitHub Actions workflow that builds the site and publishes `dist/public` to GitHub Pages (`gh-pages` branch). The workflow is located at `.github/workflows/deploy-gh-pages.yml`.
 
-Or manually:
-1. Fork this repository
-2. Connect to [Vercel](https://vercel.com)
-3. Add `DATABASE_URL` environment variable (see [Deployment Guide](README_VERCEL.md))
-4. Deploy! Your game will be live at `https://your-project-name.vercel.app`
+To deploy manually via Actions:
+1. Push to `main` (the workflow will build and publish automatically), or use the `workflow_dispatch` trigger in the Actions UI to run it on demand.
+2. Ensure `npm run build` completes successfully and `dist/public/index.html` is created.
 
-The deployed application is **fully public** - anyone with the URL can play the game directly in their browser, no installation required!
+The site will be available at `https://<your-org-or-username>.github.io/<repository-name>/` when published.
 
 ---
 
 ## 🚀 Quick Start (Local Development)
 
-Get the simulator running in under 2 minutes (developer) — or open the public playtest (tester):
+Get the simulator running in under 2 minutes (developer):
 
 ```bash
 # Clone repository
@@ -44,43 +42,34 @@ git clone https://github.com/Nola-Developer-Incubator/MardiGrasParadeGame.git
 cd MardiGrasParadeGame
 
 # Install dependencies
-npm install
+npm ci
 
 # Start development server (dev):
 npm run dev
 
 # Open locally → http://localhost:5000
-# Public playtest (tester) → https://mardi-gras-parade-game.vercel.app/
 ```
 
-**Which link should I use?**
-- Testers / non-devs: use the Public playtest → https://mardi-gras-parade-game.vercel.app/
-- Developers: run `npm run dev` and open the local URL → http://localhost:5000
+### Windows PowerShell notes
 
-**Playwright / CI**: To run Playwright against the public deploy, set `PLAYTEST_URL` to the Vercel URL in GitHub Secrets or locally before running tests.
-
-PowerShell (local test):
+If you get errors like "`npm.ps1 cannot be loaded because running scripts is disabled on this system`", run this in PowerShell (temporary for the session):
 
 ```powershell
-$env:PLAYTEST_URL = 'https://mardi-gras-parade-game.vercel.app'; npx playwright test
+# Allow scripts for this session (safe, temporary):
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process -Force
+
+# If npm.ps1 wrapper still blocks, run via cmd fallback:
+cmd /c "npm ci"
 ```
 
-Or on macOS / Linux:
-
-```bash
-export PLAYTEST_URL='https://mardi-gras-parade-game.vercel.app' && npx playwright test
-```
-
-That's it! The simulator will open in your default browser (or open the public link for a hosted playtest).
+If `npx` or `npm exec` is blocked by the PS wrapper, use the `cmd /c` fallback shown above.
 
 ---
 
 ## 🔗 Public Playtest
 
-Cloudflare Tunnel (cloudflared) support has been removed from this repository.
-
 - Developers: run the local dev server with `npm run dev` and open `http://localhost:5000`.
-- For a public instance, deploy to Vercel (recommended) or another hosting provider. See `README_VERCEL.md` for deployment instructions.
+- For a public instance, deploy using the GitHub Pages workflow or another hosting provider. See `DEPLOYMENT.md` for more options.
 
 ---
 
@@ -160,32 +149,15 @@ NDI_MardiGrasParade/
 
 ## 🌐 Deployment
 
-### Vercel (Recommended)
+### GitHub Pages (Recommended)
 
-This application is **production-ready for Vercel deployment**:
+This application is production-ready for GitHub Pages deployment. A workflow at `.github/workflows/deploy-gh-pages.yml` builds the site and publishes `dist/public` to the `gh-pages` branch.
 
-✅ **Public Access** - Deployed instances are publicly accessible to anyone with the URL  
-✅ **One-Click Deploy** - Use the "Deploy with Vercel" button above  
-✅ **Auto-Deploy** - Push to main branch automatically deploys  
-✅ **Preview URLs** - Every PR gets its own preview deployment  
+To deploy manually via Actions:
+1. Push to `main` (the workflow will build and publish automatically), or use the `workflow_dispatch` trigger in the Actions UI to run it on demand.
+2. Ensure `npm run build` completes successfully and `dist/public/index.html` is created.
 
-**Complete deployment instructions:** See [README_VERCEL.md](README_VERCEL.md)
-
-**Key Features When Deployed:**
-- Game accessible at `https://your-project-name.vercel.app`
-- Share the link with anyone - no login or setup required for players
-- Automatic HTTPS and global CDN
-- API routes work as serverless functions
-- Database persists user data and high scores
-
-### Testing Your Deployment
-
-Once deployed, anyone can test by visiting:
-```
-https://your-project-name.vercel.app
-```
-
-No authentication needed - the game loads and plays immediately in the browser!
+The site will be available at `https://<your-org-or-username>.github.io/<repository-name>/` when published.
 
 ---
 
@@ -332,12 +304,11 @@ If the public playtest URL returns an error (503 or similar):
 
 - Confirm the server is running locally: `npm run dev` (serves on http://localhost:5000)
 - Check the health endpoint: `curl http://localhost:5000/health` should return `{ status: 'ok' }`.
-- For a publicly accessible instance, deploy to Vercel (recommended) or another hosting provider.
-
+- For a publicly accessible instance, deploy using the GitHub Pages workflow or another hosting provider.
 
 ---
 
 ## 🛡️ Server & Deployment Updates (2025-12-18)
 
 - Graceful shutdown implemented: server now tracks open sockets and destroys lingering connections on shutdown. This improves reliability when restarting under process managers (pm2) or tunnels (cloudflared).
-- Use `startServer()` export from `server/index.ts` for programmatic start/shutdown in tests/CI.
+- Use `startServer()` export from `server/index.ts` for programmatic start/shutdown in tests/CI
