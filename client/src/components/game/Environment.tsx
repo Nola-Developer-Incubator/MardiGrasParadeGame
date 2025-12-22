@@ -123,12 +123,17 @@ export function Environment() {
       {/* Street/Ground - Main parade route */}
       <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
         <planeGeometry args={[14, 50]} />
-        <meshStandardMaterial 
-          map={asphaltTexture} 
-          map-repeat={new THREE.Vector2(3, 10)}
-          map-wrapS={THREE.RepeatWrapping}
-          map-wrapT={THREE.RepeatWrapping}
-        />
+        {asphaltTexture ? (
+          <meshStandardMaterial
+            map={asphaltTexture}
+            map-repeat={new THREE.Vector2(3, 10)}
+            map-wrapS={THREE.RepeatWrapping}
+            map-wrapT={THREE.RepeatWrapping}
+          />
+        ) : (
+          // Fallback plain material if texture fails to load
+          <meshStandardMaterial color="#444444" />
+        )}
       </mesh>
       
       {/* Street yellow center line */}
