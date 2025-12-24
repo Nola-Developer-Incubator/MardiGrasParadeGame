@@ -21,7 +21,8 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
-        run: npm ci
+        # Use npm install to tolerate lockfile mismatches in forks/PRs; maintainers should update lockfile in main for reproducible builds
+        run: npm install
 
       - name: Build project
         run: npm run build
@@ -49,4 +50,3 @@ jobs:
               issue_number: context.payload.pull_request.number,
               body
             });
-
