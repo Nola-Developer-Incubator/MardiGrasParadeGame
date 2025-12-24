@@ -21,8 +21,15 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
-        # Use npm install to tolerate lockfile mismatches in forks/PRs; maintainers should update lockfile in main for reproducible builds
-        run: npm install
+        # Try a reproducible install first (npm ci). If it fails (lockfile mismatch), fall back to npm install for contributor forks.
+        run: |
+          echo "Attempting reproducible install (npm ci)..."
+          if npm ci; then
+            echo "npm ci succeeded"
+          else
+            echo "npm ci failed — falling back to npm install"
+            npm install
+          fi
 
       - name: Build project
         run: npm run build
