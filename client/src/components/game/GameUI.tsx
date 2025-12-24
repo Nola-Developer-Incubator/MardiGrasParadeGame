@@ -28,7 +28,20 @@ export function GameUI() {
   });
   const [showAdmin, setShowAdmin] = useState(false);
   const isMobile = useIsMobile();
-  
+
+  // Development: Minimal HUD toggle
+  const [minimalHud, setMinimalHud] = useState<boolean>(() => {
+    try { return typeof window !== 'undefined' && localStorage.getItem('minimalHud') === 'true'; } catch { return false; }
+  });
+
+  useEffect(() => {
+    const handler = () => {
+      try { setMinimalHud(localStorage.getItem('minimalHud') === 'true'); } catch { }
+    };
+    window.addEventListener('minimalHud:updated', handler);
+    return () => window.removeEventListener('minimalHud:updated', handler);
+  }, []);
+
   // Map player color to display info
   const colorDisplayMap = {
     beads: { name: "Purple Beads", color: "#9b59b6" },
@@ -36,10 +49,10 @@ export function GameUI() {
     cup: { name: "Red Cup", color: "#e74c3c" },
   };
   const playerColorInfo = colorDisplayMap[playerColor];
-  
+
   // Sort bots by catches (descending)
   const sortedBots = [...botScores].sort((a, b) => b.catches - a.catches);
-  
+
   // Show combo animation when combo changes
   useEffect(() => {
     if (combo > 1) {
@@ -48,7 +61,7 @@ export function GameUI() {
       return () => clearTimeout(timer);
     }
   }, [combo]);
-  
+
   // Update combo timer
   useEffect(() => {
     if (combo > 0 && lastCatchTime > 0) {
@@ -61,7 +74,7 @@ export function GameUI() {
       return () => clearInterval(interval);
     }
   }, [combo, lastCatchTime]);
-  
+
   // Update power-up UI countdown
   useEffect(() => {
     if (activePowerUps.length > 0) {
@@ -71,12 +84,12 @@ export function GameUI() {
       return () => clearInterval(interval);
     }
   }, [activePowerUps.length]);
-  
+
   // Update showPersonas in localStorage
   useEffect(() => {
     try { if (typeof window !== 'undefined') localStorage.setItem('showPersonas', String(showPersonas)); } catch { }
   }, [showPersonas]);
-  
+
   const handleStartGame = () => {
     setShowTutorial(false);
     // Show first-level tutorial on level 1
@@ -86,12 +99,41 @@ export function GameUI() {
       startGame();
     }
   };
-  
+
   const handleTutorialComplete = () => {
     setShowFirstLevelTutorial(false);
     startGame();
   };
-  
+
+  // Render a minimal HUD when requested in dev
+  if (minimalHud && process.env.NODE_ENV === 'development') {
+    return (
+      <>
+        {phase === 'tutorial' && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+            <Card className="bg-black/80 border-2 border-yellow-400 p-6 max-w-xs text-white">
+              <h2 className="text-lg font-bold text-yellow-300 text-center mb-2">NDI_MardiGrasParade</h2>
+              <p className="text-sm text-center mb-4">A simplified HUD preview for development.</p>
+              <Button onClick={handleStartGame} className="w-full bg-yellow-500 text-purple-900 font-bold">Start</Button>
+            </Card>
+          </div>
+        )}
+
+        {phase === 'playing' && (
+          <div className="absolute top-4 left-4 pointer-events-none">
+            <div className="bg-black/60 text-white px-3 py-2 rounded-md pointer-events-auto">
+              <div className="flex items-center gap-3">
+                <div className="font-bold">L{level}</div>
+                <div className="text-xl font-black">{score}</div>
+                <div className="ml-2">💰 {coins}</div>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
+    );
+  }
+
   return (
     <>
       {/* Tutorial Overlay */}
