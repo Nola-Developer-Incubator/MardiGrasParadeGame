@@ -53,3 +53,56 @@ If you'd like, I can now:
 - Commit these docs to a branch and open a PR to trigger the preview workflow and produce a preview URL.
 - Expand any backlog item into a ticket template or Playwright test skeleton.
 
+# Product Backlog
+
+This backlog organizes work into prioritized items for the next milestones. Each row includes: ID, Title, Priority, Estimate (story points), Owner, and Status.
+
+| ID | Title | Priority | Estimate | Owner | Status |
+|----|-------|----------|----------|-------|--------|
+| PB-001 | Mobile & Desktop Joystick Improvements | P0 | 8 | Eng-A | In Progress |
+| PB-002 | Minimal HUD / Compact UI Mode | P0 | 5 | Eng-B | To Do |
+| PB-003 | Audio toggle persistence bugfix | P0 | 2 | Eng-A | To Do |
+| PB-004 | Session analytics & cloud save (Supabase) | P0 | 13 | Eng-C | To Do |
+| PB-005 | Visual remaining floats indicator | P1 | 3 | Eng-B | To Do |
+| PB-006 | Helper bot spawn on combo/purchase | P1 | 5 | Eng-A | To Do |
+| PB-007 | Leaderboard MVP (serverless) | P2 | 8 | Eng-C | Backlog |
+| PB-008 | Monetization plumbing (shop UI) | P2 | 13 | Eng-PM | Backlog |
+
+## Backlog Item — Expanded Example (PB-001)
+
+Title: Mobile & Desktop Joystick Improvements
+
+Description:
+- Make joystick responsive across common mobile browsers.
+- Separate competitor catch area from joystick when on mobile to avoid accidental input conflicts.
+- Improve visual affordance and hit targets for accessibility.
+
+Acceptance criteria:
+- Joystick area size is configurable and defaults to 120px for small mobile screens.
+- Joystick supports multi-touch and does not capture unrelated gestures (e.g., page scroll).
+- No regressions in desktop keyboard/mouse input.
+
+Implementation notes:
+- Use pointer events and `touch-action` CSS hints.
+- Extract joystick into `client/src/components/ui/Joystick.tsx` if not already separated.
+- Add unit/Playwright tests for basic movement and multi-touch behavior.
+
+Test/QA tasks:
+- Manual: Test on iOS Safari, Android Chrome, and desktop Chrome/Firefox.
+- Automated: Playwright skeleton test added in `tests/playwright/joystick.spec.ts` (placeholder).
+
+## Sprint Planning (example)
+Sprint goal: Ship joystick and minimal HUD improvements.
+Sprint length: 2 weeks
+Team: 2 engineers, 1 designer
+
+Planned items for Sprint:
+- PB-001 Joystick improvements (8 points)
+- PB-002 Minimal HUD (5 points)
+- PB-003 Audio toggle persistence (2 points)
+- PB-005 Remaining floats indicator (3 points)
+
+Total estimate: 18 points (fits 2-engineer cadence)
+
+## Ticket linking & templates
+Use the `docs/TICKET_TEMPLATE.md` for ticket content and acceptance criteria.
