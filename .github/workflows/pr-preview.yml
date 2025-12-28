@@ -64,10 +64,11 @@ jobs:
           path: ./dist/public
 
       - name: Deploy to gh-pages (previews/<run_id>)
-        if: ${{ secrets.GH_PAGES_PAT != '' }}
+        if: ${{ secrets.GH_PAGES_PAT != '' || secrets.GH_PAGES_DEPLOY_TOKEN != '' }}
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.GH_PAGES_PAT }}
+          # Accept either GH_PAGES_PAT (original) or GH_PAGES_DEPLOY_TOKEN (new name) as the deploy token
+          github_token: ${{ secrets.GH_PAGES_PAT || secrets.GH_PAGES_DEPLOY_TOKEN }}
           publish_branch: gh-pages
           publish_dir: ./dist/public
           # Place builds under previews/<run_id> so multiple previews can coexist
@@ -91,7 +92,7 @@ jobs:
               `\n`,
               `If a public preview was published to GitHub Pages it will (or will soon) be available at:`,
               ghPagesUrl,
-              `\nIf you don't see the preview or the gh-pages URL isn't live, ensure a repository secret named \`GH_PAGES_PAT\` is set (PAT with repo push permission) or download the artifact manually.`
+              `\nIf you don't see the preview or the gh-pages URL isn't live, ensure a repository secret named \`GH_PAGES_PAT\` or \`GH_PAGES_DEPLOY_TOKEN\` is set (PAT with repo push permission) or download the artifact manually.`
             ];
             const body = bodyLines.join('\n');
             await github.rest.issues.createComment({ owner, repo, issue_number: context.payload.pull_request.number, body });
