@@ -124,15 +124,7 @@ export function GameUI() {
         )}
 
         {phase === 'playing' && (
-          <div className="absolute top-4 left-4 pointer-events-none">
-            <div className="bg-black/60 text-white px-3 py-2 rounded-md pointer-events-auto">
-              <div className="flex items-center gap-3">
-                <div className="font-bold">L{level}</div>
-                <div className="text-xl font-black">{score}</div>
-                <div className="ml-2">💰 {coins}</div>
-              </div>
-            </div>
-          </div>
+          <MinimalHUD floatsRemaining={Math.max(0, (totalFloats || 0) - (floatsPassed || 0))} score={score} />
         )}
       </>
     );
@@ -263,6 +255,9 @@ export function GameUI() {
             </div>
           </div>
           
+          {/* Remaining floats indicator (compact) */}
+          <RemainingFloats remaining={Math.max(0, (totalFloats || 0) - (floatsPassed || 0))} />
+
           {/* Admin & Controls - Hidden on phones */}
           <div className="hidden md:flex absolute bottom-4 right-4 pointer-events-auto flex-col gap-2">
             <Button onClick={() => setShowAdmin(true)} size="lg" className="bg-gray-800 text-white border-2 border-yellow-400">Admin</Button>
