@@ -14,8 +14,6 @@ export const useAudioStore = create<AudioStore>()(
     }),
     {
       name: 'audio-storage',
-      getStorage: () => localStorage,
     }
   )
 );
-
