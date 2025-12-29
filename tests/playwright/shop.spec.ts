@@ -38,19 +38,36 @@ test('shop purchase helper', async ({ page }) => {
     // If the start button isn't present, assume we're already past tutorial
   }
 
-  // Remove any debug overlay that might intercept clicks (e.g., 'Show Personas (debug)')
+  // Install a MutationObserver in the page to remove or hide any overlay elements that match 'Show Personas'
   await page.evaluate(() => {
     try {
-      const el = Array.from(document.querySelectorAll('div')).find(d => d && d.textContent && d.textContent.includes('Show Personas'));
-      if (el) {
-        // hide and disable pointer events to avoid intercepting clicks
-        (el as HTMLElement).style.pointerEvents = 'none';
-        (el as HTMLElement).style.opacity = '0.01';
-      }
+      const removeOverlays = () => {
+        const els = Array.from(document.querySelectorAll('*')).filter(el => {
+          try {
+            return el.textContent && el.textContent.includes('Show Personas');
+          } catch { return false; }
+        });
+        for (const el of els) {
+          try {
+            // Prefer to remove the element from the DOM; if removal causes React issues, fall back to hiding
+            if (el.parentNode) el.parentNode.removeChild(el);
+          } catch (_) {
+            try { (el as HTMLElement).style.pointerEvents = 'none'; (el as HTMLElement).style.opacity = '0'; } catch (_) {}
+          }
+        }
+      };
+      removeOverlays();
+      const observer = new MutationObserver(() => removeOverlays());
+      observer.observe(document.body || document.documentElement, { subtree: true, childList: true });
+      // Stop observing after 5s
+      setTimeout(() => observer.disconnect(), 5000);
     } catch (e) {
       // ignore
     }
   });
+
+  // Wait a short moment to let overlay removals take effect
+  await page.waitForTimeout(250);
 
   // Wait for HUD and open shop button
   const open = page.getByTestId('open-shop');
