@@ -1,5 +1,5 @@
-// Vercel Serverless Function Entry Point
-// This file wraps the Express app for Vercel's serverless environment
+// Serverless function entry point
+// This file exports the Express app as a serverless function handler
 
 // Explicitly set runtime to Node.js since we use Node-specific APIs
 // (fs, path, Buffer, process.env, etc.)
@@ -10,13 +10,25 @@ import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 import fs from 'fs';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+async function getApp() {
+  if (!appPromise) {
+    // Set production environment
+    process.env.NODE_ENV = 'production';
 
-// Create Express app
-const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+    // Dynamic import of the built server bundle. Older builds placed createApp
+    // in `dist/app.js` while current builds output a single `dist/index.js`.
+    // Try both, but prefer index.js.
+    let mod;
+    try {
+      mod = await import('../dist/index.js');
+    } catch (eIndex) {
+      try {
+        mod = await import('../dist/app.js');
+      } catch (eApp) {
+        console.error('Failed to load server bundle:', eIndex, eApp);
+        throw eIndex;
+      }
+    }
 
 // Structured logging middleware for API routes
 app.use((req, res, next) => {
@@ -32,12 +44,16 @@ app.use((req, res, next) => {
   next();
 });
 
-// Register API routes
-// Add your API routes here with /api prefix
-// Example:
-// app.get('/api/health', (req, res) => {
-//   res.json({ status: 'ok', timestamp: new Date().toISOString() });
-// });
+    if (typeof createApp !== 'function') {
+      // If the import returned an object with multiple keys, try to find a function value
+      const keys = Object.keys(mod || {});
+      for (const k of keys) {
+        if (typeof mod[k] === 'function') {
+          createApp = mod[k];
+          break;
+        }
+      }
+    }
 
 // Health check endpoint with error handling
 app.get('/api/health', (req, res) => {
@@ -63,28 +79,23 @@ app.get('/api/health', (req, res) => {
   }
 });
 
-// Serve static files in production
-const distPath = resolve(__dirname, '..', 'dist', 'public');
+    appPromise = createApp();
+  }
+  return appPromise;
+}
 
-if (fs.existsSync(distPath)) {
-  // Serve static assets
-  app.use(express.static(distPath));
-  
-  // Fallback to index.html for client-side routing (SPA)
-  app.get('*', (req, res) => {
-    // Don't serve index.html for API routes
-    if (req.path.startsWith('/api')) {
-      return res.status(404).json({ error: 'API endpoint not found' });
+// Export handler for serverless functions
+export default async function handler(req, res) {
+  try {
+    const app = await getApp();
+    // Express apps can be called directly as functions
+    return app(req, res);
+  } catch (error) {
+    console.error('Handler error:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Internal Server Error', message: String(error && error.message ? error.message : error) });
     }
-    res.sendFile(resolve(distPath, 'index.html'));
-  });
-} else {
-  app.get('*', (req, res) => {
-    res.status(503).json({ 
-      error: 'Application not built',
-      message: 'Please run npm run build before deploying' 
-    });
-  });
+  }
 }
 
 // Enhanced error handler with structured logging

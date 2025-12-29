@@ -1,39 +1,7 @@
-node_modules
-.git
-.github
-.gitignore
-.DS_Store
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# This repository no longer uses Vercel for deployments.
+# The original .vercelignore has been archived under archive/legacy-hosting/.vercelignore
+# Keep this stub to avoid accidental use; see docs/DEPLOYMENT.md and README.md for GitHub Pages deployment instructions.
 
-# Development files
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.replit
+# No files required here; this project uses GitHub Pages for public hosting.
 
-# Editor directories and files
-.vscode
-.idea
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# Documentation (optional - uncomment if you want to exclude)
-# docs/
-
-# Test files
-*.test.ts
-*.test.tsx
-*.spec.ts
-*.spec.tsx
-
-# Temporary files
-*.tmp
-.cache
-unreal
+# NOTE: If you intentionally need the original .vercelignore, see archive/legacy-hosting/.vercelignore
