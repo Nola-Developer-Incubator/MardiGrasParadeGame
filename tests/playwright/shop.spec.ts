@@ -15,12 +15,17 @@ test('shop purchase helper', async ({ page }) => {
 
   await page.goto(process.env.PLAYTEST_URL ?? 'http://localhost:5000', { waitUntil: 'load' });
 
-  // Try clicking 'Start Game' via DOM regardless of Playwright locators
-  await page.evaluate(() => {
-    const buttons = Array.from(document.querySelectorAll('button')) as HTMLElement[];
-    const start = buttons.find(b => b.textContent && b.textContent.trim() === 'Start Game');
-    if (start) start.click();
-  });
+  // Wait for Start Game button to be attached (if present) then click via DOM
+  try {
+    await page.waitForSelector('button:has-text("Start Game")', { state: 'attached', timeout: 3000 });
+    await page.evaluate(() => {
+      const buttons = Array.from(document.querySelectorAll('button')) as HTMLElement[];
+      const start = buttons.find(b => b.textContent && b.textContent.trim() === 'Start Game');
+      if (start) start.click();
+    });
+  } catch {
+    // Start button not present quickly; proceed (may already be past tutorial)
+  }
 
   // Aggressively click through tutorial buttons for up to 8s
   await page.evaluate(() => {
