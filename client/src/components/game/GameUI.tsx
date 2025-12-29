@@ -1,18 +1,18 @@
-import { useState, useEffect } from "react";
-import { useParadeGame } from "@/lib/stores/useParadeGame";
-import { useAudio } from "@/lib/stores/useAudio";
-import { useIsMobile } from "@/hooks/use-is-mobile";
-import { motion, AnimatePresence } from "framer-motion";
-import { Volume2, VolumeX, ShoppingBag, Settings } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { CosmeticShop } from "./CosmeticShop";
-import { AdminModal } from '@/components/ui/AdminModal';
-import { FirstLevelTutorial } from "./FirstLevelTutorial";
-import { SettingsModal } from "./SettingsModal";
-import { MinimalHUD } from "@/components/ui/MinimalHUD";
-import { RemainingFloats } from "@/components/ui/RemainingFloats";
+import {useEffect, useState} from "react";
+import {useParadeGame} from "@/lib/stores/useParadeGame";
+import {useAudio} from "@/lib/stores/useAudio";
+import {useIsMobile} from "@/hooks/use-is-mobile";
+import {AnimatePresence, motion} from "framer-motion";
+import {Settings, ShoppingBag, Volume2, VolumeX} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {Card} from "@/components/ui/card";
+import {Progress} from "@/components/ui/progress";
+import {CosmeticShop} from "./CosmeticShop";
+import {AdminModal} from '@/components/ui/AdminModal';
+import {FirstLevelTutorial} from "./FirstLevelTutorial";
+import {SettingsModal} from "./SettingsModal";
+import {MinimalHUD} from "@/components/ui/MinimalHUD";
+import {RemainingFloats} from "@/components/ui/RemainingFloats";
 
 export function GameUI() {
   const { phase, score, level, combo, startGame, activePowerUps, lastCatchTime, playerColor, botScores, coins, joystickEnabled, totalFloats, floatsPassed } = useParadeGame();
@@ -39,6 +39,14 @@ export function GameUI() {
   const forceHudForTests = typeof window !== 'undefined' && (() => {
     try { return localStorage.getItem('TEST_FORCE_HUD') === 'true'; } catch { return false; }
   })();
+
+  // Expose a test helper to open the shop programmatically when running tests.
+  useEffect(() => {
+    if (forceHudForTests && typeof window !== 'undefined') {
+      (window as any).__OPEN_SHOP = () => setShowShop(true);
+      return () => { try { delete (window as any).__OPEN_SHOP; } catch {} };
+    }
+  }, [forceHudForTests]);
 
   useEffect(() => {
     const handler = () => {
