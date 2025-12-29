@@ -38,6 +38,20 @@ test('shop purchase helper', async ({ page }) => {
     // If the start button isn't present, assume we're already past tutorial
   }
 
+  // Remove any debug overlay that might intercept clicks (e.g., 'Show Personas (debug)')
+  await page.evaluate(() => {
+    try {
+      const el = Array.from(document.querySelectorAll('div')).find(d => d && d.textContent && d.textContent.includes('Show Personas'));
+      if (el) {
+        // hide and disable pointer events to avoid intercepting clicks
+        (el as HTMLElement).style.pointerEvents = 'none';
+        (el as HTMLElement).style.opacity = '0.01';
+      }
+    } catch (e) {
+      // ignore
+    }
+  });
+
   // Wait for HUD and open shop button
   const open = page.getByTestId('open-shop');
   await open.waitFor({ timeout: 10000 });
