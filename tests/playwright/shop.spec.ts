@@ -14,18 +14,14 @@ test('shop purchase helper', async ({ page }) => {
 
   await page.goto(process.env.PLAYTEST_URL ?? 'http://localhost:5000', { waitUntil: 'load' });
 
-  // Use DOM clicks (evaluate) to drive tutorial reliably
+  // Try clicking 'Start Game' via DOM regardless of Playwright locators
   await page.evaluate(() => {
     const buttons = Array.from(document.querySelectorAll('button')) as HTMLElement[];
     const start = buttons.find(b => b.textContent && b.textContent.trim() === 'Start Game');
-    if (start) {
-      start.click();
-      // return true to indicate we clicked
-      // (Playwright evaluate ignores return here but it's fine)
-    }
+    if (start) start.click();
   });
 
-  // Now aggressively click through tutorial buttons for up to 8s
+  // Aggressively click through tutorial buttons for up to 8s
   await page.evaluate(() => {
     const texts = ['Skip', 'Start!', 'Next'];
     const end = Date.now() + 8000;
@@ -40,7 +36,7 @@ test('shop purchase helper', async ({ page }) => {
     }
   });
 
-  // Ensure debug overlays are removed (defensive)
+  // Remove 'Show Personas' overlays defensively
   await page.evaluate(() => {
     try {
       const els = Array.from(document.querySelectorAll('*')).filter(e => e.textContent && e.textContent.includes('Show Personas'));
@@ -50,13 +46,13 @@ test('shop purchase helper', async ({ page }) => {
     } catch {}
   });
 
-  // Wait up to 30s for HUD/shop to render (open-shop is rendered after tutorial/game start)
+  // Wait up to 30s for HUD/shop to render
   await page.waitForSelector('[data-testid="open-shop"]', { timeout: 30000 });
 
-  // Click shop open using DOM click (avoid pointer interception issues)
+  // Click open-shop via DOM
   await page.evaluate(() => { const b = document.querySelector('[data-testid="open-shop"]') as HTMLElement | null; if (b) b.click(); });
 
-  // Wait for buy-helper, click it
+  // Click buy-helper
   await page.waitForSelector('[data-testid="buy-helper"]', { timeout: 5000 });
   await page.evaluate(() => { const b = document.querySelector('[data-testid="buy-helper"]') as HTMLElement | null; if (b) b.click(); });
 
