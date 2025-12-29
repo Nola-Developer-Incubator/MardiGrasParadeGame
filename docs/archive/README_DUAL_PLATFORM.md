@@ -14,7 +14,11 @@ Both versions share the same backend API and game design, allowing players to ex
 ## ?? Project Structure
 
 ```
+<<<<<<< HEAD
+Mardi-Gras-Parade-Game/
+=======
 NDI_MardiGrasParade/
+>>>>>>> origin/main
 ??? client/   # React Three.js frontend (WEB VERSION)
 ?   ??? src/
 ?   ?   ??? components/game/  # Game components

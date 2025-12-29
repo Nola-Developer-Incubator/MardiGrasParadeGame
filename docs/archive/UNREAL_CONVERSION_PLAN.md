@@ -17,7 +17,11 @@ This document provides a complete roadmap for converting the React Three.js NDI_
 
 ### Current React Three.js Structure
 ```
+<<<<<<< HEAD
+Mardi-Gras-Parade-Game/
+=======
 NDI_MardiGrasParade/
+>>>>>>> origin/main
 ??? client/       # React frontend
 ?   ??? src/
 ?       ??? components/game/  # Game components
@@ -29,7 +33,11 @@ NDI_MardiGrasParade/
 
 ### New Unreal Engine Structure (Side-by-Side)
 ```
+<<<<<<< HEAD
+Mardi-Gras-Parade-Game/
+=======
 NDI_MardiGrasParade/
+>>>>>>> origin/main
 ??? client/         # React frontend (EXISTING)
 ??? server/       # Express backend (SHARED)
 ??? shared/        # Database schema (SHARED)

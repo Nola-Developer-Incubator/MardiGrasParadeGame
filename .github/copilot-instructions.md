@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+# GitHub Copilot Instructions for Mardi Gras Parade Simulator
+
+## Repository Overview
+
+This is a 3D Mardi Gras parade simulator built with React, Three.js, and Express.js. Players catch collectibles (beads, doubloons, cups) from parade floats in an immersive browser-based experience that celebrates New Orleans culture.
+=======
 # GitHub Copilot Instructions for NDI_MardiGrasParade
 
 ## Quick Reference
@@ -23,6 +30,7 @@ npx playwright test  # Run E2E tests
 ## Repository Overview
 
 This is NDI_MardiGrasParade, a 3D Mardi Gras parade experience built with React, Three.js, and Express.js. Players catch collectibles (beads, doubloons, cups) from parade floats in an immersive browser-based experience that celebrates New Orleans culture.
+>>>>>>> origin/main
 
 ## Tech Stack
 
@@ -90,6 +98,8 @@ npm start          # Start production server
 npm run db:push    # Push database schema to PostgreSQL
 ```
 
+<<<<<<< HEAD
+=======
 ### Testing
 ```bash
 npx playwright test              # Run Playwright end-to-end tests
@@ -97,6 +107,7 @@ npx playwright test --ui         # Run tests in UI mode
 npx playwright test --headed     # Run tests in headed mode (see browser)
 ```
 
+>>>>>>> origin/main
 ## Coding Standards
 
 ### TypeScript
@@ -303,7 +314,11 @@ const texture = useTexture('/textures/my-texture.png');
 
 ## Git Commit Message Format
 
+<<<<<<< HEAD
+Follow [Conventional Commits](https://www.conventionalcommits.org/):
+=======
 Follow <a href="https://www.conventionalcommits.org/">Conventional Commits</a>:
+>>>>>>> origin/main
 
 ```
 type(scope): description
@@ -332,8 +347,11 @@ perf(rendering): reduce draw calls for better FPS
 
 ## Testing Guidelines
 
+<<<<<<< HEAD
+=======
 ### Manual Testing
 
+>>>>>>> origin/main
 Since this is a game, most testing is manual:
 
 1. **Start dev server**: `npm run dev`
@@ -344,6 +362,16 @@ Since this is a game, most testing is manual:
 6. **Check console**: Ensure no errors or warnings
 7. **Type check**: Run `npm run check` before committing
 
+<<<<<<< HEAD
+### Pre-Commit Checklist
+- [ ] Code runs without errors (`npm run dev`)
+- [ ] TypeScript compiles (`npm run check`)
+- [ ] No console errors or warnings
+- [ ] Game is playable and features work
+- [ ] Performance is acceptable (45+ FPS)
+- [ ] Code follows project style guidelines
+- [ ] Commit message follows conventional format
+=======
 ### Automated Testing
 
 The project includes Playwright end-to-end tests:
@@ -384,6 +412,7 @@ Test files are located in `tests/playwright/`. When adding new features, conside
 - **Playwright tests** run in CI environment
 - **Review required** before merging to main
 - **Deploy to GitHub Pages** happens automatically on merge to main
+>>>>>>> origin/main
 
 ## Environment Variables
 
@@ -404,6 +433,15 @@ SESSION_SECRET=your_random_secret_here
 - **Follow existing patterns** - Match the coding style of surrounding code
 - **Update documentation** if you change public APIs or add new features
 
+<<<<<<< HEAD
+## Resources
+
+- [CONTRIBUTING.md](../docs/CONTRIBUTING.md) - Full contribution guidelines
+- [DEVELOPMENT_GUIDE.md](../docs/DEVELOPMENT_GUIDE.md) - Detailed technical documentation
+- [React Three Fiber Docs](https://docs.pmnd.rs/react-three-fiber)
+- [Three.js Documentation](https://threejs.org/docs)
+- [Drizzle ORM Docs](https://orm.drizzle.team)
+=======
 ## Working with GitHub Copilot
 
 ### Best Practices for This Repository
@@ -496,3 +534,4 @@ PORT=3000 npm run dev
 - [React Three Fiber Docs](https://docs.pmnd.rs/react-three-fiber) - R3F official documentation
 - [Three.js Documentation](https://threejs.org/docs) - Three.js API reference
 - [Drizzle ORM Docs](https://orm.drizzle.team) - Database ORM documentation
+>>>>>>> origin/main

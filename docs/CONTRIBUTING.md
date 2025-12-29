@@ -510,6 +510,8 @@ Follow the existing code style in the project:
 
 ---
 
+<<<<<<< HEAD
+=======
 ## Communication & Best Practices
 
 To reduce friction and speed up review/merge cycles, follow these simple rules when contributing or requesting merges:
@@ -536,6 +538,7 @@ Why this helps
 
 ---
 
+>>>>>>> origin/main
 ## Getting Help
 
 ### Resources
