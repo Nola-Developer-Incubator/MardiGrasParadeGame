@@ -1,6 +1,9 @@
 import { test, expect } from '@playwright/test';
 
 test('shop purchase helper', async ({ page }) => {
+  // Ensure desktop viewport so shop button isn't hidden (hidden on small screens)
+  await page.setViewportSize({ width: 1280, height: 800 });
+
   await page.goto(process.env.PLAYTEST_URL ?? 'http://localhost:5000');
 
   // Ensure the main tutorial overlay is handled: click Start Game if present
