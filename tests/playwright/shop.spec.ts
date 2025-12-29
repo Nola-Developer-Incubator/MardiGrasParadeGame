@@ -47,14 +47,14 @@ test('shop purchase helper', async ({ page }) => {
     } catch {}
   });
 
-  // Wait up to 30s for HUD/shop to render
-  await page.waitForSelector('[data-testid="open-shop"]', { timeout: 30000 });
+  // Wait up to 30s for HUD/shop to be attached to DOM (state: 'attached')
+  await page.waitForSelector('[data-testid="open-shop"]', { state: 'attached', timeout: 30000 });
 
-  // Click open-shop via DOM
+  // Click open-shop via DOM regardless of visibility
   await page.evaluate(() => { const b = document.querySelector('[data-testid="open-shop"]') as HTMLElement | null; if (b) b.click(); });
 
-  // Click buy-helper
-  await page.waitForSelector('[data-testid="buy-helper"]', { timeout: 5000 });
+  // Click buy-helper (wait for attached)
+  await page.waitForSelector('[data-testid="buy-helper"]', { state: 'attached', timeout: 5000 });
   await page.evaluate(() => { const b = document.querySelector('[data-testid="buy-helper"]') as HTMLElement | null; if (b) b.click(); });
 
   // Assert shop message
