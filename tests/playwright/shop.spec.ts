@@ -4,11 +4,12 @@ test('shop purchase helper', async ({ page }) => {
   // desktop viewport
   await page.setViewportSize({ width: 1280, height: 800 });
 
-  // disable debug overlays and minimal HUD flags early
+  // disable debug overlays and minimal HUD flags early; force HUD for tests
   await page.addInitScript(() => {
     try {
       localStorage.setItem('showPersonas', 'false');
       localStorage.setItem('minimalHud', 'false');
+      localStorage.setItem('TEST_FORCE_HUD', 'true');
     } catch {}
   });
 

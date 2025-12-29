@@ -35,6 +35,11 @@ export function GameUI() {
     try { return typeof window !== 'undefined' && localStorage.getItem('minimalHud') === 'true'; } catch { return false; }
   });
 
+  // Force HUD for tests (localStorage flag) — helpful so automated tests can access shop without completing tutorial
+  const forceHudForTests = typeof window !== 'undefined' && (() => {
+    try { return localStorage.getItem('TEST_FORCE_HUD') === 'true'; } catch { return false; }
+  })();
+
   useEffect(() => {
     const handler = () => {
       try { setMinimalHud(localStorage.getItem('minimalHud') === 'true'); } catch { }
@@ -182,7 +187,7 @@ export function GameUI() {
       </AnimatePresence>
       
       {/* In-Game HUD */}
-      {phase === "playing" && (
+      {(phase === "playing" || forceHudForTests) && (
         <div className="absolute inset-0 pointer-events-none">
           {/* Top HUD Bar - Phone Optimized */}
           <div className="absolute top-2 md:top-4 left-2 md:left-4 right-2 md:right-4 flex justify-between items-start pointer-events-auto">
