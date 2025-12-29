@@ -11,9 +11,21 @@ test('shop purchase helper', async ({ page }) => {
   try {
     if (await startButton.isVisible({ timeout: 3000 })) {
       await startButton.click();
+
+      // If the first-level tutorial appears, click Skip (or click through to Start!)
+      const skipBtn = page.getByRole('button', { name: /^Skip$/i });
+      try {
+        if (await skipBtn.isVisible({ timeout: 2000 })) {
+          await skipBtn.click();
+        }
+      } catch {
+        // If Skip isn't visible, try final Start button in tutorial
+        const finalStart = page.getByRole('button', { name: /Start!?$/i });
+        try { if (await finalStart.isVisible({ timeout: 2000 })) await finalStart.click(); } catch { }
+      }
     }
   } catch {
-    // If not visible, assume already past tutorial
+    // If the start button isn't present, assume we're already past tutorial
   }
 
   // Wait for HUD and open shop button
