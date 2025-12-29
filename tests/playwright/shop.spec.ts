@@ -20,29 +20,34 @@ test('shop purchase helper', async ({ page }) => {
   const startButton = page.getByRole('button', { name: /Start Game/i });
   try {
     if (await startButton.isVisible({ timeout: 3000 })) {
-      // use DOM click to avoid Playwright interception; match by trimmed text
+      // Click the Start Game button via DOM to avoid Playwright interception
       await page.evaluate(() => {
         const buttons = Array.from(document.querySelectorAll('button')) as HTMLElement[];
         const b = buttons.find(el => el.textContent && el.textContent.trim() === 'Start Game');
         if (b) b.click();
       });
 
-      // If the first-level tutorial appears, click Skip (or click through to Start!)
-      try {
-        await page.waitForTimeout(300); // allow tutorial to render
-        await page.evaluate(() => {
+      // Drive the tutorial: repeatedly click Next / Skip / Start! until overlay closes
+      await page.evaluate(() => {
+        const texts = ['Next', 'Skip', 'Start!'];
+        const timeout = Date.now() + 8000; // 8s max
+        function clickAny() {
           const buttons = Array.from(document.querySelectorAll('button')) as HTMLElement[];
-          // Try Skip first
-          let b = buttons.find(el => el.textContent && el.textContent.trim() === 'Skip');
-          if (!b) {
-            // Try exact 'Start!' label in the tutorial
-            b = buttons.find(el => el.textContent && el.textContent.trim() === 'Start!');
+          for (const t of texts) {
+            const b = buttons.find(el => el.textContent && el.textContent.trim() === t);
+            if (b) { try { b.click(); return true; } catch {} }
           }
-          if (b) b.click();
-        });
-      } catch (e) {
-        // ignore
-      }
+          return false;
+        }
+        // keep clicking until no more buttons or timeout
+        while (Date.now() < timeout) {
+          const clicked = clickAny();
+          if (!clicked) break;
+        }
+      });
+
+      // small pause to allow HUD to render
+      await page.waitForTimeout(300);
     }
   } catch {
     // If the start button isn't present, assume we're already past tutorial
