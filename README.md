@@ -1,15 +1,3 @@
-<<<<<<< HEAD
-# 🎭 Mardi Gras Parade Simulator
-
-[![React](https://img.shields.io/badge/React-18.3-61dafb)](https://reactjs.org/)
-[![Three.js](https://img.shields.io/badge/Three.js-WebGL-black)](https://threejs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178c6)](https://www.typescriptlang.org/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-
-> **An immersive 3D Mardi Gras parade simulator playable directly in your browser!**
-> 
-> Catch beads, doubloons, and cups from parade floats while competing with AI opponents in this celebration of New Orleans culture.
-=======
 # 🎭 NDI_MardiGrasParade — Playable 3D Mardi Gras Parade
 
 This repository contains a browser-playable 3D Mardi Gras parade experience built with React, React Three Fiber, Three.js and TypeScript.
@@ -20,21 +8,10 @@ Quick references
 - Canonical documentation and planning artifacts: `docs/README.md` (Game Design, Product Backlog, Roadmap, Ticket Template).
 - Playwright tests: `tests/playwright/` (skeletons and test cases).
 - PR preview workflow: `.github/workflows/pr-preview.yml` uploads preview artifacts and can publish previews to `gh-pages` when the `GH_PAGES_PAT` or `GH_PAGES_DEPLOY_TOKEN` secret is configured.
->>>>>>> origin/main
 
 Quick start (developer)
 1. Clone the repo and enter the directory:
 
-<<<<<<< HEAD
-## 🚀 Quick Start
-
-Get the simulator running in under 2 minutes:
-
-```bash
-# Clone repository
-git clone https://github.com/FreeLundin/Mardi-Gras-Parade-Game.git
-cd Mardi-Gras-Parade-Game
-=======
    git clone https://github.com/Nola-Developer-Incubator/MardiGrasParadeGame.git
    cd MardiGrasParadeGame
 
@@ -49,7 +26,6 @@ cd Mardi-Gras-Parade-Game
 
 Documentation
 - Full documentation and planning artifacts live under `docs/`. Start here: `docs/README.md`.
->>>>>>> origin/main
 
 Contributing
 - Run `npm ci` and `npm run dev` to test locally.
@@ -61,7 +37,21 @@ If you'd like, I can:
 - Clean up UI/HUD code and implement the minimal HUD/joystick improvements described in the backlog.
 - Enable and validate gh-pages publishing for PR previews (requires `GH_PAGES_PAT` secret).
 
-<<<<<<< HEAD
+## 🚀 Quick Start (Local Development)
+
+Get the simulator running in under 2 minutes:
+
+```bash
+# Clone repository
+git clone https://github.com/FreeLundin/Nola-Developer-Incubator.git
+cd Nola-Developer-Incubator
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
 # Open browser → http://localhost:5000
 ```
 
@@ -98,7 +88,7 @@ That's it! The simulator will open in your default browser.
 ## 🏗️ Project Structure
 
 ```
-Mardi-Gras-Parade-Game/
+NDI_MardiGrasParade/
 ├── client/                 # React frontend
 │   ├── src/
 │   │   ├── components/
@@ -140,6 +130,102 @@ Mardi-Gras-Parade-Game/
 - **Drizzle ORM** - Lightweight SQL ORM
 - **PostgreSQL** - Robust relational database (Neon)
 - **WebSocket** - Real-time communication (optional)
+
+---
+
+## 🌐 Deployment
+
+### Vercel (Recommended)
+
+This application is **production-ready for Vercel deployment**:
+
+✅ **Public Access** - Deployed instances are publicly accessible to anyone with the URL  
+✅ **One-Click Deploy** - Use the "Deploy with Vercel" button above  
+✅ **Auto-Deploy** - Push to main branch automatically deploys  
+✅ **Preview URLs** - Every PR gets its own preview deployment  
+
+**Complete deployment instructions:** See [README_VERCEL.md](README_VERCEL.md)
+
+**Key Features When Deployed:**
+- Game accessible at `https://your-project-name.vercel.app`
+- Share the link with anyone - no login or setup required for players
+- Automatic HTTPS and global CDN
+- API routes work as serverless functions
+- Database persists user data and high scores
+
+#### Understanding Vercel Runtimes
+
+This project uses **Node.js runtime** for serverless functions (not Edge runtime), which is important for the following reasons:
+
+**Why Node.js Runtime?**
+- Uses Node-specific APIs (fs, path, Buffer, crypto)
+- Requires process.env for environment variables
+- Compatible with Express.js middleware
+- Supports PostgreSQL database connections
+
+The runtime is explicitly set in `api/index.js`:
+```javascript
+export const runtime = 'nodejs';
+```
+
+**Edge vs Node.js Runtime:**
+- **Edge Runtime**: Lightweight, ultra-fast, runs on Vercel's edge network, limited Node.js API support
+- **Node.js Runtime**: Full Node.js API support, slightly slower cold starts, required for database and filesystem operations
+
+#### Environment Variables for Vercel
+
+When deploying to Vercel, configure these environment variables in your project settings:
+
+**Required:**
+- `DATABASE_URL` - PostgreSQL connection string (from Neon or other provider)
+- `NODE_ENV` - Set to `production`
+
+**How to Set Environment Variables:**
+1. Go to your Vercel project dashboard
+2. Navigate to **Settings** → **Environment Variables**
+3. Add each variable with appropriate values
+4. **Important**: Choose the correct environment:
+   - **Production**: For main branch deployments
+   - **Preview**: For PR and branch previews
+   - **Development**: For local development (use `.env` file instead)
+
+#### Viewing Function Logs in Vercel
+
+To debug issues in production:
+
+1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
+2. Select your project
+3. Click on **Deployments**
+4. Select a specific deployment
+5. Click on the **Functions** tab
+6. View real-time logs for each serverless function invocation
+
+**Logs include:**
+- Request method and path
+- Timestamp
+- Error messages and stack traces
+- Response status codes
+
+**Reference:** [Vercel Function Logs Documentation](https://vercel.com/docs/observability/runtime-logs)
+
+For FUNCTION_INVOCATION_FAILED errors, check:
+- Environment variables are set correctly
+- No missing dependencies
+- No unhandled promise rejections
+- Runtime is set to 'nodejs' for Node-dependent code
+
+**Additional Resources:**
+- [Vercel Errors Reference](https://vercel.com/docs/errors/FUNCTION_INVOCATION_FAILED)
+- [Node.js Runtime Documentation](https://vercel.com/docs/functions/runtimes/node-js)
+
+### Testing Your Deployment
+
+Once deployed, anyone can test by visiting:
+```
+https://your-project-name.vercel.app
+```
+
+No authentication needed - the game loads and plays immediately in the browser!
 
 ---
 
@@ -300,18 +386,18 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ### Getting Help
 - **📖 Documentation** - Check [DEVELOPMENT_GUIDE.md](docs/DEVELOPMENT_GUIDE.md) first
-- **🐛 Issues** - [Create an issue](https://github.com/FreeLundin/Mardi-Gras-Parade-Game/issues) for bugs or feature requests
-- **💬 Discussions** - [GitHub Discussions](https://github.com/FreeLundin/Mardi-Gras-Parade-Game/discussions) for questions and ideas
+- **🐛 Issues** - [Create an issue](https://github.com/FreeLundin/Nola-Developer-Incubator/issues) for bugs or feature requests
+- **💬 Discussions** - [GitHub Discussions](https://github.com/FreeLundin/Nola-Developer-Incubator/discussions) for questions and ideas
 
 ### Stay Connected
-- **GitHub** - [FreeLundin/Mardi-Gras-Parade-Game](https://github.com/FreeLundin/Mardi-Gras-Parade-Game)
+- **GitHub** - [FreeLundin/Nola-Developer-Incubator](https://github.com/FreeLundin/Nola-Developer-Incubator)
 - **Project Lead** - Brandon Lundin
 
 ---
 
 ## 🎉 Let's Celebrate Mardi Gras!
 
-This simulator brings the excitement of Mardi Gras parades to players everywhere. Whether you're familiar with the tradition or experiencing it for the first time, we hope you enjoy catching beads and celebrating!
+NDI_MardiGrasParade brings the excitement of Mardi Gras parades to players everywhere. Whether you're familiar with the tradition or experiencing it for the first time, we hope you enjoy catching beads and celebrating!
 
 **Laissez les bons temps rouler!** (Let the good times roll!)
 
@@ -321,13 +407,8 @@ This simulator brings the excitement of Mardi Gras parades to players everywhere
 
 **⭐ Star this repo if you like the project! ⭐**
 
-[![GitHub stars](https://img.shields.io/github/stars/FreeLundin/Mardi-Gras-Parade-Game?style=social)](https://github.com/FreeLundin/Mardi-Gras-Parade-Game/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/FreeLundin/Nola-Developer-Incubator?style=social)](https://github.com/FreeLundin/Nola-Developer-Incubator/stargazers)
 
 **Made with ❤️ in the spirit of Mardi Gras**
 
 </div>
-=======
-Contact
-- Project lead: Brian C Lundin
-- Issues: https://github.com/Nola-Developer-Incubator/MardiGrasParadeGame/issues
->>>>>>> origin/main
