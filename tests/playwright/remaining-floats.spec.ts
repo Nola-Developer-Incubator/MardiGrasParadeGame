@@ -1,11 +1,11 @@
 import { test, expect } from '@playwright/test';
 
 test('remaining floats indicator updates', async ({ page }) => {
-  // Placeholder skeleton: developer should wire selectors / IDs in the app
   await page.goto(process.env.PLAYTEST_URL ?? 'http://localhost:5000');
-  // Wait for app to be ready
-  await page.waitForSelector('#app-root', { timeout: 5000 }).catch(() => {});
-  // TODO: Implement assertions when selectors are available
-  expect(true).toBeTruthy();
-});
+  // Wait for app to be ready - our app root may not exist in build; wait for body
+  await page.waitForSelector('body', { timeout: 8000 });
 
+  // Check that the RemainingFloats UI text exists somewhere on the page
+  const text = await page.locator('text=Floats Remaining').first();
+  await expect(text).toBeVisible({ timeout: 5000 });
+});
