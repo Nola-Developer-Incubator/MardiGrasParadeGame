@@ -3,6 +3,7 @@ import { createApp } from "./app";
 import { setupVite, log } from "./vite";
 import fs from 'fs';
 import path from 'path';
+import type { Request, Response, NextFunction } from 'express';
 
 console.log('server/index.ts executing', { argv: process.argv.slice(0, 10), nodeEnv: process.env.NODE_ENV });
 
@@ -28,30 +29,30 @@ async function startServer() {
     process.env.NODE_ENV = process.env.NODE_ENV.toString().trim();
   }
 
-  app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
+  app.use(((err: any, req: Request, res: Response, _next: NextFunction) => {
     // Structured error logging
     const errorLog = {
       timestamp: new Date().toISOString(),
       method: req.method,
-      path: req.path,
-      error: err.message || "Internal Server Error",
-      stack: err.stack || "No stack trace",
-      status: err.status || err.statusCode || 500
+      path: (req as any).path,
+      error: err?.message || 'Internal Server Error',
+      stack: err?.stack || 'No stack trace',
+      status: (err && (err.status || err.statusCode)) || 500
     };
-    console.error("[API Error]", JSON.stringify(errorLog, null, 2));
+    console.error('[API Error]', JSON.stringify(errorLog, null, 2));
 
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+    const status = (err && (err.status || err.statusCode)) || 500;
+    const message = err?.message || 'Internal Server Error';
 
     // Don't send response if headers already sent
-    if (!res.headersSent) {
-      res.status(status).json({ 
+    if (!('headersSent' in res) || !(res as any).headersSent) {
+      (res as Response).status(status as number).json({ 
         error: message,
         // Only include details in development
-        ...(process.env.NODE_ENV === "development" && { stack: err.stack })
+        ...(process.env.NODE_ENV === "development" && { stack: err?.stack })
       });
     }
-  });
+  }) as unknown as any);
 
   const NODE_ENV = (process.env.NODE_ENV || '').toString().trim();
   console.log('server/index.ts starting with NODE_ENV=', NODE_ENV);
@@ -127,10 +128,6 @@ async function startServer() {
 if (isMain) {
   (async () => {
     const { shutdown } = await startServer();
-    // Do not call shutdown() immediately — keep the server running and rely on signal handlers
-    // that were registered inside startServer() when running as main.
-
-    // Keep process alive. If a forced shutdown is needed, it will be handled by the installed signal handlers.
-    // If you want an explicit programmatic shutdown from this block, call shutdown() on signal handlers only.
+    // Do not call shutdown() immediately — keep the server running and rely on signal handlers only.
   })();
 }
