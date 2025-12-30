@@ -25,7 +25,10 @@ function App() {
   const phase = useParadeGame((state) => state.phase);
   const isMobile = useIsMobile();
   const [joystickInput, setJoystickInput] = useState<JoystickInput | null>(null);
-  
+  const [gameStarted, setGameStarted] = useState<boolean>(false);
+  // Prefetch GameCanvas when user hovers Play to reduce wait
+  const prefetchCanvas = () => { void import('./components/game/GameCanvas'); };
+
   const handleJoystickInput = useCallback((input: TouchInput) => {
     setJoystickInput({ x: input.x, y: input.y });
   }, []);
@@ -40,9 +43,24 @@ function App() {
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
       <KeyboardControls map={controls}>
-        <Suspense fallback={null}>
-          <GameCanvas joystickInput={joystickInput} />
-        </Suspense>
+        {/* Show a Play overlay until user starts the game. This defers loading the heavy 3D bundle. */}
+        {!gameStarted && (
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'auto', zIndex: 50 }}>
+            <button
+              onMouseEnter={prefetchCanvas}
+              onClick={() => setGameStarted(true)}
+              style={{ padding: '18px 28px', fontSize: 20, borderRadius: 12, background: '#ff6b35', color: 'white', border: 'none', boxShadow: '0 8px 24px rgba(0,0,0,0.4)', cursor: 'pointer' }}
+            >
+              Play Mardi Gras Parade
+            </button>
+          </div>
+        )}
+
+        {gameStarted && (
+          <Suspense fallback={null}>
+            <GameCanvas joystickInput={joystickInput} />
+          </Suspense>
+        )}
         
         <GameUI />
         <WinScreen />

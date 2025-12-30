@@ -8,6 +8,7 @@ import {GameCamera} from "./GameCamera";
 import {Environment} from "./Environment";
 import {ParadeFloat} from "./ParadeFloat";
 import {Collectible} from "./Collectible";
+import {CollectibleInstanced} from "./CollectibleInstanced";
 import {CatchEffect} from "./CatchEffect";
 import {ClickMarker} from "./ClickMarker";
 import {CompetitorBot} from "./CompetitorBot";
@@ -366,15 +367,21 @@ export function GameScene({ joystickInput: externalJoystickInput = null }: GameS
             );
           })}
           
-          {/* Collectibles */}
-          {collectibles.map((collectible) => (
-            <Collectible
-              key={collectible.id}
-              collectible={collectible}
-              playerPosition={playerPosition}
-              onCatch={handleCatch}
-            />
-          ))}
+          {/* Collectibles - use instanced renderer for common items (beads/doubloon/cup). Keep special items as individual components. */}
+          {
+            // Group regular collectibles for instancing
+          }
+          <>
+            <CollectibleInstanced types={["beads", "doubloon", "cup"]} playerPosition={playerPosition} />
+            {collectibles.filter(c => c.type === 'speed_boost' || c.type === 'double_points' || c.type === 'king_cake').map((collectible) => (
+              <Collectible
+                key={collectible.id}
+                collectible={collectible}
+                playerPosition={playerPosition}
+                onCatch={handleCatch}
+              />
+            ))}
+          </>
 
           {/* Helper bot visuals */}
           <HelperBotVisual playerPosition={playerPosition} />
