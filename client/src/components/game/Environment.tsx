@@ -13,7 +13,7 @@ export function Environment() {
   useEffect(() => {
     let cancelled = false;
     let createdFallback: THREE.Texture | null = null;
-    const url = `${assetBase.replace(/\/$/, '')}/${'textures/asphalt.png'.replace(/^\/+/, '')}`.replace(/\/+/g, '/');
+    const url = `${assetBase.replace(/\/$/, '')}/${'textures/asphalt.png'.replace(/^\/+/, '')}`.replace(/\/+/, '/');
     // Check existence before loading to avoid console 404s and exceptions
     (async () => {
       try {
@@ -42,6 +42,10 @@ export function Environment() {
               fallback.wrapS = THREE.RepeatWrapping;
               fallback.wrapT = THREE.RepeatWrapping;
               fallback.repeat.set(3, 10);
+              // Ensure correct encoding and filtering for consistent visuals
+              fallback.encoding = THREE.sRGBEncoding;
+              fallback.minFilter = THREE.LinearMipMapLinearFilter;
+              fallback.magFilter = THREE.LinearFilter;
               createdFallback = fallback;
               setAsphaltTexture(fallback);
             }
@@ -57,6 +61,12 @@ export function Environment() {
               tex.wrapS = THREE.RepeatWrapping;
               tex.wrapT = THREE.RepeatWrapping;
               tex.repeat.set(3, 10);
+              // Ensure correct color-space for albedo
+              tex.encoding = THREE.sRGBEncoding;
+              // Use sensible filters to avoid shimmering
+              tex.minFilter = THREE.LinearMipMapLinearFilter;
+              tex.magFilter = THREE.LinearFilter;
+
               // optional: increase anisotropy if renderer exposes the capability
               try {
                 // Set anisotropy if renderer exposes the capability
@@ -94,6 +104,9 @@ export function Environment() {
               fallback.wrapS = THREE.RepeatWrapping;
               fallback.wrapT = THREE.RepeatWrapping;
               fallback.repeat.set(3, 10);
+              fallback.encoding = THREE.sRGBEncoding;
+              fallback.minFilter = THREE.LinearMipMapLinearFilter;
+              fallback.magFilter = THREE.LinearFilter;
               createdFallback = fallback;
               setAsphaltTexture(fallback);
             }
@@ -121,6 +134,9 @@ export function Environment() {
             fallback.wrapS = THREE.RepeatWrapping;
             fallback.wrapT = THREE.RepeatWrapping;
             fallback.repeat.set(3, 10);
+            fallback.encoding = THREE.sRGBEncoding;
+            fallback.minFilter = THREE.LinearMipMapLinearFilter;
+            fallback.magFilter = THREE.LinearFilter;
             createdFallback = fallback;
             setAsphaltTexture(fallback);
           }
@@ -245,9 +261,16 @@ export function Environment() {
       <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
         <planeGeometry args={[14, 50]} />
         {asphaltTexture ? (
-          <meshStandardMaterial map={asphaltTexture as any} />
+          // Use a simple, non-reflective material for the street to avoid shiny artifacts
+          <meshStandardMaterial
+            map={asphaltTexture as any}
+            roughness={1}
+            metalness={0}
+            bumpMap={asphaltTexture as any}
+            bumpScale={0.02}
+          />
         ) : (
-          <meshStandardMaterial color="#333333" />
+          <meshStandardMaterial color="#333333" roughness={1} metalness={0} />
         )}
       </mesh>
       

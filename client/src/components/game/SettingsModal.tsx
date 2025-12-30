@@ -4,6 +4,7 @@ import {Settings, Volume2, VolumeX, X} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Card} from "@/components/ui/card";
 import {Switch} from "@/components/ui/switch";
+import {Slider} from "@/components/ui/slider";
 import {useEffect, useState} from "react";
 import {useAudio} from "@/lib/stores/useAudio";
 
@@ -33,8 +34,9 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const [enableAdvancedPost, setEnableAdvancedPost] = useState<boolean>(() => {
     try { return localStorage.getItem('visual:advancedPost') === null ? false : localStorage.getItem('visual:advancedPost') === 'true'; } catch { return false; }
   });
+  // Default confetti OFF to simplify visuals
   const [enableConfetti, setEnableConfetti] = useState<boolean>(() => {
-    try { return localStorage.getItem('visual:confetti') === null ? true : localStorage.getItem('visual:confetti') === 'true'; } catch { return true; }
+    try { return localStorage.getItem('visual:confetti') === null ? false : localStorage.getItem('visual:confetti') === 'true'; } catch { return false; }
   });
   const [enableHDRI, setEnableHDRI] = useState<boolean>(() => {
     try { return localStorage.getItem('visual:hdri') === null ? false : localStorage.getItem('visual:hdri') === 'true'; } catch { return false; }
@@ -44,6 +46,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   useEffect(() => { try { localStorage.setItem('hud:showPowerUps', String(showPowerUps)); window.dispatchEvent(new Event('hud:updated')); } catch {} }, [showPowerUps]);
   useEffect(() => { try { localStorage.setItem('hud:showCompetitors', String(showCompetitors)); window.dispatchEvent(new Event('hud:updated')); } catch {} }, [showCompetitors]);
   useEffect(() => { try { localStorage.setItem('hud:showRemainingFloats', String(showRemainingFloats)); window.dispatchEvent(new Event('hud:updated')); } catch {} }, [showRemainingFloats]);
+  // Persist visual toggles and notify the app when visuals change
   useEffect(() => { try { localStorage.setItem('visual:advancedPost', String(enableAdvancedPost)); window.dispatchEvent(new Event('visual:updated')); } catch {} }, [enableAdvancedPost]);
   useEffect(() => { try { localStorage.setItem('visual:confetti', String(enableConfetti)); window.dispatchEvent(new Event('visual:updated')); } catch {} }, [enableConfetti]);
   useEffect(() => { try { localStorage.setItem('visual:hdri', String(enableHDRI)); window.dispatchEvent(new Event('visual:updated')); } catch {} }, [enableHDRI]);
@@ -132,39 +135,48 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
           {/* Visual / Performance toggles */}
           <div className="mt-3 border-t border-white/5 pt-3">
-            <p className="text-xs text-gray-300 mb-2">Visual Options</p>
-            <label className="flex items-center justify-between text-white text-xs">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">Advanced Post-processing</span>
-                  <span className="px-2 py-0.5 text-[11px] rounded bg-red-700 text-yellow-100 font-bold">High</span>
-                </div>
-                <div className="text-[11px] text-gray-300">Enable depth-of-field and LUT color grading (may reduce performance).</div>
-              </div>
-              <Switch checked={enableAdvancedPost} onCheckedChange={(v) => setEnableAdvancedPost(Boolean(v))} />
-            </label>
+            <p className="text-xs text-gray-300 mb-2">Visual Options (slider style)</p>
 
-            <label className="flex items-center justify-between text-white text-xs">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">Confetti Particle Effects</span>
-                  <span className="px-2 py-0.5 text-[11px] rounded bg-amber-700 text-white font-semibold">Medium</span>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between text-white text-xs">
+                <div className="flex-1 pr-3" onClick={() => setEnableAdvancedPost((v) => !v)} role="button" tabIndex={0}>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold">Advanced Post-processing</span>
+                    <span className="px-2 py-0.5 text-[11px] rounded bg-gray-700 text-yellow-100 font-bold">{enableAdvancedPost ? 'On' : 'Off'}</span>
+                  </div>
+                  <div className="text-[11px] text-gray-300">Depth-of-field and LUT color grading (turn off for simpler visuals).</div>
                 </div>
-                <div className="text-[11px] text-gray-300">Enable small confetti bursts for celebrations.</div>
+                <div style={{ width: 120 }} data-testid="visual-advanced-post">
+                  <Slider value={enableAdvancedPost ? [1] : [0]} onValueChange={(v) => setEnableAdvancedPost(Boolean(v[0]))} defaultValue={[enableAdvancedPost ? 1 : 0]} max={1} step={1} />
+                </div>
               </div>
-              <Switch checked={enableConfetti} onCheckedChange={(v) => setEnableConfetti(Boolean(v))} />
-            </label>
 
-            <label className="flex items-center justify-between text-white text-xs">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">HDR Environment</span>
-                  <span className="px-2 py-0.5 text-[11px] rounded bg-red-700 text-yellow-100 font-bold">High</span>
+              <div className="flex items-center justify-between text-white text-xs">
+                <div className="flex-1 pr-3" onClick={() => setEnableConfetti((v) => !v)} role="button" tabIndex={0}>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold">Confetti Particle Effects</span>
+                    <span className="px-2 py-0.5 text-[11px] rounded bg-gray-700 text-white font-semibold">{enableConfetti ? 'On' : 'Off'}</span>
+                  </div>
+                  <div className="text-[11px] text-gray-300">Small confetti bursts for celebrations (off to simplify visuals).</div>
                 </div>
-                <div className="text-[11px] text-gray-300">Use HDRI lighting for richer materials (increases memory).</div>
+                <div style={{ width: 120 }} data-testid="visual-confetti">
+                  <Slider value={enableConfetti ? [1] : [0]} onValueChange={(v) => setEnableConfetti(Boolean(v[0]))} defaultValue={[enableConfetti ? 1 : 0]} max={1} step={1} />
+                </div>
               </div>
-              <Switch checked={enableHDRI} onCheckedChange={(v) => setEnableHDRI(Boolean(v))} />
-            </label>
+
+              <div className="flex items-center justify-between text-white text-xs">
+                <div className="flex-1 pr-3" onClick={() => setEnableHDRI((v) => !v)} role="button" tabIndex={0}>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold">HDR Environment</span>
+                    <span className="px-2 py-0.5 text-[11px] rounded bg-gray-700 text-yellow-100 font-bold">{enableHDRI ? 'On' : 'Off'}</span>
+                  </div>
+                  <div className="text-[11px] text-gray-300">Use HDRI lighting for richer materials (off by default).</div>
+                </div>
+                <div style={{ width: 120 }} data-testid="visual-hdri">
+                  <Slider value={enableHDRI ? [1] : [0]} onValueChange={(v) => setEnableHDRI(Boolean(v[0]))} defaultValue={[enableHDRI ? 1 : 0]} max={1} step={1} />
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="pt-2">
