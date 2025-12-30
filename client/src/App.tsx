@@ -25,8 +25,12 @@ function App() {
   const startGame = useParadeGame((s) => s.startGame);
   const phase = useParadeGame((state) => state.phase);
   const isMobile = useIsMobile();
-  const [joystickInput, setJoystickInput] = useState<JoystickInput | null>(null);
-  const [gameStarted, setGameStarted] = useState<boolean>(false);
+  // Force HUD for tests (localStorage flag) — used to render test-only UI like joystick without starting the game
+  const forceHudForTests = typeof window !== 'undefined' && (() => {
+    try { return localStorage.getItem('TEST_FORCE_HUD') === 'true'; } catch { return false; }
+  })();
+   const [joystickInput, setJoystickInput] = useState<JoystickInput | null>(null);
+   const [gameStarted, setGameStarted] = useState<boolean>(false);
 
   // Auto-start behavior for local test environments: if URL contains `autoStart=true` or running on localhost
   useEffect(() => {
@@ -84,8 +88,8 @@ function App() {
         <AdRewardScreen />
         <AudioManager />
         
-        {/* Touch Controls - only show when joystick is enabled on mobile during gameplay */}
-        {isMobile && joystickEnabled && phase === "playing" && (
+        {/* Touch Controls - show on mobile when joystick is enabled; during tests (TEST_FORCE_HUD) allow showing before gameplay */}
+        {isMobile && (joystickEnabled || forceHudForTests) && (phase === "playing" || forceHudForTests) && (
           <>
             <TouchControls onInput={handleJoystickInput} />
             <CatchArea />

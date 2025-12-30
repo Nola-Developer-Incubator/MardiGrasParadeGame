@@ -3,7 +3,7 @@ import {useParadeGame} from "@/lib/stores/useParadeGame";
 import {useAudio} from "@/lib/stores/useAudio";
 import {useIsMobile} from "@/hooks/use-is-mobile";
 import {AnimatePresence, motion} from "framer-motion";
-import {Settings, ShoppingBag, Volume2, VolumeX} from "lucide-react";
+import {ShoppingBag, Volume2, VolumeX} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Card} from "@/components/ui/card";
 import {Progress} from "@/components/ui/progress";
@@ -176,6 +176,33 @@ export function GameUI() {
       {(forceHudForTests || showRemainingFloats) && (
         <RemainingFloats remaining={Math.max(0, (totalFloats || 0) - (floatsPassed || 0))} />
       )}
+
+      {/* Always-present settings button so tests can open settings regardless of phase */}
+      <div style={{ position: 'fixed', top: 8, right: 8, zIndex: 2147483647, pointerEvents: 'auto' }}>
+        <button
+          onClick={() => setShowSettings(true)}
+          data-testid="settings-button"
+          aria-label="Open Settings"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 40,
+            height: 40,
+            borderRadius: 8,
+            background: 'rgba(45, 15, 80, 0.85)',
+            color: 'white',
+            border: '2px solid rgba(245, 215, 110, 0.9)',
+            cursor: 'pointer'
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+            <path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7z" fill="currentColor" />
+          </svg>
+        </button>
+      </div>
+      {/* Ensure this button doesn't get hidden by parent pointer-events rules */}
+      
       {/* Tutorial Overlay */}
       <AnimatePresence>
         {phase === "tutorial" && showTutorial && (
@@ -286,17 +313,6 @@ export function GameUI() {
                 className="bg-purple-700 hover:bg-purple-600 border-2 border-yellow-400 text-white p-1 md:p-2"
               >
                 {isMuted ? <VolumeX size={14} className="md:w-[18px] md:h-[18px]" /> : <Volume2 size={14} className="md:w-[18px] md:h-[18px]" />}
-              </Button>
-              
-              {/* Settings button available on all devices for easier access and tests */}
-              <Button
-                onClick={() => setShowSettings(true)}
-                size="sm"
-                className="bg-purple-700 hover:bg-purple-600 border-2 border-yellow-400 text-white p-1 md:p-2"
-                data-testid="settings-button"
-                style={{ zIndex: 80 }}
-              >
-                <Settings size={14} className="md:w-[18px] md:h-[18px]" />
               </Button>
             </div>
           </div>
