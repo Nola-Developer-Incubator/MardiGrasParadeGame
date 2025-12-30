@@ -55,6 +55,14 @@ export function GameUI() {
     window.addEventListener('minimalHud:updated', handler);
     return () => window.removeEventListener('minimalHud:updated', handler);
   }, []);
+  
+  // HUD toggles persisted in localStorage
+  const [showFloatLabels, setShowFloatLabels] = useState<boolean>(() => {
+    try { return localStorage.getItem('hud:showFloatLabels') === null ? true : localStorage.getItem('hud:showFloatLabels') === 'true'; } catch { return true; }
+  });
+  const [showHudElements, setShowHudElements] = useState<boolean>(() => {
+    try { return localStorage.getItem('hud:showHudElements') === null ? true : localStorage.getItem('hud:showHudElements') === 'true'; } catch { return true; }
+  });
 
   // Allow preview builds to force a minimal HUD via Vite env flag (VITE_MINIMAL_HUD=true)
   // This is safe because the flag will only be set in preview CI jobs and not in production builds.
@@ -108,6 +116,14 @@ export function GameUI() {
   useEffect(() => {
     try { if (typeof window !== 'undefined') localStorage.setItem('showPersonas', String(showPersonas)); } catch { }
   }, [showPersonas]);
+
+  // Persist HUD toggles and notify listeners
+  useEffect(() => {
+    try { localStorage.setItem('hud:showFloatLabels', String(showFloatLabels)); window.dispatchEvent(new Event('hud:updated')); } catch {}
+  }, [showFloatLabels]);
+  useEffect(() => {
+    try { localStorage.setItem('hud:showHudElements', String(showHudElements)); window.dispatchEvent(new Event('hud:updated')); } catch {}
+  }, [showHudElements]);
 
   const handleStartGame = () => {
     setShowTutorial(false);
@@ -237,7 +253,7 @@ export function GameUI() {
               </div>
               
               {/* Active Power-ups - Compact */}
-              {activePowerUps.map((powerUp) => {
+              {showHudElements && activePowerUps.map((powerUp) => {
                 const timeLeft = Math.max(0, powerUp.endTime - Date.now());
                 return (
                   <Card key={powerUp.type} className="bg-cyan-600/90 border-2 border-cyan-300 px-2 py-1 md:px-3 md:py-2">
@@ -259,7 +275,7 @@ export function GameUI() {
                 {isMuted ? <VolumeX size={14} className="md:w-[18px] md:h-[18px]" /> : <Volume2 size={14} className="md:w-[18px] md:h-[18px]" />}
               </Button>
               
-              {isMobile && (
+              {isMobile && showHudElements && (
                 <Button
                   onClick={() => setShowSettings(true)}
                   size="sm"
@@ -272,8 +288,8 @@ export function GameUI() {
             </div>
           </div>
           
-          {/* Remaining floats indicator (compact) - show only in dev or when tests force HUD */}
-          {(import.meta.env.DEV || forceHudForTests) && (
+          {/* Remaining floats indicator (compact) - show only in dev or when tests force HUD and when HUD elements enabled */}
+          {(import.meta.env.DEV || forceHudForTests) && showHudElements && (
             <RemainingFloats remaining={Math.max(0, (totalFloats || 0) - (floatsPassed || 0))} />
           )}
 
@@ -360,10 +376,18 @@ export function GameUI() {
           
           {/* Small HUD toggles - top-right compact */}
           <div className="absolute top-4 right-4">
-            <div className="bg-black/60 p-2 rounded-md pointer-events-auto">
+            <div className="bg-black/60 p-2 rounded-md pointer-events-auto space-y-2">
               <label className="flex items-center gap-2 text-white text-xs">
                 <input type="checkbox" checked={showPersonas} onChange={(e) => setShowPersonas(e.target.checked)} />
                 <span>Show Personas (debug)</span>
+              </label>
+              <label className="flex items-center gap-2 text-white text-xs">
+                <input type="checkbox" checked={showFloatLabels} onChange={(e) => setShowFloatLabels(e.target.checked)} />
+                <span>Show Float Labels</span>
+              </label>
+              <label className="flex items-center gap-2 text-white text-xs">
+                <input type="checkbox" checked={showHudElements} onChange={(e) => setShowHudElements(e.target.checked)} />
+                <span>Show HUD Elements</span>
               </label>
             </div>
           </div>

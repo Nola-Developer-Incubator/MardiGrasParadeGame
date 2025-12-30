@@ -10,6 +10,7 @@ interface ParadeFloatProps {
   lane: number; // -1 or 1 for left or right side of street
   color: string;
   label?: number; // optional numeric label to show on the float
+  labelEnabled?: boolean;
   playerPosition?: THREE.Vector3;
 }
 
@@ -19,9 +20,11 @@ export function ParadeFloat({
   lane, 
   color,
   label,
+  labelEnabled = true,
   playerPosition,
 }: ParadeFloatProps) {
   const meshRef = useRef<THREE.Group>(null);
+  const labelRef = useRef<HTMLDivElement | null>(null);
   const position = useRef(new THREE.Vector3(lane * 5, 1, startZ));
   const lastThrowTime = useRef(Date.now());
   const hasPassed = useRef(false);
@@ -72,6 +75,14 @@ export function ParadeFloat({
       throwCollectible();
       lastThrowTime.current = now;
     }
+    
+    // Update label visibility based on whether the float is in the play area
+    try {
+      if (labelRef.current) {
+        const inPlayArea = position.current.z > -15 && position.current.z < 15;
+        labelRef.current.style.display = (labelEnabled && typeof label === 'number' && inPlayArea) ? 'block' : 'none';
+      }
+    } catch (e) { /* ignore DOM update errors */ }
   });
   
   const throwCollectible = () => {
@@ -182,8 +193,8 @@ export function ParadeFloat({
       
       {/* Numeric label integrated into UX */}
       {typeof label === 'number' && (
-        <Html position={[0, 1.0, 0]} center style={{ pointerEvents: 'none' }}>
-          <div style={{
+        <Html position={[0, 0.6, -1.6]} center style={{ pointerEvents: 'none' }}>
+          <div ref={labelRef} style={{
             background: 'rgba(0,0,0,0.6)',
             color: 'white',
             padding: '6px 8px',

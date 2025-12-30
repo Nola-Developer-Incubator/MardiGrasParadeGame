@@ -55,6 +55,18 @@ export function GameScene({ joystickInput: externalJoystickInput = null }: GameS
   const [catchEffects, setCatchEffects] = useState<CatchEffectInstance[]>([]);
   const [clickMarkers, setClickMarkers] = useState<ClickMarkerInstance[]>([]);
   const floatStartTime = useState(() => Date.now())[0];
+  const [labelEnabled, setLabelEnabled] = useState<boolean>(() => {
+    try { const v = localStorage.getItem('hud:showFloatLabels'); return v === null ? true : v === 'true'; } catch { return true; }
+  });
+  
+  // Update labelEnabled state when 'hud:updated' event is received
+  useEffect(() => {
+    const onHudUpdated = () => {
+      try { const v = localStorage.getItem('hud:showFloatLabels'); setLabelEnabled(v === null ? true : v === 'true'); } catch { }
+    };
+    window.addEventListener('hud:updated', onHudUpdated);
+    return () => window.removeEventListener('hud:updated', onHudUpdated);
+  }, []);
   
   // Check for float-player collision
   useEffect(() => {
@@ -232,6 +244,7 @@ export function GameScene({ joystickInput: externalJoystickInput = null }: GameS
                  lane={1}
                  color={color}
                 label={i + 1}
+                labelEnabled={labelEnabled}
                  playerPosition={playerPosition}
                />
              );
