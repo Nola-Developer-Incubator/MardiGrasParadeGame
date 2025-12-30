@@ -31,7 +31,8 @@ export function CollectibleInstanced({ types, playerPosition }: CollectibleInsta
   const incrementMisses = useParadeGame((s) => s.incrementMisses);
   const addCatch = useParadeGame((s) => s.addCatch);
 
-  const geometry = useMemo(() => new THREE.SphereGeometry(0.25, 8, 8), []);
+  // Make instanced collectibles substantially larger and smoother for accessibility
+  const geometry = useMemo(() => new THREE.SphereGeometry(0.45, 12, 12), []);
   const materials = useMemo(() => ({
     beads: new THREE.MeshStandardMaterial({ color: '#9b59b6', metalness: 0.6, roughness: 0.2 }),
     doubloon: new THREE.MeshStandardMaterial({ color: '#f1c40f', metalness: 0.9, roughness: 0.15 }),
@@ -156,7 +157,8 @@ export function CollectibleInstanced({ types, playerPosition }: CollectibleInsta
         const inst = list[i];
         tempPos.copy(inst.position);
         tempQuat.setFromEuler(new THREE.Euler(0, state.clock.elapsedTime * 0.5, 0));
-        tempScale.setScalar(inst.type === 'cup' ? 0.3 : 0.25);
+        // Larger scales: cups slightly bigger than beads/doubloons for clarity
+        tempScale.setScalar(inst.type === 'cup' ? 0.5 : 0.45);
         tempMatrix.compose(tempPos, tempQuat, tempScale);
         mesh.setMatrixAt(i, tempMatrix);
       }

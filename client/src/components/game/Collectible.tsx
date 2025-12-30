@@ -163,8 +163,8 @@ export function Collectible({ collectible, playerPosition, onCatch }: Collectibl
     }
   });
   
-  // Increase sizes for better visibility
-  const size = collectible.type === "cup" ? 0.3 : 0.25;
+  // Increased sizes for accessibility (easier to see for children and seniors)
+  const size = collectible.type === "cup" ? 0.5 : 0.45;
   
   const color = COLLECTIBLE_COLORS[collectible.type];
   
