@@ -5,9 +5,10 @@ import {useParadeGame} from '../../lib/stores/useParadeGame';
 
 interface GameCanvasProps {
   joystickInput?: { x: number; y: number } | null;
+  visible?: boolean;
 }
 
-export default function GameCanvas({ joystickInput }: GameCanvasProps) {
+export default function GameCanvas({ joystickInput, visible = true }: GameCanvasProps) {
   // Read shadow setting from the store. Cast to any to avoid transient type mismatch
   // across different TypeScript resolution contexts.
   const enableShadows = useParadeGame((s: any) => s.settings?.enableShadows ?? true);
@@ -17,6 +18,7 @@ export default function GameCanvas({ joystickInput }: GameCanvasProps) {
       shadows={enableShadows}
       camera={{ position: [0, 4, 6], fov: 60, near: 0.1, far: 1000 }}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
+      style={{ visibility: visible ? 'visible' : 'hidden', width: '100%', height: '100%' }}
     >
       <color attach="background" args={["#0f0f1e"]} />
       <Suspense fallback={null}>

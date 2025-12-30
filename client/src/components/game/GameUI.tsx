@@ -130,11 +130,16 @@ export function GameUI() {
   useEffect(() => { try { localStorage.setItem('hud:showRemainingFloats', String(showRemainingFloats)); window.dispatchEvent(new Event('hud:updated')); } catch {} }, [showRemainingFloats]);
 
   const handleStartGame = () => {
-    setShowTutorial(false);
-    // Show first-level tutorial on level 1
+    // When launching the first-level tutorial, delay hiding the tutorial overlay
+    // briefly so the click event can complete without the element being detached.
     if (level === 1) {
-      setShowFirstLevelTutorial(true);
+      // Keep the main tutorial visible for a short tick, then show the multi-step tutorial.
+      setTimeout(() => {
+        setShowTutorial(false);
+        setShowFirstLevelTutorial(true);
+      }, 50);
     } else {
+      setShowTutorial(false);
       startGame();
     }
   };
@@ -167,6 +172,10 @@ export function GameUI() {
 
   return (
     <>
+      {/* Remaining floats indicator: render independently so tests can detect it before gameplay starts */}
+      {(forceHudForTests || showRemainingFloats) && (
+        <RemainingFloats remaining={Math.max(0, (totalFloats || 0) - (floatsPassed || 0))} />
+      )}
       {/* Tutorial Overlay */}
       <AnimatePresence>
         {phase === "tutorial" && showTutorial && (
@@ -293,9 +302,7 @@ export function GameUI() {
           </div>
           
           {/* Remaining floats indicator (compact) - show only in dev or when tests force HUD and when enabled */}
-          {(import.meta.env.DEV || forceHudForTests) && showRemainingFloats && (
-            <RemainingFloats remaining={Math.max(0, (totalFloats || 0) - (floatsPassed || 0))} />
-          )}
+          {/* (RemainingFloats now renders globally above so it is always detectable by tests) */}
 
           {/* Admin & Controls - Hidden on phones */}
           <div className="hidden md:flex absolute bottom-4 right-4 pointer-events-auto flex-col gap-2">

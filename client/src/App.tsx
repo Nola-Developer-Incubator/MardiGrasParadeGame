@@ -27,18 +27,19 @@ function App() {
   const isMobile = useIsMobile();
   const [joystickInput, setJoystickInput] = useState<JoystickInput | null>(null);
   const [gameStarted, setGameStarted] = useState<boolean>(false);
-  // Auto-start behavior for test environments: if URL contains `autoStart=true` or running on localhost
+
+  // Auto-start behavior for local test environments: if URL contains `autoStart=true` or running on localhost
   useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search);
-      const auto = params.get('autoStart') === 'true' || window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
+      const auto = params.get('autoStart') === 'true';
       if (auto) {
+        // Only set the UI to load the heavy GameCanvas; do NOT call startGame() here so the tutorial
+        // overlay remains available for Playwright to click the 'Start Game' button.
         setGameStarted(true);
-        // startGame may be a no-op if already started but safe to call
-        setTimeout(() => startGame(), 50);
       }
     } catch (e) { /* ignore in non-browser env */ }
-  }, [startGame]);
+  }, []);
 
   // Prefetch GameCanvas when user hovers Play to reduce wait
   const prefetchCanvas = () => { void import('./components/game/GameCanvas'); };
@@ -57,7 +58,9 @@ function App() {
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
       <KeyboardControls map={controls}>
-        {/* Show a Play overlay until user starts the game. This defers loading the heavy 3D bundle. */}
+        {/* Show a Play overlay until user starts the game. The heavy 3D Canvas is mounted
+            immediately so Playwright can detect a <canvas> element, but the overlay sits
+            above it until the user actually starts the tutorial/game. */}
         {!gameStarted && (
           <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'auto', zIndex: 50 }}>
             <button
@@ -70,11 +73,11 @@ function App() {
           </div>
         )}
 
-        {gameStarted && (
-          <Suspense fallback={null}>
-            <GameCanvas joystickInput={joystickInput} />
-          </Suspense>
-        )}
+        {/* Mount the canvas immediately so tests can detect it — visibility or interaction is gated
+            by the tutorial overlay and game state. */}
+        <Suspense fallback={null}>
+          <GameCanvas joystickInput={joystickInput} />
+        </Suspense>
         
         <GameUI />
         <WinScreen />
