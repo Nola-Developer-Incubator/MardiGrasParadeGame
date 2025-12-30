@@ -1,7 +1,18 @@
-import {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useParadeGame} from "@/lib/stores/useParadeGame";
 import {useAudio} from "@/lib/stores/useAudio";
 import {useIsMobile} from "@/hooks/use-is-mobile";
+import {AnimatePresence, motion} from "framer-motion";
+import {Settings, ShoppingBag, Volume2, VolumeX} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {Card} from "@/components/ui/card";
+import {Progress} from "@/components/ui/progress";
+import {CosmeticShop} from "./CosmeticShop";
+import {AdminModal} from "@/components/ui/AdminModal";
+import {FirstLevelTutorial} from "./FirstLevelTutorial";
+import {SettingsModal} from "./SettingsModal";
+import {MinimalHUD} from "@/components/ui/MinimalHUD";
+import {RemainingFloats} from "@/components/ui/RemainingFloats";
 
 export function GameUI() {
   const { phase, score, level, combo, startGame, activePowerUps, lastCatchTime, playerColor, botScores, coins, joystickEnabled, totalFloats, floatsPassed } = useParadeGame();
@@ -13,7 +24,7 @@ export function GameUI() {
   const [, forceUpdate] = useState(0); // For power-up countdown updates
   const [showShop, setShowShop] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [showPersonas, setShowPersonas<boolean>(() => {
+  const [showPersonas, setShowPersonas] = useState<boolean>(() => {
     try { return typeof window !== 'undefined' && localStorage.getItem('showPersonas') === 'true'; } catch { return false; }
   });
   const [showAdmin, setShowAdmin] = useState(false);
