@@ -21,7 +21,6 @@ import * as THREE from 'three';
 import {FloatDecorationsInstanced} from './FloatDecorationsInstanced';
 
 const AdvancedPostProcessing = React.lazy(() => import('./AdvancedPostProcessing').then(m => ({ default: m.AdvancedPostProcessing })));
-const Confetti = React.lazy(() => import('./Confetti').then(m => ({ default: m.Confetti })));
 const HDRIEnvironment = React.lazy(() => import('./HDRIEnvironment').then(m => ({ default: m.HDRIEnvironment })));
 
 interface CatchEffectInstance {
@@ -288,9 +287,6 @@ export function GameScene({ joystickInput: externalJoystickInput = null }: GameS
       <PostProcessing />
       <Suspense fallback={null}>
         {advancedPostEnabled && <AdvancedPostProcessing enabled />}
-      </Suspense>
-      <Suspense fallback={null}>
-        {confettiEnabled && <Confetti count={200} origin={[0,2,-6]} />}
       </Suspense>
       <Suspense fallback={null}>
         {hdriEnabled && <HDRIEnvironment envUrl={'/hdrs/st-peters-square-1k.hdr'} />}

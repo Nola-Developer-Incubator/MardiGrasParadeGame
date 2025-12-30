@@ -41,6 +41,23 @@ export function ParadeFloat({
       scale: Math.random() * 0.3 + 0.2,
     }));
   }, []);
+
+  // Determine platform variant for visual variety based on id hash
+  const platformVariant = useMemo(() => {
+    const n = id.split('-').pop() ?? '0';
+    const v = parseInt(n.replace(/[^0-9]/g, ''), 10) || Math.floor(Math.random() * 1000);
+    return v % 3; // 0 = box, 1 = rounded, 2 = cylinder
+  }, [id]);
+
+  // Small bead garland positions (lightweight decorative spheres)
+  const garland = useMemo(() => {
+    const g = [] as { x:number; y:number; z:number; color:string }[];
+    const colors = ["#722F9A", "#228B22", "#FFD700"];
+    for (let i = 0; i < 8; i++) {
+      g.push({ x: -0.9 + i * 0.26, y: 0.35 + Math.sin(i * 0.8) * 0.05, z: 0.9, color: colors[i % 3] });
+    }
+    return g;
+  }, []);
   
   useEffect(() => {
     console.log(`Parade float ${id} initialized at lane ${lane}`);
@@ -227,17 +244,64 @@ export function ParadeFloat({
 
   return (
     <group ref={meshRef} position={[position.current.x, position.current.y, position.current.z]} scale={[1.5, 1.5, 1.5]}>
-      {/* Main float platform with enhanced emissive glow */}
-      <mesh castShadow>
-        <boxGeometry args={[2, 1.5, 3]} />
-        <meshStandardMaterial 
-          color={color}
-          emissive={color}
-          emissiveIntensity={0.4}
-          metalness={0.3}
-          roughness={0.4}
-        />
-      </mesh>
+      {/* Main float platform with variant shapes for visual variety */}
+      {platformVariant === 0 && (
+        <mesh castShadow>
+          <boxGeometry args={[2, 1.5, 3]} />
+          <meshStandardMaterial 
+            color={color}
+            emissive={color}
+            emissiveIntensity={0.4}
+            metalness={0.3}
+            roughness={0.4}
+          />
+        </mesh>
+      )}
+      {platformVariant === 1 && (
+        <mesh castShadow rotation={[0.02, 0.06, 0]}>
+          <boxGeometry args={[2.1, 1.2, 2.8]} />
+          <meshStandardMaterial 
+            color={color}
+            emissive={color}
+            emissiveIntensity={0.45}
+            metalness={0.25}
+            roughness={0.35}
+          />
+        </mesh>
+      )}
+      {platformVariant === 2 && (
+        <mesh castShadow>
+          <cylinderGeometry args={[1.1, 1.1, 1.3, 12]} />
+          <meshStandardMaterial 
+            color={color}
+            emissive={color}
+            emissiveIntensity={0.35}
+            metalness={0.2}
+            roughness={0.45}
+          />
+        </mesh>
+      )}
+
+      {/* Small decorative flags and garlands */}
+      <group position={[0, 0.9, 1.2]}>
+        {/* Flags */}
+        <mesh position={[-0.9, 0.15, 0]} rotation={[0, 0.2, 0]}> 
+          <planeGeometry args={[0.6, 0.3]} />
+          <meshStandardMaterial color="#FFD700" emissive="#FFD700" metalness={0.1} roughness={0.8} />
+        </mesh>
+        <mesh position={[0.9, 0.15, 0]} rotation={[0, -0.2, 0]}> 
+          <planeGeometry args={[0.6, 0.3]} />
+          <meshStandardMaterial color="#722F9A" emissive="#722F9A" metalness={0.1} roughness={0.8} />
+        </mesh>
+
+        {/* Garland beads - small spheres along the front */}
+        {garland.map((g, idx) => (
+          <mesh key={`gar-${idx}`} position={[g.x, g.y, g.z]}>
+            <sphereGeometry args={[0.06, 6, 6]} />
+            <meshStandardMaterial color={g.color} emissive={g.color} emissiveIntensity={0.6} />
+          </mesh>
+        ))}
+      </group>
       
       {/* Numeric label integrated into UX (moved in front of float) */}
       {typeof label === 'number' && (

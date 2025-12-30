@@ -1,18 +1,7 @@
-import React, {useEffect, useState} from "react";
+import {useState} from "react";
 import {useParadeGame} from "@/lib/stores/useParadeGame";
 import {useAudio} from "@/lib/stores/useAudio";
 import {useIsMobile} from "@/hooks/use-is-mobile";
-import {AnimatePresence, motion} from "framer-motion";
-import {ShoppingBag, Volume2, VolumeX} from "lucide-react";
-import {Button} from "@/components/ui/button";
-import {Card} from "@/components/ui/card";
-import {Progress} from "@/components/ui/progress";
-import {CosmeticShop} from "./CosmeticShop";
-import {AdminModal} from "@/components/ui/AdminModal";
-import {FirstLevelTutorial} from "./FirstLevelTutorial";
-import {SettingsModal} from "./SettingsModal";
-import {MinimalHUD} from "@/components/ui/MinimalHUD";
-import {RemainingFloats} from "@/components/ui/RemainingFloats";
 
 export function GameUI() {
   const { phase, score, level, combo, startGame, activePowerUps, lastCatchTime, playerColor, botScores, coins, joystickEnabled, totalFloats, floatsPassed } = useParadeGame();
@@ -24,7 +13,7 @@ export function GameUI() {
   const [, forceUpdate] = useState(0); // For power-up countdown updates
   const [showShop, setShowShop] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [showPersonas, setShowPersonas] = useState<boolean>(() => {
+  const [showPersonas, setShowPersonas<boolean>(() => {
     try { return typeof window !== 'undefined' && localStorage.getItem('showPersonas') === 'true'; } catch { return false; }
   });
   const [showAdmin, setShowAdmin] = useState(false);
@@ -172,13 +161,8 @@ export function GameUI() {
 
   return (
     <>
-      {/* Remaining floats indicator: render independently so tests can detect it before gameplay starts */}
-      {(forceHudForTests || showRemainingFloats) && (
-        <RemainingFloats remaining={Math.max(0, (totalFloats || 0) - (floatsPassed || 0))} />
-      )}
-
-      {/* Always-present settings button so tests can open settings regardless of phase */}
-      <div style={{ position: 'fixed', top: 8, right: 8, zIndex: 2147483647, pointerEvents: 'auto' }}>
+      {/* Settings button moved to lower-right to avoid overlapping top HUD */}
+      <div style={{ position: 'fixed', bottom: 12, right: 12, zIndex: 2147483647, pointerEvents: 'auto' }}>
         <button
           onClick={() => setShowSettings(true)}
           data-testid="settings-button"
@@ -187,22 +171,21 @@ export function GameUI() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: 40,
-            height: 40,
-            borderRadius: 8,
-            background: 'rgba(45, 15, 80, 0.85)',
+            width: 44,
+            height: 44,
+            borderRadius: 10,
+            background: 'rgba(45, 15, 80, 0.95)',
             color: 'white',
-            border: '2px solid rgba(245, 215, 110, 0.9)',
+            border: '2px solid rgba(245, 215, 110, 0.95)',
             cursor: 'pointer'
           }}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
             <path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7z" fill="currentColor" />
           </svg>
         </button>
       </div>
-      {/* Ensure this button doesn't get hidden by parent pointer-events rules */}
-      
+
       {/* Tutorial Overlay */}
       <AnimatePresence>
         {phase === "tutorial" && showTutorial && (

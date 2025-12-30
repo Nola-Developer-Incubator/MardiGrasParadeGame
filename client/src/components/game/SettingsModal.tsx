@@ -28,9 +28,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const [showCompetitors, setShowCompetitors] = useState<boolean>(() => {
     try { return localStorage.getItem('hud:showCompetitors') === null ? true : localStorage.getItem('hud:showCompetitors') === 'true'; } catch { return true; }
   });
-  const [showRemainingFloats, setShowRemainingFloats] = useState<boolean>(() => {
-    try { return localStorage.getItem('hud:showRemainingFloats') === null ? true : localStorage.getItem('hud:showRemainingFloats') === 'true'; } catch { return true; }
-  });
+  // Remaining floats HUD has been removed; do not persist this setting anymore.
   const [enableAdvancedPost, setEnableAdvancedPost] = useState<boolean>(() => {
     try { return localStorage.getItem('visual:advancedPost') === null ? false : localStorage.getItem('visual:advancedPost') === 'true'; } catch { return false; }
   });
@@ -45,7 +43,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   useEffect(() => { try { localStorage.setItem('hud:showFloatLabels', String(showFloatLabels)); window.dispatchEvent(new Event('hud:updated')); } catch {} }, [showFloatLabels]);
   useEffect(() => { try { localStorage.setItem('hud:showPowerUps', String(showPowerUps)); window.dispatchEvent(new Event('hud:updated')); } catch {} }, [showPowerUps]);
   useEffect(() => { try { localStorage.setItem('hud:showCompetitors', String(showCompetitors)); window.dispatchEvent(new Event('hud:updated')); } catch {} }, [showCompetitors]);
-  useEffect(() => { try { localStorage.setItem('hud:showRemainingFloats', String(showRemainingFloats)); window.dispatchEvent(new Event('hud:updated')); } catch {} }, [showRemainingFloats]);
+  // Note: 'Show Remaining Floats' toggle removed.
   // Persist visual toggles and notify the app when visuals change
   useEffect(() => { try { localStorage.setItem('visual:advancedPost', String(enableAdvancedPost)); window.dispatchEvent(new Event('visual:updated')); } catch {} }, [enableAdvancedPost]);
   useEffect(() => { try { localStorage.setItem('visual:confetti', String(enableConfetti)); window.dispatchEvent(new Event('visual:updated')); } catch {} }, [enableConfetti]);
@@ -123,13 +121,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 <Switch checked={showCompetitors} onCheckedChange={(v) => setShowCompetitors(Boolean(v))} />
               </label>
 
-              <label className="flex items-center justify-between text-white text-xs">
-                <div>
-                  <div className="font-semibold">Show Remaining Floats</div>
-                  <div className="text-[11px] text-gray-300">Show remaining float counter (dev only).</div>
-                </div>
-                <Switch checked={showRemainingFloats} onCheckedChange={(v) => setShowRemainingFloats(Boolean(v))} />
-              </label>
+              {/* Remaining floats counter removed */}
             </div>
           </div>
 
