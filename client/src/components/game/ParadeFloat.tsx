@@ -30,7 +30,7 @@ export function ParadeFloat({
   const hasPassed = useRef(false);
   const { addCollectible, phase, getFloatSpeed, getThrowInterval, markFloatPassed } = useParadeGame();
   
-  // Pre-calculate random decorative elements positions
+  // Pre-calculate random decorative elements positions (per-float)
   const decorations = useMemo(() => {
     return Array.from({ length: 5 }, () => ({
       x: (Math.random() - 0.5) * 1.5,
@@ -237,9 +237,9 @@ export function ParadeFloat({
         />
       </mesh>
       
-      {/* Numeric label integrated into UX */}
+      {/* Numeric label integrated into UX (moved in front of float) */}
       {typeof label === 'number' && (
-        <Html position={[0, 0.6, -1.6]} center style={{ pointerEvents: 'none' }}>
+        <Html position={[0, 0.6, 1.6]} center style={{ pointerEvents: 'none' }}>
           <div ref={labelRef} style={{
             background: 'rgba(0,0,0,0.6)',
             color: 'white',
@@ -255,7 +255,14 @@ export function ParadeFloat({
         </Html>
       )}
       
-      {/* Decorations are now rendered globally by FloatDecorationsInstanced to reduce draw calls */}
+      {/* Render per-float decorations locally (reverted from global instancing) */}
+      {decorations.map((d, idx) => (
+        <mesh key={`dec-${id}-${idx}`} position={[d.x, d.y - 0.5, d.z]} scale={[d.scale, d.scale, d.scale]} castShadow>
+          <sphereGeometry args={[0.15, 8, 8]} />
+          <meshStandardMaterial color="#FFD700" emissive="#FFD700" emissiveIntensity={0.8} metalness={0.3} roughness={0.3} />
+        </mesh>
+      ))}
+      
       {/* Float wheels - instanced (4 instances) */}
       <instancedMesh ref={wheelsRef} args={[new THREE.CylinderGeometry(0.3, 0.3, 0.3, 8), new THREE.MeshStandardMaterial({ color: '#2c2c2c' }), 4]} castShadow />
     </group>

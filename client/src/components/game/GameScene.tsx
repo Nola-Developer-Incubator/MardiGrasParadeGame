@@ -18,7 +18,6 @@ import {HelperBotVisual} from './HelperBotVisual';
 import {Lighting} from './Lighting';
 import {PostProcessing} from './PostProcessing';
 import * as THREE from 'three';
-import {FloatDecorationsInstanced} from './FloatDecorationsInstanced';
 
 const AdvancedPostProcessing = React.lazy(() => import('./AdvancedPostProcessing').then(m => ({ default: m.AdvancedPostProcessing })));
 const Confetti = React.lazy(() => import('./Confetti').then(m => ({ default: m.Confetti })));
@@ -283,7 +282,6 @@ export function GameScene({ joystickInput: externalJoystickInput = null }: GameS
     <group>
       {/* Environment - always visible */}
       <Environment />
-      <FloatDecorationsInstanced decorationsPerFloat={5} />
       <Lighting />
       <PostProcessing />
       <Suspense fallback={null}>
