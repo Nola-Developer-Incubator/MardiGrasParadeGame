@@ -61,10 +61,8 @@ export function TrajectoryHint({ initialPosition, initialVelocity, color }: Traj
         <meshBasicMaterial 
           color={color} 
           transparent 
-          opacity={0.85}
+          opacity={0.5}
           side={THREE.DoubleSide}
-          depthTest={false}
-          depthWrite={false}
         />
       </mesh>
       
@@ -74,9 +72,7 @@ export function TrajectoryHint({ initialPosition, initialVelocity, color }: Traj
         <meshBasicMaterial 
           color={color} 
           transparent 
-          opacity={0.95}
-          depthTest={false}
-          depthWrite={false}
+          opacity={0.6}
         />
       </mesh>
       
@@ -86,10 +82,8 @@ export function TrajectoryHint({ initialPosition, initialVelocity, color }: Traj
         <meshBasicMaterial 
           color={color} 
           transparent 
-          opacity={0.45}
+          opacity={0.2}
           side={THREE.DoubleSide}
-          depthTest={false}
-          depthWrite={false}
         />
       </mesh>
     </group>

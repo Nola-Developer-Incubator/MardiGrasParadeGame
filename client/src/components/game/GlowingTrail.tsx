@@ -63,10 +63,8 @@ export function GlowingTrail({ targetRef, color, length = 8 }: GlowingTrailProps
       <meshBasicMaterial 
         color={color} 
         transparent 
-        opacity={0.8}
+        opacity={0.6}
         blending={THREE.AdditiveBlending}
-        depthTest={false}
-        depthWrite={false}
       />
     </instancedMesh>
   );
