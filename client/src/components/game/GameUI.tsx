@@ -56,12 +56,18 @@ export function GameUI() {
     return () => window.removeEventListener('minimalHud:updated', handler);
   }, []);
   
-  // HUD toggles persisted in localStorage
+  // HUD toggles persisted in localStorage (per-element)
   const [showFloatLabels, setShowFloatLabels] = useState<boolean>(() => {
     try { return localStorage.getItem('hud:showFloatLabels') === null ? true : localStorage.getItem('hud:showFloatLabels') === 'true'; } catch { return true; }
   });
-  const [showHudElements, setShowHudElements] = useState<boolean>(() => {
-    try { return localStorage.getItem('hud:showHudElements') === null ? true : localStorage.getItem('hud:showHudElements') === 'true'; } catch { return true; }
+  const [showPowerUps, setShowPowerUps] = useState<boolean>(() => {
+    try { return localStorage.getItem('hud:showPowerUps') === null ? true : localStorage.getItem('hud:showPowerUps') === 'true'; } catch { return true; }
+  });
+  const [showCompetitors, setShowCompetitors] = useState<boolean>(() => {
+    try { return localStorage.getItem('hud:showCompetitors') === null ? true : localStorage.getItem('hud:showCompetitors') === 'true'; } catch { return true; }
+  });
+  const [showRemainingFloats, setShowRemainingFloats] = useState<boolean>(() => {
+    try { return localStorage.getItem('hud:showRemainingFloats') === null ? true : localStorage.getItem('hud:showRemainingFloats') === 'true'; } catch { return true; }
   });
 
   // Allow preview builds to force a minimal HUD via Vite env flag (VITE_MINIMAL_HUD=true)
@@ -118,12 +124,10 @@ export function GameUI() {
   }, [showPersonas]);
 
   // Persist HUD toggles and notify listeners
-  useEffect(() => {
-    try { localStorage.setItem('hud:showFloatLabels', String(showFloatLabels)); window.dispatchEvent(new Event('hud:updated')); } catch {}
-  }, [showFloatLabels]);
-  useEffect(() => {
-    try { localStorage.setItem('hud:showHudElements', String(showHudElements)); window.dispatchEvent(new Event('hud:updated')); } catch {}
-  }, [showHudElements]);
+  useEffect(() => { try { localStorage.setItem('hud:showFloatLabels', String(showFloatLabels)); window.dispatchEvent(new Event('hud:updated')); } catch {} }, [showFloatLabels]);
+  useEffect(() => { try { localStorage.setItem('hud:showPowerUps', String(showPowerUps)); window.dispatchEvent(new Event('hud:updated')); } catch {} }, [showPowerUps]);
+  useEffect(() => { try { localStorage.setItem('hud:showCompetitors', String(showCompetitors)); window.dispatchEvent(new Event('hud:updated')); } catch {} }, [showCompetitors]);
+  useEffect(() => { try { localStorage.setItem('hud:showRemainingFloats', String(showRemainingFloats)); window.dispatchEvent(new Event('hud:updated')); } catch {} }, [showRemainingFloats]);
 
   const handleStartGame = () => {
     setShowTutorial(false);
@@ -253,7 +257,7 @@ export function GameUI() {
               </div>
               
               {/* Active Power-ups - Compact */}
-              {showHudElements && activePowerUps.map((powerUp) => {
+              {showPowerUps && activePowerUps.map((powerUp) => {
                 const timeLeft = Math.max(0, powerUp.endTime - Date.now());
                 return (
                   <Card key={powerUp.type} className="bg-cyan-600/90 border-2 border-cyan-300 px-2 py-1 md:px-3 md:py-2">
@@ -288,8 +292,8 @@ export function GameUI() {
             </div>
           </div>
           
-          {/* Remaining floats indicator (compact) - show only in dev or when tests force HUD and when HUD elements enabled */}
-          {(import.meta.env.DEV || forceHudForTests) && showHudElements && (
+          {/* Remaining floats indicator (compact) - show only in dev or when tests force HUD and when enabled */}
+          {(import.meta.env.DEV || forceHudForTests) && showRemainingFloats && (
             <RemainingFloats remaining={Math.max(0, (totalFloats || 0) - (floatsPassed || 0))} />
           )}
 
@@ -386,11 +390,19 @@ export function GameUI() {
                 <span>Show Float Labels</span>
               </label>
               <label className="flex items-center gap-2 text-white text-xs">
-                <input type="checkbox" checked={showHudElements} onChange={(e) => setShowHudElements(e.target.checked)} />
-                <span>Show HUD Elements</span>
+                <input type="checkbox" checked={showPowerUps} onChange={(e) => setShowPowerUps(e.target.checked)} />
+                <span>Show Power-ups</span>
               </label>
-            </div>
-          </div>
+              <label className="flex items-center gap-2 text-white text-xs">
+                <input type="checkbox" checked={showCompetitors} onChange={(e) => setShowCompetitors(e.target.checked)} />
+                <span>Show Competitors</span>
+              </label>
+              <label className="flex items-center gap-2 text-white text-xs">
+                <input type="checkbox" checked={showRemainingFloats} onChange={(e) => setShowRemainingFloats(e.target.checked)} />
+                <span>Show Remaining Floats</span>
+              </label>
+             </div>
+           </div>
 
           {/* Test hook: expose a visible DOM marker when tests opt-in via localStorage */}
           {forceHudForTests && (
