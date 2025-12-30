@@ -62,7 +62,7 @@ function App() {
           <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'auto', zIndex: 50 }}>
             <button
               onMouseEnter={prefetchCanvas}
-              onClick={() => { setGameStarted(true); startGame(); }}
+              onClick={() => { setGameStarted(true); /* startGame() intentionally deferred so tutorial modal can appear */ }}
               style={{ padding: '18px 28px', fontSize: 20, borderRadius: 12, background: '#ff6b35', color: 'white', border: 'none', boxShadow: '0 8px 24px rgba(0,0,0,0.4)', cursor: 'pointer' }}
             >
               Play Mardi Gras Parade
