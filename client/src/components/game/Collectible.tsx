@@ -163,8 +163,10 @@ export function Collectible({ collectible, playerPosition, onCatch }: Collectibl
     }
   });
   
+  // Increase sizes for better visibility
+  const size = collectible.type === "cup" ? 0.6 : 0.45;
+  
   const color = COLLECTIBLE_COLORS[collectible.type];
-  const size = collectible.type === "cup" ? 0.3 : 0.25;
   
   return (
     <group>
@@ -181,7 +183,7 @@ export function Collectible({ collectible, playerPosition, onCatch }: Collectibl
         {collectible.type === "cup" ? (
           <cylinderGeometry args={[size, size * 0.8, size * 1.2, 6]} />
         ) : (
-          <sphereGeometry args={[size, 8, 8]} />
+          <sphereGeometry args={[size, 16, 16]} />
         )}
         <meshStandardMaterial 
           color={color} 
@@ -194,7 +196,7 @@ export function Collectible({ collectible, playerPosition, onCatch }: Collectibl
       
       {/* Glowing trail effect when falling */}
       {position.current.y > GROUND_LEVEL && (
-        <GlowingTrail targetRef={meshRef} color={color} length={6} />
+        <GlowingTrail targetRef={meshRef} color={color} length={8} />
       )}
       
       {/* Catchable highlight ring - original behavior (slightly transparent, respects depth) */}

@@ -62,20 +62,7 @@ function App() {
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
       <KeyboardControls map={controls}>
-        {/* Show a Play overlay until user starts the game. The heavy 3D Canvas is mounted
-            immediately so Playwright can detect a <canvas> element, but the overlay sits
-            above it until the user actually starts the tutorial/game. */}
-        {!gameStarted && (
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'auto', zIndex: 50 }}>
-            <button
-              onMouseEnter={prefetchCanvas}
-              onClick={() => { setGameStarted(true); /* startGame() intentionally deferred so tutorial modal can appear */ }}
-              style={{ padding: '18px 28px', fontSize: 20, borderRadius: 12, background: '#ff6b35', color: 'white', border: 'none', boxShadow: '0 8px 24px rgba(0,0,0,0.4)', cursor: 'pointer' }}
-            >
-              Play Mardi Gras Parade
-            </button>
-          </div>
-        )}
+        {/* Play overlay removed — GameUI handles main menu and Start button */}
 
         {/* Mount the canvas immediately so tests can detect it — visibility or interaction is gated
             by the tutorial overlay and game state. */}

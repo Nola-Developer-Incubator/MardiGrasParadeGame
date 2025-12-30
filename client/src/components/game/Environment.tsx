@@ -21,34 +21,8 @@ export function Environment() {
         if (!res.ok) {
           console.warn('Asphalt texture not found at', url, '— using generated fallback texture.');
           if (!cancelled) {
-            // create simple canvas fallback (repeating noisy pattern)
-            const size = 64;
-            const canvas = document.createElement('canvas');
-            canvas.width = size; canvas.height = size;
-            const ctx = canvas.getContext('2d');
-            if (ctx) {
-              // base
-              ctx.fillStyle = '#333333';
-              ctx.fillRect(0, 0, size, size);
-              // speckles
-              for (let i = 0; i < 120; i++) {
-                const x = Math.random() * size;
-                const y = Math.random() * size;
-                const s = Math.random() * 2;
-                ctx.fillStyle = `rgba(0,0,0,${0.2 + Math.random() * 0.4})`;
-                ctx.fillRect(x, y, s, s);
-              }
-              const fallback = new THREE.CanvasTexture(canvas);
-              fallback.wrapS = THREE.RepeatWrapping;
-              fallback.wrapT = THREE.RepeatWrapping;
-              fallback.repeat.set(3, 10);
-              // Ensure correct encoding and filtering for consistent visuals
-              (fallback as any).encoding = (THREE as any).sRGBEncoding;
-              fallback.minFilter = THREE.LinearMipMapLinearFilter;
-              fallback.magFilter = THREE.LinearFilter;
-              createdFallback = fallback;
-              setAsphaltTexture(fallback);
-            }
+            // Do NOT use a generated canvas texture fallback (visible noisy tile). Fall back to a solid color material instead.
+            createdFallback = null;
           }
           return;
         }
@@ -85,61 +59,15 @@ export function Environment() {
         }, undefined, (err) => {
           console.warn('Failed to load asphalt texture at', url, err, '— using generated fallback.');
           if (!cancelled) {
-            // create canvas fallback as above
-            const size = 64;
-            const canvas = document.createElement('canvas');
-            canvas.width = size; canvas.height = size;
-            const ctx = canvas.getContext('2d');
-            if (ctx) {
-              ctx.fillStyle = '#333333';
-              ctx.fillRect(0, 0, size, size);
-              for (let i = 0; i < 120; i++) {
-                const x = Math.random() * size;
-                const y = Math.random() * size;
-                const s = Math.random() * 2;
-                ctx.fillStyle = `rgba(0,0,0,${0.2 + Math.random() * 0.4})`;
-                ctx.fillRect(x, y, s, s);
-              }
-              const fallback = new THREE.CanvasTexture(canvas);
-              fallback.wrapS = THREE.RepeatWrapping;
-              fallback.wrapT = THREE.RepeatWrapping;
-              fallback.repeat.set(3, 10);
-              (fallback as any).encoding = (THREE as any).sRGBEncoding;
-              fallback.minFilter = THREE.LinearMipMapLinearFilter;
-              fallback.magFilter = THREE.LinearFilter;
-              createdFallback = fallback;
-              setAsphaltTexture(fallback);
-            }
+            // Do not set a canvas fallback texture to avoid visible noise; keep asphaltTexture null so material uses solid color.
+            createdFallback = null;
           }
         });
       } catch (e) {
         console.warn('Error checking asphalt texture:', e, '— using generated fallback.');
         if (!cancelled) {
-          // create canvas fallback
-          const size = 64;
-          const canvas = document.createElement('canvas');
-          canvas.width = size; canvas.height = size;
-          const ctx = canvas.getContext('2d');
-          if (ctx) {
-            ctx.fillStyle = '#333333';
-            ctx.fillRect(0, 0, size, size);
-            for (let i = 0; i < 120; i++) {
-              const x = Math.random() * size;
-              const y = Math.random() * size;
-              const s = Math.random() * 2;
-              ctx.fillStyle = `rgba(0,0,0,${0.2 + Math.random() * 0.4})`;
-              ctx.fillRect(x, y, s, s);
-            }
-            const fallback = new THREE.CanvasTexture(canvas);
-            fallback.wrapS = THREE.RepeatWrapping;
-            fallback.wrapT = THREE.RepeatWrapping;
-            fallback.repeat.set(3, 10);
-            (fallback as any).encoding = (THREE as any).sRGBEncoding;
-            fallback.minFilter = THREE.LinearMipMapLinearFilter;
-            fallback.magFilter = THREE.LinearFilter;
-            createdFallback = fallback;
-            setAsphaltTexture(fallback);
-          }
+          // Do not create or set a fallback texture; rely on solid-color material instead.
+          createdFallback = null;
         }
       }
     })();

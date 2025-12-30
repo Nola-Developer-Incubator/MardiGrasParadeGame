@@ -57,32 +57,32 @@ export function TrajectoryHint({ initialPosition, initialVelocity, color }: Traj
     <group position={landingPosition}>
       {/* Landing target circle */}
       <mesh ref={meshRef} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.4, 0.6, 16]} />
+        <ringGeometry args={[0.6, 0.9, 16]} />
         <meshBasicMaterial 
           color={color} 
           transparent 
-          opacity={0.5}
+          opacity={0.6}
           side={THREE.DoubleSide}
         />
       </mesh>
       
       {/* Center dot */}
       <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[0.3, 8]} />
+        <circleGeometry args={[0.45, 12]} />
         <meshBasicMaterial 
           color={color} 
           transparent 
-          opacity={0.6}
+          opacity={0.8}
         />
       </mesh>
       
       {/* Outer glow ring */}
       <mesh rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.6, 0.9, 16]} />
+        <ringGeometry args={[0.9, 1.3, 16]} />
         <meshBasicMaterial 
           color={color} 
           transparent 
-          opacity={0.2}
+          opacity={0.25}
           side={THREE.DoubleSide}
         />
       </mesh>
