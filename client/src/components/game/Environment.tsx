@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useRef, useState} from "react";
-import {useFrame} from "@react-three/fiber";
+import {useFrame, useThree} from "@react-three/fiber";
 import * as THREE from "three";
 
 export function Environment() {
@@ -7,15 +7,45 @@ export function Environment() {
   const assetBase = (import.meta as any).env?.VITE_ASSET_BASE_URL ?? (import.meta as any).env?.BASE_URL ?? '';
   const [asphaltTexture, setAsphaltTexture] = useState<THREE.Texture | null>(null);
 
+  const spotlightGroupRef = useRef<THREE.Group>(null);
+  const { gl } = useThree();
+
   useEffect(() => {
     let cancelled = false;
+    let createdFallback: THREE.Texture | null = null;
     const url = `${assetBase.replace(/\/$/, '')}/${'textures/asphalt.png'.replace(/^\/+/, '')}`.replace(/\/+/g, '/');
     // Check existence before loading to avoid console 404s and exceptions
     (async () => {
       try {
         const res = await fetch(url, { method: 'HEAD' });
         if (!res.ok) {
-          console.warn('Asphalt texture not found at', url, '— using fallback color material.');
+          console.warn('Asphalt texture not found at', url, '— using generated fallback texture.');
+          if (!cancelled) {
+            // create simple canvas fallback (repeating noisy pattern)
+            const size = 64;
+            const canvas = document.createElement('canvas');
+            canvas.width = size; canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              // base
+              ctx.fillStyle = '#333333';
+              ctx.fillRect(0, 0, size, size);
+              // speckles
+              for (let i = 0; i < 120; i++) {
+                const x = Math.random() * size;
+                const y = Math.random() * size;
+                const s = Math.random() * 2;
+                ctx.fillStyle = `rgba(0,0,0,${0.2 + Math.random() * 0.4})`;
+                ctx.fillRect(x, y, s, s);
+              }
+              const fallback = new THREE.CanvasTexture(canvas);
+              fallback.wrapS = THREE.RepeatWrapping;
+              fallback.wrapT = THREE.RepeatWrapping;
+              fallback.repeat.set(3, 10);
+              createdFallback = fallback;
+              setAsphaltTexture(fallback);
+            }
+          }
           return;
         }
         if (cancelled) return;
@@ -27,26 +57,79 @@ export function Environment() {
               tex.wrapS = THREE.RepeatWrapping;
               tex.wrapT = THREE.RepeatWrapping;
               tex.repeat.set(3, 10);
-              // optional: increase anisotropy if available
-              try { tex.anisotropy = (renderer && renderer.capabilities && (renderer.capabilities as any).getMaxAnisotropy ? (renderer.capabilities as any).getMaxAnisotropy() : tex.anisotropy); } catch(e) { /* ignore */ }
+              // optional: increase anisotropy if renderer exposes the capability
+              try {
+                // Set anisotropy if renderer exposes the capability
+                try {
+                  const maxAniso = (gl as any)?.capabilities && typeof (gl as any).capabilities.getMaxAnisotropy === 'function'
+                    ? (gl as any).capabilities.getMaxAnisotropy()
+                    : undefined;
+                  if (typeof maxAniso === 'number') tex.anisotropy = maxAniso;
+                } catch (e) { /* ignore */ }
+              } catch (e) { /* ignore */ }
             } catch (e) {
               // ignore if setting fails
             }
             setAsphaltTexture(tex);
           }
         }, undefined, (err) => {
-          console.warn('Failed to load asphalt texture at', url, err);
-          // keep asphaltTexture as null — fallback will be used
+          console.warn('Failed to load asphalt texture at', url, err, '— using generated fallback.');
+          if (!cancelled) {
+            // create canvas fallback as above
+            const size = 64;
+            const canvas = document.createElement('canvas');
+            canvas.width = size; canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              ctx.fillStyle = '#333333';
+              ctx.fillRect(0, 0, size, size);
+              for (let i = 0; i < 120; i++) {
+                const x = Math.random() * size;
+                const y = Math.random() * size;
+                const s = Math.random() * 2;
+                ctx.fillStyle = `rgba(0,0,0,${0.2 + Math.random() * 0.4})`;
+                ctx.fillRect(x, y, s, s);
+              }
+              const fallback = new THREE.CanvasTexture(canvas);
+              fallback.wrapS = THREE.RepeatWrapping;
+              fallback.wrapT = THREE.RepeatWrapping;
+              fallback.repeat.set(3, 10);
+              createdFallback = fallback;
+              setAsphaltTexture(fallback);
+            }
+          }
         });
       } catch (e) {
-        console.warn('Error checking asphalt texture:', e);
+        console.warn('Error checking asphalt texture:', e, '— using generated fallback.');
+        if (!cancelled) {
+          // create canvas fallback
+          const size = 64;
+          const canvas = document.createElement('canvas');
+          canvas.width = size; canvas.height = size;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.fillStyle = '#333333';
+            ctx.fillRect(0, 0, size, size);
+            for (let i = 0; i < 120; i++) {
+              const x = Math.random() * size;
+              const y = Math.random() * size;
+              const s = Math.random() * 2;
+              ctx.fillStyle = `rgba(0,0,0,${0.2 + Math.random() * 0.4})`;
+              ctx.fillRect(x, y, s, s);
+            }
+            const fallback = new THREE.CanvasTexture(canvas);
+            fallback.wrapS = THREE.RepeatWrapping;
+            fallback.wrapT = THREE.RepeatWrapping;
+            fallback.repeat.set(3, 10);
+            createdFallback = fallback;
+            setAsphaltTexture(fallback);
+          }
+        }
       }
     })();
-    return () => { cancelled = true; };
-  }, [assetBase]);
+    return () => { cancelled = true; if (createdFallback) { try { createdFallback.dispose(); } catch {} } };
+  }, [assetBase, gl]);
 
-  const spotlightGroupRef = useRef<THREE.Group>(null);
-  
   // Pre-calculate building positions to avoid Math.random in render
   const buildings = useMemo(() => {
     const mardiGrasColors = ["#722F9A", "#228B22", "#FFD700"]; // Purple, Green, Gold
