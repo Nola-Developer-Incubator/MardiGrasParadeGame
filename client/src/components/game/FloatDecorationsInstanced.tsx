@@ -25,6 +25,10 @@ export function FloatDecorationsInstanced({ decorationsPerFloat = 5 }: FloatDeco
     const floatSpeed = typeof getFloatSpeed === 'function' ? getFloatSpeed() : 0;
     const elapsed = state.clock.elapsedTime;
 
+    // Window of floats to render decorations for (reduces instance counts and avoids far-away artifacts)
+    const visibleZMin = -50;
+    const visibleZMax = 30;
+
     const desiredCount = Math.max(0, (totalFloats || 0) * decorationsPerFloat);
     const countCap = Math.min(desiredCount, MAX_INSTANCES);
 
@@ -43,6 +47,10 @@ export function FloatDecorationsInstanced({ decorationsPerFloat = 5 }: FloatDeco
 
       const startZ = -30 - (fi * 10);
       const z = startZ + floatSpeed * elapsed; // sync with ParadeFloat motion
+
+      // Skip floats that are well outside visible range to improve performance
+      if (z < visibleZMin || z > visibleZMax) continue;
+
       const floatX = 5; // keep consistent with ParadeFloat instances (GameScene uses lane=1 => x=5)
       const bobY = 1 + Math.sin(elapsed * 0.5 + fi * 0.1) * 0.08; // slight per-float phase offset to reduce visible patterning
 
