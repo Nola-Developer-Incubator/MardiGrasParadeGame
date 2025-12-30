@@ -8,6 +8,7 @@ interface FloatDecorationsProps {
 }
 
 export function FloatDecorationsInstanced({ decorationsPerFloat = 5 }: FloatDecorationsProps) {
+  const MAX_INSTANCES = 4096; // capacity of the instanced mesh buffer
   const meshRef = useRef<THREE.InstancedMesh | null>(null);
   const tempMatrix = useMemo(() => new THREE.Matrix4(), []);
   const tempPos = useMemo(() => new THREE.Vector3(), []);
@@ -20,11 +21,21 @@ export function FloatDecorationsInstanced({ decorationsPerFloat = 5 }: FloatDeco
   useFrame((state) => {
     const g = useParadeGame.getState();
     const { totalFloats, getFloatSpeed } = g;
-    const floatSpeed = getFloatSpeed();
+    const floatSpeed = typeof getFloatSpeed === 'function' ? getFloatSpeed() : 0;
     const elapsed = state.clock.elapsedTime;
-    const count = Math.max(0, totalFloats || 0) * decorationsPerFloat;
+
+    const desiredCount = Math.max(0, (totalFloats || 0) * decorationsPerFloat);
+    const count = Math.min(desiredCount, MAX_INSTANCES);
+
     if (!meshRef.current) return;
+
+    // Ensure the instanced mesh was created with the same capacity
     meshRef.current.count = count;
+
+    // Mark instanceMatrix usage dynamic for frequent updates
+    try {
+      (meshRef.current.instanceMatrix as any).setUsage?.(THREE.DynamicDrawUsage);
+    } catch {}
 
     let idx = 0;
     for (let fi = 0; fi < (totalFloats || 0); fi++) {
@@ -34,6 +45,8 @@ export function FloatDecorationsInstanced({ decorationsPerFloat = 5 }: FloatDeco
       const bobY = 1 + Math.sin(elapsed * 0.5) * 0.1;
 
       for (let d = 0; d < decorationsPerFloat; d++) {
+        if (idx >= count) break; // don't write past buffer
+
         const rx = ( ( (fi * 13 + d * 37) % 1000 ) / 1000 - 0.5) * 1.5; // deterministic pseudo-random
         const ry = ((fi * 19 + d * 97) % 1000) / 1000 * 1.5 + 0.5;
         const rz = ((fi * 7 + d * 61) % 1000) / 1000 * 2 - 1;
@@ -52,7 +65,6 @@ export function FloatDecorationsInstanced({ decorationsPerFloat = 5 }: FloatDeco
   });
 
   return (
-    <instancedMesh ref={meshRef} args={[geometry, material, 4096]} castShadow />
+    <instancedMesh ref={meshRef} args={[geometry, material, MAX_INSTANCES]} castShadow />
   );
 }
-
