@@ -71,7 +71,7 @@ export function GameScene({ joystickInput: externalJoystickInput = null }: GameS
     try { return localStorage.getItem('visual:advancedPost') === 'true'; } catch { return false; }
   });
   const [confettiEnabled, setConfettiEnabled] = useState<boolean>(() => {
-    try { return localStorage.getItem('visual:confetti') === null ? true : localStorage.getItem('visual:confetti') === 'true'; } catch { return true; }
+    try { return localStorage.getItem('visual:confetti') === null ? false : localStorage.getItem('visual:confetti') === 'true'; } catch { return false; }
   });
   const [hdriEnabled, setHdriEnabled] = useState<boolean>(() => {
     try { return localStorage.getItem('visual:hdri') === 'true'; } catch { return false; }
