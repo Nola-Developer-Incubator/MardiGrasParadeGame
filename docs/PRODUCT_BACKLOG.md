@@ -42,14 +42,14 @@ This backlog is a prioritized list of features, bugs, and chores for upcoming sp
 This section summarizes the current sprint work and short notes about progress and next steps.
 
 - Sprint A (Controls & Stability) — In Progress (start: 2025-12-22, review: ongoing)
-  - PB-001 Mobile & Desktop Joystick Improvements — In Progress
+  - PB-001 Mobile & Desktop Joystick Improvements — In Progress (partial; basic joystick landed in production but multi-touch edge cases remain)
     - Notes: Multi-touch behavior and hit-target separation are being iterated; Playwright joystick smoke test added as a skeleton (`tests/playwright/joystick.spec.ts`).
-    - Next: finish pointer/touch handling, add multi-touch tests, and polish visuals.
-  - PB-002 Minimal HUD / Compact UI Mode — To Do
-    - Notes: Design notes exist; implementation pending.
-  - PB-003 Audio toggle persistence bugfix — To Do
+    - Next: finish pointer/touch handling, add multi-touch tests, and polish visuals. Estimated remaining: 3-5 points.
+  - PB-002 Minimal HUD / Compact UI Mode — To Do (not merged to production)
+    - Notes: Design mock exists; implementation pending.
+  - PB-003 Audio toggle persistence bugfix — To Do (minor but important; affects cross-platform reloads)
     - Notes: Repro on iOS/Chrome; small fix expected (1 day).
-  - PB-005 Visual remaining floats indicator — To Do
+  - PB-005 Visual remaining floats indicator — To Do (not yet in build)
     - Notes: UI mock exists; needs HUD integration.
 
 ## Definition of Done (per backlog item)
@@ -112,7 +112,7 @@ Sprint length: 2 weeks (typical)
 Team: 2 engineers, 1 designer
 
 Planned items for Sprint A (current status):
-- PB-001 Joystick improvements (8 points) — In Progress (work ongoing; remaining: ~3-5 points depending on final QA)
+- PB-001 Joystick improvements (8 points) — In Progress (partial; basic functionality live in production)
 - PB-002 Minimal HUD (5 points) — To Do
 - PB-003 Audio toggle persistence (2 points) — To Do
 - PB-005 Remaining floats indicator (3 points) — To Do
