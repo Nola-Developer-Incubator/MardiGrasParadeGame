@@ -76,11 +76,26 @@ export function ParadeFloat({
       lastThrowTime.current = now;
     }
     
-    // Update label visibility based on whether the float is in the play area
+    // Update label visibility, opacity and scale based on player distance
     try {
-      if (labelRef.current) {
-        const inPlayArea = position.current.z > -15 && position.current.z < 15;
-        labelRef.current.style.display = (labelEnabled && typeof label === 'number' && inPlayArea) ? 'block' : 'none';
+      if (labelRef.current && typeof label === 'number' && playerPosition) {
+        const distance = position.current.distanceTo(playerPosition);
+        const maxDistance = 20; // only show labels within this distance
+        const visible = labelEnabled && distance <= maxDistance;
+        if (!visible) {
+          labelRef.current.style.display = 'none';
+        } else {
+          // Fade/scale by distance (closer = larger and more opaque)
+          const t = Math.max(0, Math.min(1, 1 - distance / maxDistance)); // 1 at 0, 0 at maxDistance
+          const opacity = Math.max(0, t);
+          const scale = 0.6 + 0.4 * t; // between 0.6 and 1.0
+          labelRef.current.style.display = 'block';
+          labelRef.current.style.opacity = String(opacity);
+          labelRef.current.style.transform = `scale(${scale})`;
+        }
+      } else if (labelRef.current) {
+        // No playerPosition or label disabled -> hide
+        labelRef.current.style.display = 'none';
       }
     } catch (e) { /* ignore DOM update errors */ }
   });
@@ -201,7 +216,8 @@ export function ParadeFloat({
             borderRadius: 8,
             fontWeight: 700,
             fontSize: 14,
-            boxShadow: '0 4px 10px rgba(0,0,0,0.6)'
+            boxShadow: '0 4px 10px rgba(0,0,0,0.6)',
+            transition: 'opacity 150ms linear, transform 150ms ease'
           }}>
             {label}
           </div>
