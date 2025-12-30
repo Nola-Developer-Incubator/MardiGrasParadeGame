@@ -1,9 +1,7 @@
-import { createServer } from "http";
-import { createApp } from "./app";
-import { setupVite, log } from "./vite";
-import fs from 'fs';
-import path from 'path';
-import type { Request, Response, NextFunction } from 'express';
+import {createServer} from "http";
+import {createApp} from "./app";
+import {log, setupVite} from "./vite";
+import type {NextFunction, Request, Response} from 'express';
 
 console.log('server/index.ts executing', { argv: process.argv.slice(0, 10), nodeEnv: process.env.NODE_ENV });
 
@@ -65,7 +63,8 @@ async function startServer() {
   const port = Number(process.env.PORT || 5000);
 
   // use a portable listen signature to avoid ENOTSUP on some platforms
-  const httpServer = server.listen(port, '0.0.0.0', () => {
+  // Bind without explicit host so the OS picks an address that supports both IPv4 and IPv6 (helps Playwright connect to ::1 and 127.0.0.1)
+  const httpServer = server.listen(port, () => {
     log(`serving on port ${port}`);
   });
 
