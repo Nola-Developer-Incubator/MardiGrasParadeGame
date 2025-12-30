@@ -1,5 +1,5 @@
-import { useRef, useMemo } from "react";
-import { useFrame } from "@react-three/fiber";
+import {useMemo, useRef} from "react";
+import {useFrame} from "@react-three/fiber";
 import * as THREE from "three";
 
 interface TrajectoryHintProps {
@@ -61,8 +61,10 @@ export function TrajectoryHint({ initialPosition, initialVelocity, color }: Traj
         <meshBasicMaterial 
           color={color} 
           transparent 
-          opacity={0.5}
+          opacity={0.85}
           side={THREE.DoubleSide}
+          depthTest={false}
+          depthWrite={false}
         />
       </mesh>
       
@@ -72,7 +74,9 @@ export function TrajectoryHint({ initialPosition, initialVelocity, color }: Traj
         <meshBasicMaterial 
           color={color} 
           transparent 
-          opacity={0.6}
+          opacity={0.95}
+          depthTest={false}
+          depthWrite={false}
         />
       </mesh>
       
@@ -82,8 +86,10 @@ export function TrajectoryHint({ initialPosition, initialVelocity, color }: Traj
         <meshBasicMaterial 
           color={color} 
           transparent 
-          opacity={0.2}
+          opacity={0.45}
           side={THREE.DoubleSide}
+          depthTest={false}
+          depthWrite={false}
         />
       </mesh>
     </group>

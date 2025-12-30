@@ -43,7 +43,7 @@ export function Environment() {
               fallback.wrapT = THREE.RepeatWrapping;
               fallback.repeat.set(3, 10);
               // Ensure correct encoding and filtering for consistent visuals
-              fallback.encoding = THREE.sRGBEncoding;
+              (fallback as any).encoding = (THREE as any).sRGBEncoding;
               fallback.minFilter = THREE.LinearMipMapLinearFilter;
               fallback.magFilter = THREE.LinearFilter;
               createdFallback = fallback;
@@ -62,7 +62,7 @@ export function Environment() {
               tex.wrapT = THREE.RepeatWrapping;
               tex.repeat.set(3, 10);
               // Ensure correct color-space for albedo
-              tex.encoding = THREE.sRGBEncoding;
+              (tex as any).encoding = (THREE as any).sRGBEncoding;
               // Use sensible filters to avoid shimmering
               tex.minFilter = THREE.LinearMipMapLinearFilter;
               tex.magFilter = THREE.LinearFilter;
@@ -104,7 +104,7 @@ export function Environment() {
               fallback.wrapS = THREE.RepeatWrapping;
               fallback.wrapT = THREE.RepeatWrapping;
               fallback.repeat.set(3, 10);
-              fallback.encoding = THREE.sRGBEncoding;
+              (fallback as any).encoding = (THREE as any).sRGBEncoding;
               fallback.minFilter = THREE.LinearMipMapLinearFilter;
               fallback.magFilter = THREE.LinearFilter;
               createdFallback = fallback;
@@ -134,7 +134,7 @@ export function Environment() {
             fallback.wrapS = THREE.RepeatWrapping;
             fallback.wrapT = THREE.RepeatWrapping;
             fallback.repeat.set(3, 10);
-            fallback.encoding = THREE.sRGBEncoding;
+            (fallback as any).encoding = (THREE as any).sRGBEncoding;
             fallback.minFilter = THREE.LinearMipMapLinearFilter;
             fallback.magFilter = THREE.LinearFilter;
             createdFallback = fallback;
@@ -257,17 +257,16 @@ export function Environment() {
         <spotLight position={[0, 0, -8]} angle={0.4} penumbra={0.6} intensity={1.5} color="#FFD700" distance={25} />
       </group>
       
-      {/* Street/Ground - Main parade route */}
+      {/* Street/Ground - Main parade route (simplified material to avoid artifacts) */}
       <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
         <planeGeometry args={[14, 50]} />
         {asphaltTexture ? (
-          // Use a simple, non-reflective material for the street to avoid shiny artifacts
           <meshStandardMaterial
+            // show the texture but avoid bump/normal maps which caused artifacts on some platforms
             map={asphaltTexture as any}
+            color="#333333"
             roughness={1}
             metalness={0}
-            bumpMap={asphaltTexture as any}
-            bumpScale={0.02}
           />
         ) : (
           <meshStandardMaterial color="#333333" roughness={1} metalness={0} />
@@ -394,7 +393,7 @@ export function Environment() {
         return (
           <group key={`lights-${i}`} position={[0, 5, -18 + i * 6]}>
             {Array.from({ length: 12 }, (_, j) => (
-              <mesh key={j} position={[-6 + j * 1, Math.sin(j) * 0.3, 0]}>
+              <mesh key={j} position={[-6 + j, Math.sin(j) * 0.3, 0]}>
                 <sphereGeometry args={[0.1, 6, 6]} />
                 <meshStandardMaterial 
                   color={colors[j % 3]} 

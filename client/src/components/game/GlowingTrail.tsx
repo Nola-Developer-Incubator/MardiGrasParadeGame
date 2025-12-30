@@ -1,5 +1,5 @@
-import { useRef, useMemo } from "react";
-import { useFrame } from "@react-three/fiber";
+import {useRef} from "react";
+import {useFrame} from "@react-three/fiber";
 import * as THREE from "three";
 
 interface GlowingTrailProps {
@@ -63,8 +63,10 @@ export function GlowingTrail({ targetRef, color, length = 8 }: GlowingTrailProps
       <meshBasicMaterial 
         color={color} 
         transparent 
-        opacity={0.6}
+        opacity={0.8}
         blending={THREE.AdditiveBlending}
+        depthTest={false}
+        depthWrite={false}
       />
     </instancedMesh>
   );

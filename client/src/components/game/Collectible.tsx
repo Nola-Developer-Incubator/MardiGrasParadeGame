@@ -197,14 +197,16 @@ export function Collectible({ collectible, playerPosition, onCatch }: Collectibl
         <GlowingTrail targetRef={meshRef} color={color} length={6} />
       )}
       
-      {/* Catchable highlight ring - optimized */}
-      <mesh position={[position.current.x, 0.05, position.current.z]} rotation={[-Math.PI / 2, 0, 0]}>
+      {/* Catchable highlight ring - render above ground for visibility */}
+      <mesh position={[position.current.x, 0.075, position.current.z]} rotation={[-Math.PI / 2, 0, 0]} renderOrder={999}>
         <ringGeometry args={[CATCH_RADIUS * 0.8, CATCH_RADIUS, 16]} />
         <meshBasicMaterial 
           color={color} 
           transparent 
-          opacity={0.2}
+          opacity={0.35}
           side={THREE.DoubleSide}
+          depthTest={false}
+          depthWrite={false}
         />
       </mesh>
     </group>
