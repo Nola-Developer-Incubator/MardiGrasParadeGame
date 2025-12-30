@@ -1,12 +1,44 @@
-import { useMemo, useRef } from "react";
-import { useTexture } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
+import {useEffect, useMemo, useRef, useState} from "react";
+import {useFrame} from "@react-three/fiber";
 import * as THREE from "three";
 
 export function Environment() {
   // Use Vite's BASE_URL so textures resolve correctly when the app is served from a subpath
   const assetBase = (import.meta as any).env?.VITE_ASSET_BASE_URL ?? (import.meta as any).env?.BASE_URL ?? '';
-  const asphaltTexture = useTexture(`${assetBase.replace(/\/$/, '')}/${'textures/asphalt.png'.replace(/^\/+/, '')}`);
+  const [asphaltTexture, setAsphaltTexture] = useState<THREE.Texture | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const url = `${assetBase.replace(/\/$/, '')}/${'textures/asphalt.png'.replace(/^\/+/, '')}`.replace(/\/+/g, '/');
+    // Check existence before loading to avoid console 404s and exceptions
+    (async () => {
+      try {
+        const res = await fetch(url, { method: 'HEAD' });
+        if (!res.ok) return;
+        if (cancelled) return;
+        const loader = new THREE.TextureLoader();
+        loader.load(url, (tex) => {
+          if (!cancelled) {
+            // configure texture repeat and wrapping before storing
+            try {
+              tex.wrapS = THREE.RepeatWrapping;
+              tex.wrapT = THREE.RepeatWrapping;
+              tex.repeat.set(3, 10);
+            } catch (e) {
+              // ignore if setting fails
+            }
+            setAsphaltTexture(tex);
+          }
+        }, undefined, () => {
+          // ignore texture load errors silently
+        });
+      } catch (e) {
+        // ignore
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [assetBase]);
+
   const spotlightGroupRef = useRef<THREE.Group>(null);
   
   // Pre-calculate building positions to avoid Math.random in render
@@ -124,10 +156,7 @@ export function Environment() {
       <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
         <planeGeometry args={[14, 50]} />
         <meshStandardMaterial 
-          map={asphaltTexture} 
-          map-repeat={new THREE.Vector2(3, 10)}
-          map-wrapS={THREE.RepeatWrapping}
-          map-wrapT={THREE.RepeatWrapping}
+          map={asphaltTexture as any} 
         />
       </mesh>
       

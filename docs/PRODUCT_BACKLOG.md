@@ -22,11 +22,11 @@ This backlog is a prioritized list of features, bugs, and chores for upcoming sp
 | P3 | Chore | Improve README and onboarding docs | 1d | Expand quick start and developer notes |
 
 ## Sprint Candidates (2-week sprint suggestions)
-- Sprint A (2w) — Controls & Stability (P0 + P1)
-  - Improve joystick & separate catch area (P0)
-  - Fix audio toggle (P0)
-  - Visual remaining floats indicator (P1)
-  - Analytics events for session start/stop (P1)
+- Sprint A (2w) — Controls & Stability (P0 + P1) — CURRENT / In Progress
+  - Improve joystick & separate catch area (P0) — PB-001 — In Progress
+  - Fix audio toggle (P0) — PB-003 — To Do
+  - Visual remaining floats indicator (P1) — PB-005 — To Do
+  - Analytics events for session start/stop (P1) — To Do
 
 - Sprint B (2w) — Backend & Persistence (P0 + P2)
   - Session tracking & cloud save (P0)
@@ -37,6 +37,20 @@ This backlog is a prioritized list of features, bugs, and chores for upcoming sp
   - Reduce draw calls & instancing (P1)
   - Add new float types and early-level rewards (P1)
   - Start basic leaderboards (P2)
+
+## Sprint status (current)
+This section summarizes the current sprint work and short notes about progress and next steps.
+
+- Sprint A (Controls & Stability) — In Progress (start: 2025-12-22, review: ongoing)
+  - PB-001 Mobile & Desktop Joystick Improvements — In Progress
+    - Notes: Multi-touch behavior and hit-target separation are being iterated; Playwright joystick smoke test added as a skeleton (`tests/playwright/joystick.spec.ts`).
+    - Next: finish pointer/touch handling, add multi-touch tests, and polish visuals.
+  - PB-002 Minimal HUD / Compact UI Mode — To Do
+    - Notes: Design notes exist; implementation pending.
+  - PB-003 Audio toggle persistence bugfix — To Do
+    - Notes: Repro on iOS/Chrome; small fix expected (1 day).
+  - PB-005 Visual remaining floats indicator — To Do
+    - Notes: UI mock exists; needs HUD integration.
 
 ## Definition of Done (per backlog item)
 - Code compiles (`npm run check`), unit/CI tests pass (where applicable), and manual QA passes on desktop & mobile.
@@ -92,17 +106,18 @@ Test/QA tasks:
 - Automated: Playwright skeleton test added in `tests/playwright/joystick.spec.ts` (placeholder).
 
 ## Sprint Planning (example)
-Sprint goal: Ship joystick and minimal HUD improvements.
-Sprint length: 2 weeks
+
+Sprint goal: Ship joystick and minimal HUD improvements (CURRENT SPRINT — Sprint A)
+Sprint length: 2 weeks (typical)
 Team: 2 engineers, 1 designer
 
-Planned items for Sprint:
-- PB-001 Joystick improvements (8 points)
-- PB-002 Minimal HUD (5 points)
-- PB-003 Audio toggle persistence (2 points)
-- PB-005 Remaining floats indicator (3 points)
+Planned items for Sprint A (current status):
+- PB-001 Joystick improvements (8 points) — In Progress (work ongoing; remaining: ~3-5 points depending on final QA)
+- PB-002 Minimal HUD (5 points) — To Do
+- PB-003 Audio toggle persistence (2 points) — To Do
+- PB-005 Remaining floats indicator (3 points) — To Do
 
-Total estimate: 18 points (fits 2-engineer cadence)
+Total planned estimate: 18 points (original plan) — Current remaining: ~10-13 points (PB-001 partially complete)
 
 ## Ticket linking & templates
 Use the `docs/TICKET_TEMPLATE.md` for ticket content and acceptance criteria.

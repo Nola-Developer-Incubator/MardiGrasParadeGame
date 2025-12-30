@@ -198,61 +198,106 @@ NODE_ENV=development
 
 Quick summary and test checklist for maintainers, designers, and QA engineers.
 
-- Production (public playtest): https://Nola-Developer-Incubator.github.io/MardiGrasParadeGame/ (frontend build published to GitHub Pages)
+- Production (public playtest): https://Nola-Developer-Incubator.github.io/MardiGrasParadeGame/
+  - Current status (2025-12-30): The site link is known to load a blank screen for some users. See "Troubleshooting - Blank Page" below for diagnosis and temporary workarounds.
 
-What's done (evidence in repo)
-- Player movement (WASD, click-to-move, touch/joystick): implemented; see `client/src/components/` and test hook in `tests/playwright/joystick.spec.ts`.
-- Parade floats and collectibles (beads, doubloons, cups, king cake, power-ups): implemented and described in `README.md` features.
-- Scoring, combos and color-match bonus: implemented in game logic (see scoring references in README and stores).
-- Power-ups (speed, double points) and basic level progression: implemented.
-- Leaderboard & persistence: basic server endpoints and `data/leaderboard.json` exist for storing scores.
-- Mobile optimizations: touch controls and optional on-screen joystick are present; Playwright skeleton test added for joystick.
+What's included in the production build (Done features)
+- Player movement (WASD, click-to-move, touch/joystick) — core movement shipped to the frontend build.
+- Parade floats and collectibles (beads, doubloons, cups, king cake, power-ups) — assets and runtime logic are present in the built client.
+- Scoring, combos and color-match bonus — scoring logic is included in the build.
+- Power-ups (speed, double points) and basic level progression — implemented and present in the build.
+- Leaderboard & persistence (basic) — endpoints and `data/leaderboard.json` exist on the server side; frontend submits to server in the build.
 
-Sprint status (from `docs/PRODUCT_BACKLOG.md`)
-- Sprint A planned items (Joystick, HUD, Audio toggle, Floats indicator): NOT fully completed.
-  - PB-001 Mobile & Desktop Joystick Improvements — In Progress
-  - PB-002 Minimal HUD / Compact UI Mode — To Do
-  - PB-003 Audio toggle persistence bugfix — To Do
-  - PB-005 Visual remaining floats indicator — To Do
+Sprint status and planning (updated)
+- Sprint A planned items (Joystick, HUD, Audio toggle, Floats indicator): PARTIAL
+  - PB-001 Mobile & Desktop Joystick Improvements — In Progress (work not yet finalized; some joystick behaviors available in build but additional fixes required for multi-touch and edge cases).
+  - PB-002 Minimal HUD / Compact UI Mode — To Do (HUD changes not merged to production build).
+  - PB-003 Audio toggle persistence bugfix — To Do (audio toggle works in session but persistence across reload/platforms not fixed).
+  - PB-005 Visual remaining floats indicator — To Do (not yet in build).
 
-Conclusion: Sprint goals are not all accomplished yet. PB-001 is in progress; the other planned sprint items remain To Do.
+Have all sprint goals been accomplished?
+- Short answer: No. Core gameplay features listed as "Done" are included in the client build, but the sprint-specific UX items (HUD, joystick polish, audio persistence, floats indicator) remain incomplete.
 
 What's undone / high priority
-- Finalize joystick improvements and multi-touch handling (PB-001)
-- Implement minimal HUD/compact UI mode (PB-002)
-- Fix audio toggle persistence across reloads/platforms (PB-003)
-- Add visual remaining floats indicator in HUD (PB-005)
-- Backend session tracking / cloud save and Shop/monetization items live in backlog (PB-004, PB-007, PB-008)
+- Finalize joystick improvements and multi-touch handling (PB-001).
+- Implement minimal HUD/compact UI mode (PB-002).
+- Fix audio toggle persistence (PB-003).
+- Add remaining floats indicator (PB-005).
+- Backend session tracking / cloud save and Shop/monetization items remain in backlog (PB-004, PB-007, PB-008).
 
-Testable features & quick checks
+Testable features & quick checks (for distributed QA team)
 - Manual smoke tests (local dev):
-  1. Run the dev server: `npm run dev` and open http://localhost:5000. Confirm no console errors.
-  2. Verify player movement: WASD, click-to-move, and touch/joystick on mobile/emulation move the player.
-  3. Verify collectibles spawn, can be caught, and that score updates and collectible disappears.
-  4. Verify combo behavior and color-match scoring.
-  5. Verify power-up behavior (speed/double points) and temporary effect timing.
-  6. Submit a score and confirm persistence in `data/leaderboard.json` or via `/api/leaderboard`.
-  7. Toggle audio and camera mode settings and confirm effects.
+  1. Clone and install: `npm ci`.
+  2. Run dev server (fastest interactive test):
+
+```powershell
+npm run dev
+# Open: http://localhost:5000
+```
+
+  3. Build and serve the production build locally (recommended for QA to match production assets):
+
+```powershell
+npm run build
+# serve the built static site locally (uses http-server via npm script)
+npm run ci:serve
+# Open: http://127.0.0.1:5000
+```
+
+  4. Confirm player movement (WASD, click-to-move, touch/joystick), collectibles spawn and can be caught, score updates, combos and power-ups behave as expected.
+  5. Submit a score and confirm persistence in `data/leaderboard.json` or via the `/api/leaderboard` endpoint.
+  6. Toggle audio and different camera modes and confirm they function.
 
 - Automated (Playwright):
-  - Joystick skeleton test is present at `tests/playwright/joystick.spec.ts` (smoke test). Run it locally with:
+  - Run joystick Playwright tests (Chromium):
 
-```bash
-# Run joystick tests (Chromium)
+```powershell
 npx playwright test tests/playwright/joystick.spec.ts --project=chromium
 ```
 
   - Run all Playwright tests:
 
-```bash
+```powershell
 npx playwright test
 ```
 
+Troubleshooting - Blank Page on GitHub Pages (what to check and fix)
+- Common causes why the public URL may show a blank page:
+  1. Incorrect base href in `index.html` (leading/trailing spaces or wrong path). The repository uses a `base` tag like `<base href="/MardiGrasParadeGame/">` — if that value contains extra whitespace or is missing, assets may 404 and result in a blank canvas.
+  2. The site wasn't actually published to `gh-pages` (publish script is gated by `GH_PAGES_CONFIRM`). The repo ships helper scripts that build to `dist/public` and publish, but publishing is gated to avoid accidental pushes.
+  3. Missing or mis-served static assets (check console for 404s to `/assets/` or `index-*.js` files).
+
+- Quick diagnosis steps for QA or maintainers (ask your dev to run these if you see a blank page):
+  1. Open the browser DevTools (F12) → Console and Network. Reload the page and look for red 404 errors for `assets/*` or `index.html`.
+  2. Check the site's `index.html` base tag (View source) and ensure the `href` matches `/MardiGrasParadeGame/` (no trailing spaces). A trailing space in the base (for example `/MardiGrasParadeGame/ `) may cause resource path resolution failures.
+  3. If debugging locally is acceptable, build and serve `dist/public` as shown above and confirm the app loads at `http://127.0.0.1:5000`.
+
+- How to re-publish the frontend to GitHub Pages (PowerShell example):
+  - Note: publishing is gated by `GH_PAGES_CONFIRM`. To publish from a maintainer machine follow these steps in PowerShell (ensure you have push rights to the repo):
+
+```powershell
+# Build and prepare GH_PAGES_BASE automatically
+node ./scripts/build-gh-pages.js
+# Confirm and publish (this runs the publish helper which will call gh-pages)
+$env:GH_PAGES_CONFIRM = '1'; npm run publish:gh-pages
+```
+
+  - Alternative (single command):
+
+```powershell
+$env:GH_PAGES_CONFIRM='1'; npm run deploy:gh-pages
+```
+
+  - After publishing, allow a minute for GitHub Pages to propagate and then re-check the public URL.
+
 How to report problems found during QA
-- Open an issue or attach to your PR with: reproduction steps, expected vs actual, browser/OS/device, screenshots or short video/GIF, and a reference to the related backlog item (if applicable).
+- Open an issue or attach to your PR with: reproduction steps, expected vs actual, browser/OS/device, screenshots or short video/GIF, and a reference to the related backlog item (if applicable). Mention whether you tested the local production build (`npm run build && npm run ci:serve`) to help triage.
 
 Notes & next steps
-- If you'd like, I can: create an `ASSET_SUBMISSION_TEMPLATE.md`, convert backlog rows into GitHub issues, or expand Playwright tests to cover power-ups, scoring edge cases, and leaderboard flows.
+- If you'd like, I can:
+  - Check the currently published `gh-pages` branch and the `index.html` there to verify the base href and asset paths and open a PR that fixes the base href if necessary.
+  - Re-run a local build and produce a short diagnostic (screenshots of console/network) showing the 404s causing blank page.
+  - Create Playwright tests to cover power-ups, scoring edge cases, and leaderboard flows as part of the next sprint.
 
 ---
 
