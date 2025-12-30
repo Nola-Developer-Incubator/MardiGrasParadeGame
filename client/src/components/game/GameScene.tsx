@@ -33,20 +33,21 @@ interface GameSceneProps {
 
 export function GameScene({ joystickInput: externalJoystickInput = null }: GameSceneProps) {
   const { 
-    phase, 
-    collectibles, 
-    addCatch, 
-    combo, 
-    totalFloats, 
-    level, 
-    getFloatSpeed, 
-    eliminatePlayer,
-    aggressiveNPCs,
-    hitAggressiveNPC,
-    aggressiveNPCHitPlayer,
-    endNPCChase,
-    joystickEnabled,
-  } = useParadeGame();
+     phase, 
+     collectibles, 
+     addCatch, 
+     combo, 
+     totalFloats, 
+     level, 
+     getFloatSpeed, 
+    playerHitByFloat,
+    botHitByFloat,
+     aggressiveNPCs,
+     hitAggressiveNPC,
+     aggressiveNPCHitPlayer,
+     endNPCChase,
+     joystickEnabled,
+   } = useParadeGame();
   const { playHit, playFireworks } = useAudio();
   const { camera, gl } = useThree();
   const isMobile = useIsMobile();
@@ -92,16 +93,53 @@ export function GameScene({ joystickInput: externalJoystickInput = null }: GameS
           
           if (distanceX < floatWidth && distanceZ < floatLength) {
             console.log(`💥 Player hit by float at position (${floatX}, ${currentZ})!`);
-            eliminatePlayer();
+            // Penalize player by losing a point and alert NPCs
+            playerHitByFloat();
             return;
           }
-        }
-      }
-    };
+         }
+       }
+     };
     
     const interval = setInterval(checkCollision, 100); // Check every 100ms
     return () => clearInterval(interval);
-  }, [phase, playerPosition, totalFloats, floatStartTime, getFloatSpeed, eliminatePlayer]);
+  }, [phase, playerPosition, totalFloats, floatStartTime, getFloatSpeed, playerHitByFloat]);
+
+  // Bot vs Float collision detection - lightweight interval polling
+  useEffect(() => {
+    if (phase !== 'playing') return;
+    const interval = setInterval(() => {
+      try {
+        const floatSpeed = getFloatSpeed();
+        const nowElapsed = (Date.now() - floatStartTime) / 1000;
+        const floatX = 5; // floats on lane 1 x=5
+        const floatWidth = 2.5;
+        const floatLength = 3;
+        const botPositions = useParadeGame.getState().botPositions || {};
+        const { totalFloats: tf } = useParadeGame.getState();
+
+        for (let i = 0; i < tf; i++) {
+          const startZ = -30 - (i * 10);
+          const currentZ = startZ + (floatSpeed * nowElapsed);
+          if (currentZ > -20 && currentZ < 20) {
+            // check each bot
+            for (const botId of Object.keys(botPositions)) {
+              const pos = (botPositions as Record<string, {x:number;y:number;z:number}>)[botId];
+              if (!pos) continue;
+              const dx = Math.abs(pos.x - floatX);
+              const dz = Math.abs(pos.z - currentZ);
+              if (dx < floatWidth && dz < floatLength) {
+                console.log(`💥 Bot ${botId} hit by float at (${floatX}, ${currentZ})`);
+                // Penalize the bot and alert NPCs
+                try { botHitByFloat(botId); } catch (e) { console.warn('botHitByFloat failed', e); }
+              }
+            }
+          }
+        }
+      } catch (e) { /* ignore */ }
+    }, 200);
+    return () => clearInterval(interval);
+  }, [phase, getFloatSpeed, floatStartTime, botHitByFloat]);
   
   // Play fireworks sound on high combos
   useEffect(() => {

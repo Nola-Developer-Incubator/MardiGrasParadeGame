@@ -279,7 +279,7 @@ export function GameUI() {
                 {isMuted ? <VolumeX size={14} className="md:w-[18px] md:h-[18px]" /> : <Volume2 size={14} className="md:w-[18px] md:h-[18px]" />}
               </Button>
               
-              {isMobile && showHudElements && (
+              {isMobile && (
                 <Button
                   onClick={() => setShowSettings(true)}
                   size="sm"
@@ -338,6 +338,7 @@ export function GameUI() {
           </AnimatePresence>
           
           {/* Bot Scores - Hidden on phones (desktop view) - but show compact overlay on mobile when joystick enabled */}
+          {showCompetitors && (
           <div className="hidden md:block absolute bottom-4 left-4 pointer-events-auto">
             <Card className="bg-black/40 backdrop-blur-md border-2 border-gray-400 shadow-2xl px-4 py-3">
               <div className="text-sm text-gray-200 font-black mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">🤖 COMPETITOR CATCHES</div>
@@ -360,9 +361,10 @@ export function GameUI() {
               </div>
             </Card>
           </div>
-
+          )}
+          
           {/* Mobile compact bot overlay when joystick enabled - positioned above joystick to avoid overlap */}
-          {isMobile && joystickEnabled && (
+          {isMobile && joystickEnabled && showCompetitors && (
             <div className="block md:hidden absolute bottom-40 left-2 right-2 pointer-events-auto">
               <Card className="bg-black/50 backdrop-blur-md border-2 border-gray-400 shadow-2xl px-3 py-2">
                 <div className="flex items-center justify-between text-xs text-gray-200 font-black mb-1">🤖 COMPETITORS</div>

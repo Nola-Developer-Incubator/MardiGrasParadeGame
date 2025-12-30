@@ -1,8 +1,8 @@
-import { useRef, useEffect, useMemo, useState } from "react";
-import { useFrame } from "@react-three/fiber";
-import { useParadeGame } from "@/lib/stores/useParadeGame";
+import {useEffect, useMemo, useRef, useState} from "react";
+import {useFrame} from "@react-three/fiber";
+import {useParadeGame} from "@/lib/stores/useParadeGame";
 import * as THREE from "three";
-import { Html } from '@react-three/drei';
+import {Html} from '@react-three/drei';
 
 interface CompetitorBotProps {
   id: string;
@@ -189,6 +189,11 @@ export function CompetitorBot({ id, startX, startZ, color }: CompetitorBotProps)
     const bobOffset = Math.sin(state.clock.elapsedTime * 3) * 0.05;
     meshRef.current.position.y = 0.5 + bobOffset;
     headRef.current.position.y = 1.0 + bobOffset;
+
+    // Report position to store for collision checks
+    try {
+      useParadeGame.getState().setBotPosition(id, { x: position.current.x, y: position.current.y, z: position.current.z });
+    } catch (e) { /* ignore */ }
   });
   
   return (

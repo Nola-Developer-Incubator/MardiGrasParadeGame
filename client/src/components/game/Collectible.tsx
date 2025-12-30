@@ -21,9 +21,10 @@ const COLLECTIBLE_COLORS = {
 };
 
 const GRAVITY = -15;
-const CATCH_RADIUS = 1.5;
+const CATCH_RADIUS = 2.0; // increased catch radius for easier pickup
 const GROUND_LEVEL = 0.5;
 const MIN_CATCH_HEIGHT = 0.5;
+const GROUND_PICKUP_WINDOW_MS = 1000; // allow pickup once on ground for 1 second
 
 export function Collectible({ collectible, playerPosition, onCatch }: CollectibleProps) {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -95,10 +96,9 @@ export function Collectible({ collectible, playerPosition, onCatch }: Collectibl
         onGroundStartTime.current = Date.now();
       }
       
-      // Check if been on ground for 5 seconds
+      // Check if been on ground too long (5s) -> remove
       const timeOnGroundMs = Date.now() - onGroundStartTime.current;
       if (timeOnGroundMs > 5000) {
-        // Count as a missed throw (not power-ups though)
         const isRegularItem = collectible.type === "beads" || collectible.type === "doubloon" || collectible.type === "cup" || collectible.type === "king_cake";
         if (isRegularItem) {
           incrementMisses();
@@ -138,7 +138,10 @@ export function Collectible({ collectible, playerPosition, onCatch }: Collectibl
     const distanceToPlayer = position.current.distanceTo(playerPosition);
     const isAboveGround = position.current.y >= MIN_CATCH_HEIGHT;
     const isInRange = distanceToPlayer < CATCH_RADIUS;
-    const isCatchable = isInRange && isAboveGround && position.current.y < 2;
+    // Catchable if in range and above minimum height OR recently on ground (within pickup window)
+    const timeOnGround = onGroundStartTime.current ? (Date.now() - onGroundStartTime.current) : 0;
+    const isGroundPickupWindow = onGroundStartTime.current !== null && timeOnGround <= GROUND_PICKUP_WINDOW_MS;
+    const isCatchable = isInRange && ((isAboveGround && position.current.y < 2) || isGroundPickupWindow);
     
     // Highlight if catchable
     if (isCatchable && !hasBeenCaught.current) {

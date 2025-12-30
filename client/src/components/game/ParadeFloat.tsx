@@ -180,16 +180,28 @@ export function ParadeFloat({
       throwForce = baseForce;
     }
     
-    const collectible = {
-      id: `${id}-${Date.now()}-${Math.random()}`,
-      position: position.current.clone(),
-      velocity: throwDirection.multiplyScalar(throwForce),
-      active: true,
-      type: randomType,
-    };
-    
-    addCollectible(collectible);
-    console.log(`Float ${id} threw ${randomType}`);
+    // Occasionally throw multiple items (clusters) to increase item density
+    const clusterRoll = Math.random();
+    const clusterCount = clusterRoll < 0.08 ? 3 : clusterRoll < 0.28 ? 2 : 1; // 8% triple, 20% double, rest single
+
+    for (let k = 0; k < clusterCount; k++) {
+      const spread = new THREE.Vector3(
+        (Math.random() - 0.5) * 0.6,
+        (Math.random() - 0.5) * 0.2,
+        (Math.random() - 0.5) * 0.6
+      );
+      const idSuffix = `${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+      const collectible = {
+        id: `${id}-${idSuffix}-${k}`,
+        position: position.current.clone().add(spread),
+        velocity: throwDirection.clone().add(spread.clone().multiplyScalar(0.2)).multiplyScalar(throwForce),
+        active: true,
+        type: randomType,
+      };
+
+      addCollectible(collectible);
+    }
+    console.log(`Float ${id} threw ${clusterCount}x ${randomType}`);
   };
   
   return (
