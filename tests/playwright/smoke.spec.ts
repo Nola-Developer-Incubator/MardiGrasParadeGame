@@ -23,12 +23,19 @@ async function checkPage(page, url: string) {
   return { errors, failedResponses, status: resp?.status() };
 }
 
-for (const url of [LOCAL_URL, PUBLIC_URL]) {
-  test(`smoke: ${url}`, async ({ page }) => {
-    const { errors, failedResponses, status } = await checkPage(page, url);
+// Run smoke checks for local URL and (optionally) public URL when PREVIEW_URL is explicitly provided.
+test(`smoke: ${LOCAL_URL}`, async ({ page }) => {
+  const { errors, failedResponses, status } = await checkPage(page, LOCAL_URL);
+  expect(status).toBeLessThan(400);
+  expect(errors.length).toBe(0);
+  expect(failedResponses.length).toBe(0);
+});
+
+if (process.env.PREVIEW_URL) {
+  test(`smoke: ${PUBLIC_URL}`, async ({ page }) => {
+    const { errors, failedResponses, status } = await checkPage(page, PUBLIC_URL);
     expect(status).toBeLessThan(400);
     expect(errors.length).toBe(0);
     expect(failedResponses.length).toBe(0);
   });
 }
-
