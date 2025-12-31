@@ -131,101 +131,27 @@ NDI_MardiGrasParade/
 - **PostgreSQL** - Robust relational database (Neon)
 - **WebSocket** - Real-time communication (optional)
 
+### Backend Features
+- REST API endpoints for game data and user profiles (see `server/routes.ts`).
+- Leaderboard persistence and retrieval (see `data/leaderboard.json` and server storage implementations).
+- Session management and simple authentication for player profiles and playtests.
+- Score submission and validation endpoints for recording high scores.
+- Admin endpoints for managing mock sessions, test data, and scheduled events.
+- Optional WebSocket support for real-time score updates and multiplayer sync hooks.
+
+(See the `server/` directory for implementation details and `shared/schema.ts` for DB schemas.)
+
 ---
 
 ## 🌐 Deployment
 
-### Vercel (Recommended)
+This repository no longer uses Vercel. Recommended deployment options:
 
-This application is **production-ready for Vercel deployment**:
+- GitHub Pages (frontend only): The client build can be published to `gh-pages`. The project includes helper scripts (`scripts/publish-gh-pages.*`) and a `build` workflow that can be adapted for GitHub Pages.
+- Self-hosted Node.js: Run the Express backend and serve the built client from a Node process. Use `npm run build` and `npm start` to run the production server.
+- Docker / Cloud provider: Build a Docker image and deploy to your cloud provider of choice (e.g., AWS, GCP, Azure, Render). Configure environment variables such as `DATABASE_URL` and `SESSION_SECRET` in your hosting environment.
 
-✅ **Public Access** - Deployed instances are publicly accessible to anyone with the URL  
-✅ **One-Click Deploy** - Use the "Deploy with Vercel" button above  
-✅ **Auto-Deploy** - Push to main branch automatically deploys  
-✅ **Preview URLs** - Every PR gets its own preview deployment  
-
-**Complete deployment instructions:** See [README_VERCEL.md](README_VERCEL.md)
-
-**Key Features When Deployed:**
-- Game accessible at `https://your-project-name.vercel.app`
-- Share the link with anyone - no login or setup required for players
-- Automatic HTTPS and global CDN
-- API routes work as serverless functions
-- Database persists user data and high scores
-
-#### Understanding Vercel Runtimes
-
-This project uses **Node.js runtime** for serverless functions (not Edge runtime), which is important for the following reasons:
-
-**Why Node.js Runtime?**
-- Uses Node-specific APIs (fs, path, Buffer, crypto)
-- Requires process.env for environment variables
-- Compatible with Express.js middleware
-- Supports PostgreSQL database connections
-
-The runtime is explicitly set in `api/index.js`:
-```javascript
-export const runtime = 'nodejs';
-```
-
-**Edge vs Node.js Runtime:**
-- **Edge Runtime**: Lightweight, ultra-fast, runs on Vercel's edge network, limited Node.js API support
-- **Node.js Runtime**: Full Node.js API support, slightly slower cold starts, required for database and filesystem operations
-
-#### Environment Variables for Vercel
-
-When deploying to Vercel, configure these environment variables in your project settings:
-
-**Required:**
-- `DATABASE_URL` - PostgreSQL connection string (from Neon or other provider)
-- `NODE_ENV` - Set to `production`
-
-**How to Set Environment Variables:**
-1. Go to your Vercel project dashboard
-2. Navigate to **Settings** → **Environment Variables**
-3. Add each variable with appropriate values
-4. **Important**: Choose the correct environment:
-   - **Production**: For main branch deployments
-   - **Preview**: For PR and branch previews
-   - **Development**: For local development (use `.env` file instead)
-
-#### Viewing Function Logs in Vercel
-
-To debug issues in production:
-
-1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
-2. Select your project
-3. Click on **Deployments**
-4. Select a specific deployment
-5. Click on the **Functions** tab
-6. View real-time logs for each serverless function invocation
-
-**Logs include:**
-- Request method and path
-- Timestamp
-- Error messages and stack traces
-- Response status codes
-
-**Reference:** [Vercel Function Logs Documentation](https://vercel.com/docs/observability/runtime-logs)
-
-For FUNCTION_INVOCATION_FAILED errors, check:
-- Environment variables are set correctly
-- No missing dependencies
-- No unhandled promise rejections
-- Runtime is set to 'nodejs' for Node-dependent code
-
-**Additional Resources:**
-- [Vercel Errors Reference](https://vercel.com/docs/errors/FUNCTION_INVOCATION_FAILED)
-- [Node.js Runtime Documentation](https://vercel.com/docs/functions/runtimes/node-js)
-
-### Testing Your Deployment
-
-Once deployed, anyone can test by visiting:
-```
-https://your-project-name.vercel.app
-```
-
-No authentication needed - the game loads and plays immediately in the browser!
+If you need help with a specific hosting provider, I can add provider-specific instructions and CI/CD examples.
 
 ---
 
@@ -267,6 +193,103 @@ DATABASE_URL=your_postgresql_connection_string
 PORT=5000
 NODE_ENV=development
 ```
+
+## QA Checklist
+
+This section gives a short, actionable QA checklist for distributed testers and a clear status of what is included in the published production build.
+
+- Production (public playtest): https://Nola-Developer-Incubator.github.io/MardiGrasParadeGame/
+  - Current status (2025-12-30): The public URL exists but some users report a blank canvas; see "Blank Page Troubleshooting" below.
+
+What's included in the production build (Testable features - DONE)
+- Player movement: WASD, Arrow keys, and click-to-move (desktop) — shipped and testable.
+- Touch joystick and basic touch tap movement (mobile) — basic functionality present; some edge cases remain.
+- Parade floats spawn and travel along the route — visible in the built client.
+- Collectibles: beads, doubloons, cups, king cake, and power-ups — spawn and can be picked up.
+- Scoring, combos and color-match bonus — score updates when collectibles are caught.
+- Power-ups (speed boost, double points) and basic level progression — applied at runtime.
+- Leaderboard submission (basic) — frontend posts to server and local `data/leaderboard.json` is updated when running the local server.
+- Audio files and textures — included in `client/public/sounds/` and `client/public/textures/` (however see troubleshooting below if audio/textures fail to load in production).
+
+High priority items still NOT in production (UNDONE / In Progress)
+- PB-001: Joystick polish & multi-touch handling — In Progress (additional fixes required for flawless multi-touch behavior).
+- PB-002: Minimal HUD / compact UI mode — To Do (not merged to production build).
+- PB-003: Audio toggle persistence across reloads/platforms — To Do (session-level toggle works, persistence does not yet survive reloads consistently).
+- PB-005: Visual remaining floats indicator — To Do (not yet implemented in the production build).
+- Backend: Cloud save / robust session tracking, full leaderboard security and moderation — Backlog.
+
+Have all sprint goals been accomplished?
+- Short answer: No. Core gameplay features listed as "DONE" are included in the frontend build, but several sprint UX polish items and persistence/back-end hardening remain outstanding (see the list above).
+
+QA quick tests for distributed team (step-by-step)
+1. Prefer testing the local production build when the public URL shows a blank screen:
+
+```powershell
+# From repo root
+npm ci
+npm run build
+npm run ci:serve
+# Open: http://127.0.0.1:5000
+```
+
+2. Manual smoke checklist (10–15 minutes):
+- Verify the page loads with an active WebGL canvas (black/mardi-gras backdrop should be visible).
+- Confirm no fatal red errors in DevTools Console (F12) and check the Network tab for missing assets (404s).
+- Move the player with WASD and Arrow keys; confirm movement is responsive.
+- Click on the ground to move the player; on mobile, confirm touch joystick responds.
+- Observe floats and collectibles spawning; catch one collectible and confirm the score increments.
+- Activate a power-up and confirm its effect (speed or double points).
+- Submit a score and check that the server accepts it (and local `data/leaderboard.json` updates when using the local server).
+- Toggle audio on/off and verify background music and SFX behave (mute/unmute).
+- Try the game in Chrome, Firefox, and Safari (mobile if possible).
+
+3. Automated test hints (if you want to run them locally):
+- Playwright (Chromium): `npx playwright test tests/playwright/joystick.spec.ts --project=chromium`
+- Run all Playwright tests: `npx playwright test`
+
+Blank Page Troubleshooting (Production GitHub Pages)
+- Symptoms: Page loads but the canvas is blank or the app never initializes; DevTools show 404s for JS/CSS/assets or an incorrect base path.
+- Common root causes:
+  1. Incorrect base href or Vite BASE_URL used at build time. If the `index.html` base path contains trailing whitespace or a wrong path the app's assets will 404 and the runtime bundle will not execute.
+  2. The `gh-pages` branch does not contain a correct `dist/public` build (publish step may have been skipped or gated by `GH_PAGES_CONFIRM`).
+  3. Runtime asset path expectations (VITE_ASSET_BASE_URL or BASE_URL) differ from the path GitHub Pages serves the project under.
+
+Quick checks you can do from a maintainer machine:
+- Inspect the published branch's `index.html` to verify the base href:
+
+```powershell
+# Fetch / inspect the published branch (replace origin/gh-pages with your remote branch if different)
+git fetch origin gh-pages; git show origin/gh-pages:dist/public/index.html > /tmp/gh-index.html; notepad /tmp/gh-index.html
+```
+
+- Look for incorrect `base` tag values or stray whitespace.
+- In the browser, open DevTools → Network and reload the page; filter for 404 responses to find missing assets.
+
+How to republish the frontend (maintainer/power-user steps)
+- Build and publish to gh-pages (PowerShell example; requires push rights and `gh-pages` tooling):
+
+```powershell
+# Build and prepare GH_PAGES_BASE automatically
+node ./scripts/build-gh-pages.js
+# Confirm and publish
+$env:GH_PAGES_CONFIRM = '1'; npm run publish:gh-pages
+# Alternative single-line (PowerShell):
+$env:GH_PAGES_CONFIRM='1'; npm run deploy:gh-pages
+```
+
+- After publishing, allow ~60 seconds for GitHub Pages to serve the new content and re-test the public URL.
+
+If the public link still shows a blank page after re-publish, gather these artifacts and file a ticket:
+- Browser console screenshot showing 404s or runtime exceptions
+- The `index.html` found in the `gh-pages` branch (to confirm base href)
+- Exact steps used to publish (commands, environment variables)
+
+How to report problems found during QA
+- Create an issue or attach findings to your PR with: reproduction steps, expected vs actual, browser/OS/device, console/network screenshots, and a reference to the related backlog item (if known).
+
+Notes & next steps
+- I can inspect the live `gh-pages` branch and open a PR that fixes the `base`/asset path if that is what is causing the blank page. I can also re-run a local build and produce a short diagnostic (console/network screenshots) showing the 404s causing the blank page.
+- If you'd like, I can also add a small Playwright smoke test that loads the built `dist/public` and verifies the canvas initializes (fast guard for CI on PRs).
 
 ---
 
@@ -364,7 +387,7 @@ See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for specific guidelines.
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is distributed under a traditional proprietary license. See the `LICENSE` file for details.
 
 ---
 
@@ -391,7 +414,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ### Stay Connected
 - **GitHub** - [FreeLundin/Nola-Developer-Incubator](https://github.com/FreeLundin/Nola-Developer-Incubator)
-- **Project Lead** - Brandon Lundin
+- **Project Lead** - Brian C Lundin
 
 ---
 

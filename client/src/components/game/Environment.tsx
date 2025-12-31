@@ -1,14 +1,79 @@
-import { useMemo, useRef } from "react";
-import { useTexture } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
+import {useEffect, useMemo, useRef, useState} from "react";
+import {useFrame, useThree} from "@react-three/fiber";
 import * as THREE from "three";
 
 export function Environment() {
   // Use Vite's BASE_URL so textures resolve correctly when the app is served from a subpath
   const assetBase = (import.meta as any).env?.VITE_ASSET_BASE_URL ?? (import.meta as any).env?.BASE_URL ?? '';
-  const asphaltTexture = useTexture(`${assetBase.replace(/\/$/, '')}/${'textures/asphalt.png'.replace(/^\/+/, '')}`);
+  const [asphaltTexture, setAsphaltTexture] = useState<THREE.Texture | null>(null);
+
   const spotlightGroupRef = useRef<THREE.Group>(null);
-  
+  const { gl } = useThree();
+
+  useEffect(() => {
+    let cancelled = false;
+    let createdFallback: THREE.Texture | null = null;
+    const url = `${assetBase.replace(/\/$/, '')}/${'textures/asphalt.png'.replace(/^\/+/, '')}`.replace(/\/+/, '/');
+    // Check existence before loading to avoid console 404s and exceptions
+    (async () => {
+      try {
+        const res = await fetch(url, { method: 'HEAD' });
+        if (!res.ok) {
+          console.warn('Asphalt texture not found at', url, '— using generated fallback texture.');
+          if (!cancelled) {
+            // Do NOT use a generated canvas texture fallback (visible noisy tile). Fall back to a solid color material instead.
+            createdFallback = null;
+          }
+          return;
+        }
+        if (cancelled) return;
+        const loader = new THREE.TextureLoader();
+        loader.load(url, (tex) => {
+          if (!cancelled) {
+            // configure texture repeat and wrapping before storing
+            try {
+              tex.wrapS = THREE.RepeatWrapping;
+              tex.wrapT = THREE.RepeatWrapping;
+              tex.repeat.set(3, 10);
+              // Ensure correct color-space for albedo
+              (tex as any).encoding = (THREE as any).sRGBEncoding;
+              // Use sensible filters to avoid shimmering
+              tex.minFilter = THREE.LinearMipMapLinearFilter;
+              tex.magFilter = THREE.LinearFilter;
+
+              // optional: increase anisotropy if renderer exposes the capability
+              try {
+                // Set anisotropy if renderer exposes the capability
+                try {
+                  const maxAniso = (gl as any)?.capabilities && typeof (gl as any).capabilities.getMaxAnisotropy === 'function'
+                    ? (gl as any).capabilities.getMaxAnisotropy()
+                    : undefined;
+                  if (typeof maxAniso === 'number') tex.anisotropy = maxAniso;
+                } catch (e) { /* ignore */ }
+              } catch (e) { /* ignore */ }
+            } catch (e) {
+              // ignore if setting fails
+            }
+            setAsphaltTexture(tex);
+          }
+        }, undefined, (err) => {
+          console.warn('Failed to load asphalt texture at', url, err, '— using generated fallback.');
+          if (!cancelled) {
+            // Do not set a canvas fallback texture to avoid visible noise; keep asphaltTexture null so material uses solid color.
+            createdFallback = null;
+          }
+        });
+      } catch (e) {
+        console.warn('Error checking asphalt texture:', e, '— using generated fallback.');
+        if (!cancelled) {
+          // Do not create or set a fallback texture; rely on solid-color material instead.
+          createdFallback = null;
+        }
+      }
+    })();
+    return () => { cancelled = true; if (createdFallback) { try { createdFallback.dispose(); } catch {} } };
+  }, [assetBase, gl]);
+
   // Pre-calculate building positions to avoid Math.random in render
   const buildings = useMemo(() => {
     const mardiGrasColors = ["#722F9A", "#228B22", "#FFD700"]; // Purple, Green, Gold
@@ -120,15 +185,20 @@ export function Environment() {
         <spotLight position={[0, 0, -8]} angle={0.4} penumbra={0.6} intensity={1.5} color="#FFD700" distance={25} />
       </group>
       
-      {/* Street/Ground - Main parade route */}
+      {/* Street/Ground - Main parade route (simplified material to avoid artifacts) */}
       <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
         <planeGeometry args={[14, 50]} />
-        <meshStandardMaterial 
-          map={asphaltTexture} 
-          map-repeat={new THREE.Vector2(3, 10)}
-          map-wrapS={THREE.RepeatWrapping}
-          map-wrapT={THREE.RepeatWrapping}
-        />
+        {asphaltTexture ? (
+          <meshStandardMaterial
+            // show the texture but avoid bump/normal maps which caused artifacts on some platforms
+            map={asphaltTexture as any}
+            color="#333333"
+            roughness={1}
+            metalness={0}
+          />
+        ) : (
+          <meshStandardMaterial color="#333333" roughness={1} metalness={0} />
+        )}
       </mesh>
       
       {/* Street yellow center line */}
@@ -251,7 +321,7 @@ export function Environment() {
         return (
           <group key={`lights-${i}`} position={[0, 5, -18 + i * 6]}>
             {Array.from({ length: 12 }, (_, j) => (
-              <mesh key={j} position={[-6 + j * 1, Math.sin(j) * 0.3, 0]}>
+              <mesh key={j} position={[-6 + j, Math.sin(j) * 0.3, 0]}>
                 <sphereGeometry args={[0.1, 6, 6]} />
                 <meshStandardMaterial 
                   color={colors[j % 3]} 

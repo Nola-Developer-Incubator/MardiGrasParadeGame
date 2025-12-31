@@ -1,6 +1,7 @@
-import { useRef, useEffect, useMemo } from "react";
-import { useFrame } from "@react-three/fiber";
-import { useParadeGame } from "@/lib/stores/useParadeGame";
+import {useEffect, useMemo, useRef} from "react";
+import {useFrame} from "@react-three/fiber";
+import {useParadeGame} from "@/lib/stores/useParadeGame";
+import {Html} from '@react-three/drei';
 import * as THREE from "three";
 
 interface ParadeFloatProps {
@@ -8,7 +9,10 @@ interface ParadeFloatProps {
   startZ: number;
   lane: number; // -1 or 1 for left or right side of street
   color: string;
+  label?: number; // optional numeric label to show on the float
+  labelEnabled?: boolean;
   playerPosition?: THREE.Vector3;
+  useInstancedDecorations?: boolean; // if true, skip local decoration meshes
 }
 
 export function ParadeFloat({ 
@@ -16,22 +20,43 @@ export function ParadeFloat({
   startZ, 
   lane, 
   color,
+  label,
+  labelEnabled = true,
   playerPosition,
+  useInstancedDecorations = false,
 }: ParadeFloatProps) {
   const meshRef = useRef<THREE.Group>(null);
+  const labelRef = useRef<HTMLDivElement | null>(null);
   const position = useRef(new THREE.Vector3(lane * 5, 1, startZ));
   const lastThrowTime = useRef(Date.now());
   const hasPassed = useRef(false);
   const { addCollectible, phase, getFloatSpeed, getThrowInterval, markFloatPassed } = useParadeGame();
   
-  // Pre-calculate random decorative elements positions
+  // Pre-calculate random decorative elements positions (per-float)
   const decorations = useMemo(() => {
-    return Array.from({ length: 5 }, (_, i) => ({
+    return Array.from({ length: 5 }, () => ({
       x: (Math.random() - 0.5) * 1.5,
       y: Math.random() * 1.5 + 0.5,
       z: (Math.random() - 0.5) * 2,
       scale: Math.random() * 0.3 + 0.2,
     }));
+  }, []);
+
+  // Determine platform variant for visual variety based on id hash
+  const platformVariant = useMemo(() => {
+    const n = id.split('-').pop() ?? '0';
+    const v = parseInt(n.replace(/[^0-9]/g, ''), 10) || Math.floor(Math.random() * 1000);
+    return v % 3; // 0 = box, 1 = rounded, 2 = cylinder
+  }, [id]);
+
+  // Small bead garland positions (lightweight decorative spheres)
+  const garland = useMemo(() => {
+    const g = [] as { x:number; y:number; z:number; color:string }[];
+    const colors = ["#722F9A", "#228B22", "#FFD700"];
+    for (let i = 0; i < 8; i++) {
+      g.push({ x: -0.9 + i * 0.26, y: 0.35 + Math.sin(i * 0.8) * 0.05, z: 0.9, color: colors[i % 3] });
+    }
+    return g;
   }, []);
   
   useEffect(() => {
@@ -69,6 +94,29 @@ export function ParadeFloat({
       throwCollectible();
       lastThrowTime.current = now;
     }
+    
+    // Update label visibility, opacity and scale based on player distance
+    try {
+      if (labelRef.current && typeof label === 'number' && playerPosition) {
+        const distance = position.current.distanceTo(playerPosition);
+        const maxDistance = 20; // only show labels within this distance
+        const visible = labelEnabled && distance <= maxDistance;
+        if (!visible) {
+          labelRef.current.style.display = 'none';
+        } else {
+          // Fade/scale by distance (closer = larger and more opaque)
+          const t = Math.max(0, Math.min(1, 1 - distance / maxDistance)); // 1 at 0, 0 at maxDistance
+          const opacity = Math.max(0, t);
+          const scale = 0.6 + 0.4 * t; // between 0.6 and 1.0
+          labelRef.current.style.display = 'block';
+          labelRef.current.style.opacity = String(opacity);
+          labelRef.current.style.transform = `scale(${scale})`;
+        }
+      } else if (labelRef.current) {
+        // No playerPosition or label disabled -> hide
+        labelRef.current.style.display = 'none';
+      }
+    } catch (e) { /* ignore DOM update errors */ }
   });
   
   const throwCollectible = () => {
@@ -151,63 +199,138 @@ export function ParadeFloat({
       throwForce = baseForce;
     }
     
-    const collectible = {
-      id: `${id}-${Date.now()}-${Math.random()}`,
-      position: position.current.clone(),
-      velocity: throwDirection.multiplyScalar(throwForce),
-      active: true,
-      type: randomType,
-    };
-    
-    addCollectible(collectible);
-    console.log(`Float ${id} threw ${randomType}`);
+    // Occasionally throw multiple items (clusters) to increase item density
+    const clusterRoll = Math.random();
+    const clusterCount = clusterRoll < 0.08 ? 3 : clusterRoll < 0.28 ? 2 : 1; // 8% triple, 20% double, rest single
+
+    for (let k = 0; k < clusterCount; k++) {
+      const spread = new THREE.Vector3(
+        (Math.random() - 0.5) * 0.6,
+        (Math.random() - 0.5) * 0.2,
+        (Math.random() - 0.5) * 0.6
+      );
+      const idSuffix = `${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+      const collectible = {
+        id: `${id}-${idSuffix}-${k}`,
+        position: position.current.clone().add(spread),
+        velocity: throwDirection.clone().add(spread.clone().multiplyScalar(0.2)).multiplyScalar(throwForce),
+        active: true,
+        type: randomType,
+      };
+
+      addCollectible(collectible);
+    }
+    console.log(`Float ${id} threw ${clusterCount}x ${randomType}`);
   };
   
+  // Refs for instanced meshes
+  const wheelsRef = useRef<THREE.InstancedMesh | null>(null);
+
+  useFrame(() => {
+    // Update wheel instance matrices (4 wheels)
+    if (wheelsRef.current) {
+      const wheelPositions = [[-0.8, -0.7, -1], [0.8, -0.7, -1], [-0.8, -0.7, 1], [0.8, -0.7, 1]];
+      for (let i = 0; i < 4; i++) {
+        const pos = new THREE.Vector3(wheelPositions[i][0], wheelPositions[i][1] + meshRef.current!.position.y - 1, wheelPositions[i][2]);
+        const m = new THREE.Matrix4();
+        const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 0, Math.PI/2));
+        const s = new THREE.Vector3(1,1,1);
+        m.compose(pos, q, s);
+        wheelsRef.current.setMatrixAt(i, m);
+      }
+      wheelsRef.current.instanceMatrix.needsUpdate = true;
+    }
+  });
+
   return (
     <group ref={meshRef} position={[position.current.x, position.current.y, position.current.z]} scale={[1.5, 1.5, 1.5]}>
-      {/* Main float platform with enhanced emissive glow */}
-      <mesh castShadow>
-        <boxGeometry args={[2, 1.5, 3]} />
-        <meshStandardMaterial 
-          color={color}
-          emissive={color}
-          emissiveIntensity={0.4}
-          metalness={0.3}
-          roughness={0.4}
-        />
-      </mesh>
-      
-      {/* Decorative elements on the float with glow */}
-      {decorations.map((dec, i) => (
-        <mesh key={i} position={[dec.x, dec.y, dec.z]} castShadow>
-          <sphereGeometry args={[dec.scale, 6, 6]} />
+      {/* Main float platform with variant shapes for visual variety */}
+      {platformVariant === 0 && (
+        <mesh castShadow>
+          <boxGeometry args={[2, 1.5, 3]} />
           <meshStandardMaterial 
-            color="#FFD700" 
-            emissive="#FFD700"
-            emissiveIntensity={1.2}
-            metalness={0.8} 
-            roughness={0.2} 
+            color={color}
+            emissive={color}
+            emissiveIntensity={0.4}
+            metalness={0.3}
+            roughness={0.4}
           />
+        </mesh>
+      )}
+      {platformVariant === 1 && (
+        <mesh castShadow rotation={[0.02, 0.06, 0]}>
+          <boxGeometry args={[2.1, 1.2, 2.8]} />
+          <meshStandardMaterial 
+            color={color}
+            emissive={color}
+            emissiveIntensity={0.45}
+            metalness={0.25}
+            roughness={0.35}
+          />
+        </mesh>
+      )}
+      {platformVariant === 2 && (
+        <mesh castShadow>
+          <cylinderGeometry args={[1.1, 1.1, 1.3, 12]} />
+          <meshStandardMaterial 
+            color={color}
+            emissive={color}
+            emissiveIntensity={0.35}
+            metalness={0.2}
+            roughness={0.45}
+          />
+        </mesh>
+      )}
+
+      {/* Small decorative flags and garlands */}
+      <group position={[0, 0.9, 1.2]}>
+        {/* Flags */}
+        <mesh position={[-0.9, 0.15, 0]} rotation={[0, 0.2, 0]}> 
+          <planeGeometry args={[0.6, 0.3]} />
+          <meshStandardMaterial color="#FFD700" emissive="#FFD700" metalness={0.1} roughness={0.8} />
+        </mesh>
+        <mesh position={[0.9, 0.15, 0]} rotation={[0, -0.2, 0]}> 
+          <planeGeometry args={[0.6, 0.3]} />
+          <meshStandardMaterial color="#722F9A" emissive="#722F9A" metalness={0.1} roughness={0.8} />
+        </mesh>
+
+        {/* Garland beads - small spheres along the front */}
+        {garland.map((g, idx) => (
+          <mesh key={`gar-${idx}`} position={[g.x, g.y, g.z]}>
+            <sphereGeometry args={[0.06, 6, 6]} />
+            <meshStandardMaterial color={g.color} emissive={g.color} emissiveIntensity={0.6} />
+          </mesh>
+        ))}
+      </group>
+      
+      {/* Numeric label integrated into UX (moved in front of float) */}
+      {typeof label === 'number' && (
+        <Html position={[0, 0.6, 1.6]} center style={{ pointerEvents: 'none' }}>
+          <div ref={labelRef} style={{
+            background: 'rgba(0,0,0,0.6)',
+            color: 'white',
+            padding: '6px 8px',
+            borderRadius: 8,
+            fontWeight: 700,
+            fontSize: 14,
+            boxShadow: '0 4px 10px rgba(0,0,0,0.6)',
+            transition: 'opacity 150ms linear, transform 150ms ease'
+          }}>
+            {label}
+          </div>
+        </Html>
+      )}
+      
+      {/* Render per-float decorations locally unless instanced decorations are enabled */}
+      {!useInstancedDecorations && decorations.map((d, idx) => (
+        <mesh key={`dec-${id}-${idx}`} position={[d.x, d.y - 0.5, d.z]} scale={[d.scale, d.scale, d.scale]} castShadow>
+          <sphereGeometry args={[0.15, 8, 8]} />
+          <meshStandardMaterial color="#FFD700" emissive="#FFD700" emissiveIntensity={0.8} metalness={0.3} roughness={0.3} />
         </mesh>
       ))}
       
-      {/* Float wheels - optimized */}
-      <mesh position={[-0.8, -0.7, -1]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.3, 0.3, 0.3, 8]} />
-        <meshStandardMaterial color="#2c2c2c" />
-      </mesh>
-      <mesh position={[0.8, -0.7, -1]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.3, 0.3, 0.3, 8]} />
-        <meshStandardMaterial color="#2c2c2c" />
-      </mesh>
-      <mesh position={[-0.8, -0.7, 1]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.3, 0.3, 0.3, 8]} />
-        <meshStandardMaterial color="#2c2c2c" />
-      </mesh>
-      <mesh position={[0.8, -0.7, 1]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.3, 0.3, 0.3, 8]} />
-        <meshStandardMaterial color="#2c2c2c" />
-      </mesh>
+      {/* Float wheels - instanced (4 instances) */}
+      <instancedMesh ref={wheelsRef} args={[new THREE.CylinderGeometry(0.3, 0.3, 0.3, 8), new THREE.MeshStandardMaterial({ color: '#2c2c2c' }), 4]} castShadow />
     </group>
   );
 }

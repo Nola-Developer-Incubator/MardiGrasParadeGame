@@ -1,21 +1,27 @@
-import { useState, useEffect, useCallback } from "react";
-import { useThree } from "@react-three/fiber";
-import { useParadeGame } from "@/lib/stores/useParadeGame";
-import { useAudio } from "@/lib/stores/useAudio";
-import { useIsMobile } from "@/hooks/use-is-mobile";
-import { Player, Controls, JoystickInput } from "./Player";
-import { GameCamera } from "./GameCamera";
-import { Environment } from "./Environment";
-import { ParadeFloat } from "./ParadeFloat";
-import { Collectible } from "./Collectible";
-import { CatchEffect } from "./CatchEffect";
-import { ClickMarker } from "./ClickMarker";
-import { CompetitorBot } from "./CompetitorBot";
-import { AggressiveNPC } from "./AggressiveNPC";
-import { Obstacle } from "./Obstacle";
-import { TouchControls, TouchInput } from "./TouchControls";
-import { HelperBotVisual } from './HelperBotVisual';
-import * as THREE from "three";
+import React, {Suspense, useCallback, useEffect, useState} from "react";
+import {useThree} from "@react-three/fiber";
+import {useParadeGame} from "@/lib/stores/useParadeGame";
+import {useAudio} from "@/lib/stores/useAudio";
+import {useIsMobile} from "@/hooks/use-is-mobile";
+import {JoystickInput, Player} from "./Player";
+import {GameCamera} from "./GameCamera";
+import {Environment} from "./Environment";
+import {ParadeFloat} from "./ParadeFloat";
+import {Collectible} from "./Collectible";
+import {CollectibleInstanced} from "./CollectibleInstanced";
+import {CatchEffect} from "./CatchEffect";
+import {ClickMarker} from "./ClickMarker";
+import {CompetitorBot} from "./CompetitorBot";
+import {AggressiveNPC} from "./AggressiveNPC";
+import {Obstacle} from "./Obstacle";
+import {HelperBotVisual} from './HelperBotVisual';
+import {Lighting} from './Lighting';
+import {PostProcessing} from './PostProcessing';
+import * as THREE from 'three';
+import {FloatDecorationsInstanced} from './FloatDecorationsInstanced';
+
+const AdvancedPostProcessing = React.lazy(() => import('./AdvancedPostProcessing').then(m => ({ default: m.AdvancedPostProcessing })));
+const HDRIEnvironment = React.lazy(() => import('./HDRIEnvironment').then(m => ({ default: m.HDRIEnvironment })));
 
 interface CatchEffectInstance {
   id: string;
@@ -34,20 +40,21 @@ interface GameSceneProps {
 
 export function GameScene({ joystickInput: externalJoystickInput = null }: GameSceneProps) {
   const { 
-    phase, 
-    collectibles, 
-    addCatch, 
-    combo, 
-    totalFloats, 
-    level, 
-    getFloatSpeed, 
-    eliminatePlayer,
-    aggressiveNPCs,
-    hitAggressiveNPC,
-    aggressiveNPCHitPlayer,
-    endNPCChase,
-    joystickEnabled,
-  } = useParadeGame();
+     phase, 
+     collectibles, 
+     addCatch, 
+     combo, 
+     totalFloats, 
+     level, 
+     getFloatSpeed, 
+    playerHitByFloat,
+    botHitByFloat,
+     aggressiveNPCs,
+     hitAggressiveNPC,
+     aggressiveNPCHitPlayer,
+     endNPCChase,
+     joystickEnabled,
+   } = useParadeGame();
   const { playHit, playFireworks } = useAudio();
   const { camera, gl } = useThree();
   const isMobile = useIsMobile();
@@ -56,6 +63,40 @@ export function GameScene({ joystickInput: externalJoystickInput = null }: GameS
   const [catchEffects, setCatchEffects] = useState<CatchEffectInstance[]>([]);
   const [clickMarkers, setClickMarkers] = useState<ClickMarkerInstance[]>([]);
   const floatStartTime = useState(() => Date.now())[0];
+  const [labelEnabled, setLabelEnabled] = useState<boolean>(() => {
+     try { const v = localStorage.getItem('hud:showFloatLabels'); return v === null ? true : v === 'true'; } catch { return true; }
+   });
+  const [advancedPostEnabled, setAdvancedPostEnabled] = useState<boolean>(() => {
+    try { return localStorage.getItem('visual:advancedPost') === 'true'; } catch { return false; }
+  });
+  const [confettiEnabled, setConfettiEnabled] = useState<boolean>(() => {
+    try { return localStorage.getItem('visual:confetti') === null ? false : localStorage.getItem('visual:confetti') === 'true'; } catch { return false; }
+  });
+  const [hdriEnabled, setHdriEnabled] = useState<boolean>(() => {
+    try { return localStorage.getItem('visual:hdri') === 'true'; } catch { return false; }
+  });
+  
+  // Update labelEnabled state when 'hud:updated' event is received
+  useEffect(() => {
+    const onHudUpdated = () => {
+      try { const v = localStorage.getItem('hud:showFloatLabels'); setLabelEnabled(v === null ? true : v === 'true'); } catch { }
+    };
+    window.addEventListener('hud:updated', onHudUpdated);
+    return () => window.removeEventListener('hud:updated', onHudUpdated);
+  }, []);
+  
+  // Listen for visual toggle updates
+  useEffect(() => {
+    const onVisualUpdated = () => {
+      try {
+        setAdvancedPostEnabled(localStorage.getItem('visual:advancedPost') === 'true');
+        setConfettiEnabled((localStorage.getItem('visual:confetti') === null) ? true : localStorage.getItem('visual:confetti') === 'true');
+        setHdriEnabled(localStorage.getItem('visual:hdri') === 'true');
+      } catch { }
+    };
+    window.addEventListener('visual:updated', onVisualUpdated);
+    return () => window.removeEventListener('visual:updated', onVisualUpdated);
+  }, []);
   
   // Check for float-player collision
   useEffect(() => {
@@ -81,16 +122,53 @@ export function GameScene({ joystickInput: externalJoystickInput = null }: GameS
           
           if (distanceX < floatWidth && distanceZ < floatLength) {
             console.log(`💥 Player hit by float at position (${floatX}, ${currentZ})!`);
-            eliminatePlayer();
+            // Penalize player by losing a point and alert NPCs
+            playerHitByFloat();
             return;
           }
-        }
-      }
-    };
+         }
+       }
+     };
     
     const interval = setInterval(checkCollision, 100); // Check every 100ms
     return () => clearInterval(interval);
-  }, [phase, playerPosition, totalFloats, floatStartTime, getFloatSpeed, eliminatePlayer]);
+  }, [phase, playerPosition, totalFloats, floatStartTime, getFloatSpeed, playerHitByFloat]);
+
+  // Bot vs Float collision detection - lightweight interval polling
+  useEffect(() => {
+    if (phase !== 'playing') return;
+    const interval = setInterval(() => {
+      try {
+        const floatSpeed = getFloatSpeed();
+        const nowElapsed = (Date.now() - floatStartTime) / 1000;
+        const floatX = 5; // floats on lane 1 x=5
+        const floatWidth = 2.5;
+        const floatLength = 3;
+        const botPositions = useParadeGame.getState().botPositions || {};
+        const { totalFloats: tf } = useParadeGame.getState();
+
+        for (let i = 0; i < tf; i++) {
+          const startZ = -30 - (i * 10);
+          const currentZ = startZ + (floatSpeed * nowElapsed);
+          if (currentZ > -20 && currentZ < 20) {
+            // check each bot
+            for (const botId of Object.keys(botPositions)) {
+              const pos = (botPositions as Record<string, {x:number;y:number;z:number}>)[botId];
+              if (!pos) continue;
+              const dx = Math.abs(pos.x - floatX);
+              const dz = Math.abs(pos.z - currentZ);
+              if (dx < floatWidth && dz < floatLength) {
+                console.log(`💥 Bot ${botId} hit by float at (${floatX}, ${currentZ})`);
+                // Penalize the bot and alert NPCs
+                try { botHitByFloat(botId); } catch (e) { console.warn('botHitByFloat failed', e); }
+              }
+            }
+          }
+        }
+      } catch (e) { /* ignore */ }
+    }, 200);
+    return () => clearInterval(interval);
+  }, [phase, getFloatSpeed, floatStartTime, botHitByFloat]);
   
   // Play fireworks sound on high combos
   useEffect(() => {
@@ -204,6 +282,15 @@ export function GameScene({ joystickInput: externalJoystickInput = null }: GameS
     <group>
       {/* Environment - always visible */}
       <Environment />
+      <FloatDecorationsInstanced decorationsPerFloat={5} />
+      <Lighting />
+      <PostProcessing />
+      <Suspense fallback={null}>
+        {advancedPostEnabled && <AdvancedPostProcessing enabled />}
+      </Suspense>
+      <Suspense fallback={null}>
+        {hdriEnabled && <HDRIEnvironment envUrl={'/hdrs/st-peters-square-1k.hdr'} />}
+      </Suspense>
       
       {/* Player - starts behind center line */}
       <Player 
@@ -222,20 +309,23 @@ export function GameScene({ joystickInput: externalJoystickInput = null }: GameS
         <>
           {/* Parade Floats - dynamically generated based on level (10 floats per level) */}
           {Array.from({ length: totalFloats }, (_, i) => {
-            const colors = ["#9b59b6", "#e74c3c", "#ff6b35", "#3498db", "#f39c12", "#1abc9c", "#e91e63", "#9c27b0"];
-            const color = colors[i % colors.length];
-            const startZ = -30 - (i * 10); // Space floats 10 units apart
-            return (
-              <ParadeFloat 
-                key={`float-${level}-${i}`}
-                id={`float-${level}-${i}`}
+             const colors = ["#9b59b6", "#e74c3c", "#ff6b35", "#3498db", "#f39c12", "#1abc9c", "#e91e63", "#9c27b0"];
+             const color = colors[i % colors.length];
+             const startZ = -30 - (i * 10); // Space floats 10 units apart
+             return (
+               <ParadeFloat 
+                 key={`float-${level}-${i}`}
+                 id={`float-${level}-${i}`}
                 startZ={startZ}
-                lane={1}
-                color={color}
-                playerPosition={playerPosition}
-              />
-            );
-          })}
+                 lane={1}
+                 color={color}
+                label={i + 1}
+                labelEnabled={labelEnabled}
+                useInstancedDecorations={true}
+                 playerPosition={playerPosition}
+               />
+             );
+           })}
           
           {/* Competitor Bots - scaled by level for casual gameplay (ages 10-80) */}
           {/* Level 1-2: 2 bots, Level 3: 3 bots, Level 4+: All 6 bots */}
@@ -276,15 +366,21 @@ export function GameScene({ joystickInput: externalJoystickInput = null }: GameS
             );
           })}
           
-          {/* Collectibles */}
-          {collectibles.map((collectible) => (
-            <Collectible
-              key={collectible.id}
-              collectible={collectible}
-              playerPosition={playerPosition}
-              onCatch={handleCatch}
-            />
-          ))}
+          {/* Collectibles - use instanced renderer for common items (beads/doubloon/cup). Keep special items as individual components. */}
+          {
+            // Group regular collectibles for instancing
+          }
+          <>
+            <CollectibleInstanced types={["beads", "doubloon", "cup"]} playerPosition={playerPosition} />
+            {collectibles.filter(c => c.type === 'speed_boost' || c.type === 'double_points' || c.type === 'king_cake').map((collectible) => (
+              <Collectible
+                key={collectible.id}
+                collectible={collectible}
+                playerPosition={playerPosition}
+                onCatch={handleCatch}
+              />
+            ))}
+          </>
 
           {/* Helper bot visuals */}
           <HelperBotVisual playerPosition={playerPosition} />

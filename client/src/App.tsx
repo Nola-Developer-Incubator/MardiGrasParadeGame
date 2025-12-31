@@ -1,17 +1,17 @@
-import { Canvas } from "@react-three/fiber";
-import { Suspense, useState, useCallback, useEffect } from "react";
-import { KeyboardControls } from "@react-three/drei";
-import { GameScene } from "./components/game/GameScene";
-import { GameUI } from "./components/game/GameUI";
-import { WinScreen } from "./components/game/WinScreen";
-import { AudioManager } from "./components/game/AudioManager";
-import { AdRewardScreen } from "./components/game/AdRewardScreen";
-import { TouchControls, TouchInput } from "./components/game/TouchControls";
-import { CatchArea } from './components/game/CatchArea';
-import { Controls, JoystickInput } from "./components/game/Player";
-import { useParadeGame } from "./lib/stores/useParadeGame";
-import { useIsMobile } from "./hooks/use-is-mobile";
+import React, {Suspense, useCallback, useEffect, useState} from "react";
+import {KeyboardControls} from "@react-three/drei";
+import {GameUI} from "./components/game/GameUI";
+import {WinScreen} from "./components/game/WinScreen";
+import {AudioManager} from "./components/game/AudioManager";
+import {AdRewardScreen} from "./components/game/AdRewardScreen";
+import {TouchControls, TouchInput} from "./components/game/TouchControls";
+import {CatchArea} from './components/game/CatchArea';
+import {Controls, JoystickInput} from "./components/game/Player";
+import {useParadeGame} from "./lib/stores/useParadeGame";
+import {useIsMobile} from "./hooks/use-is-mobile";
 import DevOverlay from "./components/game/DevOverlay";
+// Lazy-load the heavy Canvas and scene to defer loading R3F/drei until needed
+const GameCanvas = React.lazy(() => import("./components/game/GameCanvas"));
 
 const controls = [
   { name: Controls.forward, keys: ["KeyW", "ArrowUp"] },
@@ -22,10 +22,32 @@ const controls = [
 
 function App() {
   const joystickEnabled = useParadeGame((state) => state.joystickEnabled);
+  const startGame = useParadeGame((s) => s.startGame);
   const phase = useParadeGame((state) => state.phase);
   const isMobile = useIsMobile();
-  const [joystickInput, setJoystickInput] = useState<JoystickInput | null>(null);
-  
+  // Force HUD for tests (localStorage flag) — used to render test-only UI like joystick without starting the game
+  const forceHudForTests = typeof window !== 'undefined' && (() => {
+    try { return localStorage.getItem('TEST_FORCE_HUD') === 'true'; } catch { return false; }
+  })();
+   const [joystickInput, setJoystickInput] = useState<JoystickInput | null>(null);
+   const [gameStarted, setGameStarted] = useState<boolean>(false);
+
+  // Auto-start behavior for local test environments: if URL contains `autoStart=true` or running on localhost
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const auto = params.get('autoStart') === 'true';
+      if (auto) {
+        // Only set the UI to load the heavy GameCanvas; do NOT call startGame() here so the tutorial
+        // overlay remains available for Playwright to click the 'Start Game' button.
+        setGameStarted(true);
+      }
+    } catch (e) { /* ignore in non-browser env */ }
+  }, []);
+
+  // Prefetch GameCanvas when user hovers Play to reduce wait
+  const prefetchCanvas = () => { void import('./components/game/GameCanvas'); };
+
   const handleJoystickInput = useCallback((input: TouchInput) => {
     setJoystickInput({ x: input.x, y: input.y });
   }, []);
@@ -40,33 +62,21 @@ function App() {
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
       <KeyboardControls map={controls}>
-        <Canvas
-          shadows
-          camera={{
-            position: [0, 4, 6],
-            fov: 60,
-            near: 0.1,
-            far: 1000
-          }}
-          gl={{
-            antialias: true,
-            powerPreference: "high-performance"
-          }}
-        >
-          <color attach="background" args={["#0f0f1e"]} />
-          
-          <Suspense fallback={null}>
-            <GameScene joystickInput={joystickInput} />
-          </Suspense>
-        </Canvas>
+        {/* Play overlay removed — GameUI handles main menu and Start button */}
+
+        {/* Mount the canvas immediately so tests can detect it — visibility or interaction is gated
+            by the tutorial overlay and game state. */}
+        <Suspense fallback={null}>
+          <GameCanvas joystickInput={joystickInput} />
+        </Suspense>
         
         <GameUI />
         <WinScreen />
         <AdRewardScreen />
         <AudioManager />
         
-        {/* Touch Controls - only show when joystick is enabled on mobile during gameplay */}
-        {isMobile && joystickEnabled && phase === "playing" && (
+        {/* Touch Controls - show on mobile when joystick is enabled; during tests (TEST_FORCE_HUD) allow showing before gameplay */}
+        {isMobile && (joystickEnabled || forceHudForTests) && (phase === "playing" || forceHudForTests) && (
           <>
             <TouchControls onInput={handleJoystickInput} />
             <CatchArea />

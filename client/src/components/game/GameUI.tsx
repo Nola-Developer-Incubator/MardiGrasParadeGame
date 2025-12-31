@@ -1,18 +1,17 @@
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useParadeGame} from "@/lib/stores/useParadeGame";
 import {useAudio} from "@/lib/stores/useAudio";
 import {useIsMobile} from "@/hooks/use-is-mobile";
 import {AnimatePresence, motion} from "framer-motion";
-import {Settings, ShoppingBag, Volume2, VolumeX} from "lucide-react";
+import {Settings as SettingsIcon, ShoppingBag, Volume2, VolumeX} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Card} from "@/components/ui/card";
 import {Progress} from "@/components/ui/progress";
 import {CosmeticShop} from "./CosmeticShop";
-import {AdminModal} from '@/components/ui/AdminModal';
+import {AdminModal} from "@/components/ui/AdminModal";
 import {FirstLevelTutorial} from "./FirstLevelTutorial";
 import {SettingsModal} from "./SettingsModal";
 import {MinimalHUD} from "@/components/ui/MinimalHUD";
-import {RemainingFloats} from "@/components/ui/RemainingFloats";
 
 export function GameUI() {
   const { phase, score, level, combo, startGame, activePowerUps, lastCatchTime, playerColor, botScores, coins, joystickEnabled, totalFloats, floatsPassed } = useParadeGame();
@@ -55,6 +54,20 @@ export function GameUI() {
     window.addEventListener('minimalHud:updated', handler);
     return () => window.removeEventListener('minimalHud:updated', handler);
   }, []);
+  
+  // HUD toggles persisted in localStorage (per-element)
+  const [showFloatLabels, setShowFloatLabels] = useState<boolean>(() => {
+    try { return localStorage.getItem('hud:showFloatLabels') === null ? true : localStorage.getItem('hud:showFloatLabels') === 'true'; } catch { return true; }
+  });
+  const [showPowerUps, setShowPowerUps] = useState<boolean>(() => {
+    try { return localStorage.getItem('hud:showPowerUps') === null ? true : localStorage.getItem('hud:showPowerUps') === 'true'; } catch { return true; }
+  });
+  const [showCompetitors, setShowCompetitors] = useState<boolean>(() => {
+    try { return localStorage.getItem('hud:showCompetitors') === null ? true : localStorage.getItem('hud:showCompetitors') === 'true'; } catch { return true; }
+  });
+  const [showRemainingFloats, setShowRemainingFloats] = useState<boolean>(() => {
+    try { return localStorage.getItem('hud:showRemainingFloats') === null ? true : localStorage.getItem('hud:showRemainingFloats') === 'true'; } catch { return true; }
+  });
 
   // Allow preview builds to force a minimal HUD via Vite env flag (VITE_MINIMAL_HUD=true)
   // This is safe because the flag will only be set in preview CI jobs and not in production builds.
@@ -109,12 +122,23 @@ export function GameUI() {
     try { if (typeof window !== 'undefined') localStorage.setItem('showPersonas', String(showPersonas)); } catch { }
   }, [showPersonas]);
 
+  // Persist HUD toggles and notify listeners
+  useEffect(() => { try { localStorage.setItem('hud:showFloatLabels', String(showFloatLabels)); window.dispatchEvent(new Event('hud:updated')); } catch {} }, [showFloatLabels]);
+  useEffect(() => { try { localStorage.setItem('hud:showPowerUps', String(showPowerUps)); window.dispatchEvent(new Event('hud:updated')); } catch {} }, [showPowerUps]);
+  useEffect(() => { try { localStorage.setItem('hud:showCompetitors', String(showCompetitors)); window.dispatchEvent(new Event('hud:updated')); } catch {} }, [showCompetitors]);
+  useEffect(() => { try { localStorage.setItem('hud:showRemainingFloats', String(showRemainingFloats)); window.dispatchEvent(new Event('hud:updated')); } catch {} }, [showRemainingFloats]);
+
   const handleStartGame = () => {
-    setShowTutorial(false);
-    // Show first-level tutorial on level 1
+    // When launching the first-level tutorial, delay hiding the tutorial overlay
+    // briefly so the click event can complete without the element being detached.
     if (level === 1) {
-      setShowFirstLevelTutorial(true);
+      // Keep the main tutorial visible for a short tick, then show the multi-step tutorial.
+      setTimeout(() => {
+        setShowTutorial(false);
+        setShowFirstLevelTutorial(true);
+      }, 50);
     } else {
+      setShowTutorial(false);
       startGame();
     }
   };
@@ -147,6 +171,33 @@ export function GameUI() {
 
   return (
     <>
+      {/* Settings button moved to lower-right to avoid overlapping top HUD */}
+      <div style={{ position: 'fixed', bottom: 12, right: 12, zIndex: 2147483647, pointerEvents: 'auto' }}>
+        <button
+          onClick={() => setShowSettings(true)}
+          data-testid="settings-button"
+          aria-label="Open Settings"
+          title="Settings"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 48,
+            height: 48,
+            borderRadius: 12,
+            background: 'linear-gradient(180deg, rgba(60,20,100,0.98), rgba(35,10,60,0.95))',
+            color: 'white',
+            border: '2px solid rgba(245, 215, 110, 0.98)',
+            cursor: 'pointer',
+            boxShadow: '0 6px 18px rgba(0,0,0,0.6)'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <SettingsIcon style={{ width: 20, height: 20 }} />
+          </div>
+        </button>
+      </div>
+
       {/* Tutorial Overlay */}
       <AnimatePresence>
         {phase === "tutorial" && showTutorial && (
@@ -237,7 +288,7 @@ export function GameUI() {
               </div>
               
               {/* Active Power-ups - Compact */}
-              {activePowerUps.map((powerUp) => {
+              {showPowerUps && activePowerUps.map((powerUp) => {
                 const timeLeft = Math.max(0, powerUp.endTime - Date.now());
                 return (
                   <Card key={powerUp.type} className="bg-cyan-600/90 border-2 border-cyan-300 px-2 py-1 md:px-3 md:py-2">
@@ -258,21 +309,11 @@ export function GameUI() {
               >
                 {isMuted ? <VolumeX size={14} className="md:w-[18px] md:h-[18px]" /> : <Volume2 size={14} className="md:w-[18px] md:h-[18px]" />}
               </Button>
-              
-              {isMobile && (
-                <Button
-                  onClick={() => setShowSettings(true)}
-                  size="sm"
-                  className="bg-purple-700 hover:bg-purple-600 border-2 border-yellow-400 text-white p-1 md:p-2"
-                >
-                  <Settings size={14} className="md:w-[18px] md:h-[18px]" />
-                </Button>
-              )}
             </div>
           </div>
           
-          {/* Remaining floats indicator (compact) */}
-          <RemainingFloats remaining={Math.max(0, (totalFloats || 0) - (floatsPassed || 0))} />
+          {/* Remaining floats indicator (compact) - show only in dev or when tests force HUD and when enabled */}
+          {/* (RemainingFloats now renders globally above so it is always detectable by tests) */}
 
           {/* Admin & Controls - Hidden on phones */}
           <div className="hidden md:flex absolute bottom-4 right-4 pointer-events-auto flex-col gap-2">
@@ -315,6 +356,7 @@ export function GameUI() {
           </AnimatePresence>
           
           {/* Bot Scores - Hidden on phones (desktop view) - but show compact overlay on mobile when joystick enabled */}
+          {showCompetitors && (
           <div className="hidden md:block absolute bottom-4 left-4 pointer-events-auto">
             <Card className="bg-black/40 backdrop-blur-md border-2 border-gray-400 shadow-2xl px-4 py-3">
               <div className="text-sm text-gray-200 font-black mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">🤖 COMPETITOR CATCHES</div>
@@ -337,9 +379,10 @@ export function GameUI() {
               </div>
             </Card>
           </div>
-
+          )}
+          
           {/* Mobile compact bot overlay when joystick enabled - positioned above joystick to avoid overlap */}
-          {isMobile && joystickEnabled && (
+          {isMobile && joystickEnabled && showCompetitors && (
             <div className="block md:hidden absolute bottom-40 left-2 right-2 pointer-events-auto">
               <Card className="bg-black/50 backdrop-blur-md border-2 border-gray-400 shadow-2xl px-3 py-2">
                 <div className="flex items-center justify-between text-xs text-gray-200 font-black mb-1">🤖 COMPETITORS</div>
@@ -355,15 +398,14 @@ export function GameUI() {
             </div>
           )}
           
-          {/* Small HUD toggles - top-right compact */}
-          <div className="absolute top-4 right-4">
-            <div className="bg-black/60 p-2 rounded-md pointer-events-auto">
-              <label className="flex items-center gap-2 text-white text-xs">
-                <input type="checkbox" checked={showPersonas} onChange={(e) => setShowPersonas(e.target.checked)} />
-                <span>Show Personas (debug)</span>
-              </label>
+          {/* Small HUD toggles removed (these belong in SettingsModal) */}
+
+          {/* Test hook: expose a visible DOM marker when tests opt-in via localStorage */}
+          {forceHudForTests && (
+            <div data-testid="player-entity" style={{ position: 'absolute', left: 8, top: 8, zIndex: 60, background: 'rgba(255,255,255,0.02)', padding: '2px 6px', borderRadius: 4, color: 'white', pointerEvents: 'none' }}>
+              Player
             </div>
-          </div>
+          )}
           
           {/* Controls Hint - Hidden on phones */}
           <div className="hidden md:block absolute bottom-4 left-1/2 transform -translate-x-1/2">

@@ -1,9 +1,12 @@
-import { useParadeGame } from "@/lib/stores/useParadeGame";
-import { useIsMobile } from "@/hooks/use-is-mobile";
-import { X, Settings } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
+import {useParadeGame} from "@/lib/stores/useParadeGame";
+import {useIsMobile} from "@/hooks/use-is-mobile";
+import {Settings, Volume2, VolumeX, X} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {Card} from "@/components/ui/card";
+import {Switch} from "@/components/ui/switch";
+import {Slider} from "@/components/ui/slider";
+import {useEffect, useState} from "react";
+import {useAudio} from "@/lib/stores/useAudio";
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -13,16 +16,48 @@ interface SettingsModalProps {
 export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const { joystickEnabled, toggleJoystick } = useParadeGame();
   const isMobile = useIsMobile();
+  const { isMuted, toggleMute } = useAudio();
+
+  // HUD toggles persisted in localStorage
+  const [showFloatLabels, setShowFloatLabels] = useState<boolean>(() => {
+    try { return localStorage.getItem('hud:showFloatLabels') === null ? true : localStorage.getItem('hud:showFloatLabels') === 'true'; } catch { return true; }
+  });
+  const [showPowerUps, setShowPowerUps] = useState<boolean>(() => {
+    try { return localStorage.getItem('hud:showPowerUps') === null ? true : localStorage.getItem('hud:showPowerUps') === 'true'; } catch { return true; }
+  });
+  const [showCompetitors, setShowCompetitors] = useState<boolean>(() => {
+    try { return localStorage.getItem('hud:showCompetitors') === null ? true : localStorage.getItem('hud:showCompetitors') === 'true'; } catch { return true; }
+  });
+  // Remaining floats HUD has been removed; do not persist this setting anymore.
+  const [enableAdvancedPost, setEnableAdvancedPost] = useState<boolean>(() => {
+    try { return localStorage.getItem('visual:advancedPost') === null ? false : localStorage.getItem('visual:advancedPost') === 'true'; } catch { return false; }
+  });
+  // Default confetti OFF to simplify visuals
+  const [enableConfetti, setEnableConfetti] = useState<boolean>(() => {
+    try { return localStorage.getItem('visual:confetti') === null ? false : localStorage.getItem('visual:confetti') === 'true'; } catch { return false; }
+  });
+  const [enableHDRI, setEnableHDRI] = useState<boolean>(() => {
+    try { return localStorage.getItem('visual:hdri') === null ? false : localStorage.getItem('visual:hdri') === 'true'; } catch { return false; }
+  });
+
+  useEffect(() => { try { localStorage.setItem('hud:showFloatLabels', String(showFloatLabels)); window.dispatchEvent(new Event('hud:updated')); } catch {} }, [showFloatLabels]);
+  useEffect(() => { try { localStorage.setItem('hud:showPowerUps', String(showPowerUps)); window.dispatchEvent(new Event('hud:updated')); } catch {} }, [showPowerUps]);
+  useEffect(() => { try { localStorage.setItem('hud:showCompetitors', String(showCompetitors)); window.dispatchEvent(new Event('hud:updated')); } catch {} }, [showCompetitors]);
+  // Note: 'Show Remaining Floats' toggle removed.
+  // Persist visual toggles and notify the app when visuals change
+  useEffect(() => { try { localStorage.setItem('visual:advancedPost', String(enableAdvancedPost)); window.dispatchEvent(new Event('visual:updated')); } catch {} }, [enableAdvancedPost]);
+  useEffect(() => { try { localStorage.setItem('visual:confetti', String(enableConfetti)); window.dispatchEvent(new Event('visual:updated')); } catch {} }, [enableConfetti]);
+  useEffect(() => { try { localStorage.setItem('visual:hdri', String(enableHDRI)); window.dispatchEvent(new Event('visual:updated')); } catch {} }, [enableHDRI]);
 
   if (!isOpen) return null;
 
   return (
     <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm pointer-events-auto">
-      <Card className="bg-purple-900/95 border-2 border-yellow-400 p-6 max-w-sm mx-4 text-white">
+      <Card className="bg-purple-900/95 border-2 border-yellow-400 p-6 max-w-md mx-4 text-white">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <Settings className="w-5 h-5 text-yellow-300" />
-            <h2 className="text-xl font-bold text-yellow-300">Settings</h2>
+          <div className="flex items-center gap-3">
+            <Settings className="w-6 h-6 text-yellow-300" />
+            <h2 className="text-2xl font-extrabold text-yellow-300">Settings</h2>
           </div>
           <Button
             variant="ghost"
@@ -34,45 +69,115 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           </Button>
         </div>
 
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 gap-4">
+          {/* Joystick toggle (mobile) */}
           {isMobile && (
             <div className="flex items-center justify-between p-3 bg-black/30 rounded-lg">
-              <div className="flex-1">
+              <div>
                 <p className="text-sm font-semibold">Joystick Controls</p>
-                <p className="text-xs text-gray-300 mt-1">
-                  Use on-screen joystick for movement
-                </p>
-                <p className="text-xs text-gray-300 mt-1">
-                  How to use: touch and drag the round joystick. Release to stop.
-                  Drag up/down/left/right to move in that direction. The joystick
-                  supports multi-touch and pointer events for modern browsers.
-                </p>
-                <p className="text-xs text-yellow-300 mt-2 font-semibold">
-                  Tip: Enable joystick for tablet & phone gameplay.
-                </p>
+                <p className="text-xs text-gray-300 mt-1">On-screen joystick for mobile controls.</p>
               </div>
-              <Switch
-                checked={joystickEnabled}
-                onCheckedChange={toggleJoystick}
-                className="ml-3"
-              />
+              <Switch checked={joystickEnabled} onCheckedChange={toggleJoystick} className="ml-3" data-testid="joystick-toggle" />
             </div>
           )}
 
-          {!isMobile && (
-            <div className="p-4 bg-black/30 rounded-lg text-center">
-              <p className="text-sm text-gray-300">
-                Settings are available on mobile and tablet devices.
-              </p>
+          {/* Audio toggle */}
+          <div className="flex items-center justify-between p-3 bg-black/30 rounded-lg">
+            <div className="flex items-center gap-3">
+              {isMuted ? <VolumeX className="w-5 h-5 text-red-400" /> : <Volume2 className="w-5 h-5 text-green-300" />}
+              <div>
+                <p className="text-sm font-semibold">Audio</p>
+                <p className="text-xs text-gray-300 mt-1">Toggle game audio on/off.</p>
+              </div>
             </div>
-          )}
+            <Switch checked={isMuted} onCheckedChange={() => toggleMute()} className="ml-3" data-testid="audio-toggle" />
+          </div>
+
+          {/* HUD toggles */}
+          <div className="p-3 bg-black/30 rounded-lg">
+            <p className="text-sm font-semibold mb-2">HUD Options</p>
+            <div className="space-y-2">
+              <label className="flex items-center justify-between text-white text-xs">
+                <div>
+                  <div className="font-semibold">Show Float Labels</div>
+                  <div className="text-[11px] text-gray-300">Display numbers above/in front of floats.</div>
+                </div>
+                <Switch checked={showFloatLabels} onCheckedChange={(v) => setShowFloatLabels(Boolean(v))} />
+              </label>
+
+              <label className="flex items-center justify-between text-white text-xs">
+                <div>
+                  <div className="font-semibold">Show Power-ups</div>
+                  <div className="text-[11px] text-gray-300">Show active power-up icons and timers.</div>
+                </div>
+                <Switch checked={showPowerUps} onCheckedChange={(v) => setShowPowerUps(Boolean(v))} />
+              </label>
+
+              <label className="flex items-center justify-between text-white text-xs">
+                <div>
+                  <div className="font-semibold">Show Competitors</div>
+                  <div className="text-[11px] text-gray-300">Show competitor bot catches list.</div>
+                </div>
+                <Switch checked={showCompetitors} onCheckedChange={(v) => setShowCompetitors(Boolean(v))} />
+              </label>
+
+              {/* Remaining floats counter removed */}
+            </div>
+          </div>
+
+          {/* Visual / Performance toggles */}
+          <div className="mt-3 border-t border-white/5 pt-3">
+            <p className="text-xs text-gray-300 mb-2">Visual Options (slider style)</p>
+
+            <div className="space-y-3">
+              <div className="flex items-center justify-between text-white text-xs">
+                <div className="flex-1 pr-3" onClick={() => setEnableAdvancedPost((v) => !v)} role="button" tabIndex={0}>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold">Advanced Post-processing</span>
+                    <span className="px-2 py-0.5 text-[11px] rounded bg-gray-700 text-yellow-100 font-bold">{enableAdvancedPost ? 'On' : 'Off'}</span>
+                  </div>
+                  <div className="text-[11px] text-gray-300">Depth-of-field and LUT color grading (turn off for simpler visuals).</div>
+                </div>
+                <div style={{ width: 120 }} data-testid="visual-advanced-post">
+                  <Slider value={enableAdvancedPost ? [1] : [0]} onValueChange={(v) => setEnableAdvancedPost(Boolean(v[0]))} defaultValue={[enableAdvancedPost ? 1 : 0]} max={1} step={1} />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-white text-xs">
+                <div className="flex-1 pr-3" onClick={() => setEnableConfetti((v) => !v)} role="button" tabIndex={0}>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold">Confetti Particle Effects</span>
+                    <span className="px-2 py-0.5 text-[11px] rounded bg-gray-700 text-white font-semibold">{enableConfetti ? 'On' : 'Off'}</span>
+                  </div>
+                  <div className="text-[11px] text-gray-300">Small confetti bursts for celebrations (off to simplify visuals).</div>
+                </div>
+                <div style={{ width: 120 }} data-testid="visual-confetti">
+                  <Slider value={enableConfetti ? [1] : [0]} onValueChange={(v) => setEnableConfetti(Boolean(v[0]))} defaultValue={[enableConfetti ? 1 : 0]} max={1} step={1} />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-white text-xs">
+                <div className="flex-1 pr-3" onClick={() => setEnableHDRI((v) => !v)} role="button" tabIndex={0}>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold">HDR Environment</span>
+                    <span className="px-2 py-0.5 text-[11px] rounded bg-gray-700 text-yellow-100 font-bold">{enableHDRI ? 'On' : 'Off'}</span>
+                  </div>
+                  <div className="text-[11px] text-gray-300">Use HDRI lighting for richer materials (off by default).</div>
+                </div>
+                <div style={{ width: 120 }} data-testid="visual-hdri">
+                  <Slider value={enableHDRI ? [1] : [0]} onValueChange={(v) => setEnableHDRI(Boolean(v[0]))} defaultValue={[enableHDRI ? 1 : 0]} max={1} step={1} />
+                </div>
+              </div>
+            </div>
+          </div>
 
           <div className="pt-2">
             <Button
               onClick={onClose}
               className="w-full bg-yellow-400 hover:bg-yellow-500 text-purple-900 font-bold"
+              data-testid="settings-close"
             >
-              Close
+              Done
             </Button>
           </div>
         </div>

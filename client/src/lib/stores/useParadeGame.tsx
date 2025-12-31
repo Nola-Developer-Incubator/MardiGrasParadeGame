@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { subscribeWithSelector } from "zustand/middleware";
+import {create} from "zustand";
+import {subscribeWithSelector} from "zustand/middleware";
 import * as THREE from "three";
 
 export type GamePhase = "tutorial" | "playing" | "won" | "ad_offer";
@@ -54,6 +54,7 @@ interface ParadeGameState {
   playerColor: "beads" | "doubloon" | "cup"; // Player's assigned color for bonus points
   missedThrows: number; // Track missed throws for bot gift system
   botScores: BotScore[]; // Track bot catches
+  botPositions: Record<string, { x: number; y: number; z: number }>; // Track bot positions
   botClaims: Record<string, BotClaim>; // Track which bot claimed which collectible
   totalFloats: number; // Total floats for current level (10 * level)
   floatsPassed: number; // How many floats have passed the player
@@ -68,6 +69,10 @@ interface ParadeGameState {
   
   // Settings
   joystickEnabled: boolean; // Enable joystick controls for mobile/tablet
+  settings?: {
+    enableShadows?: boolean;
+    quality?: 'low' | 'medium' | 'high';
+  };
   
   // Actions
   startGame: () => void;
@@ -116,6 +121,11 @@ interface ParadeGameState {
   // Settings actions
   toggleJoystick: () => void;
 
+  // Bot & float interactions
+  setBotPosition: (id: string, pos: { x: number; y: number; z: number }) => void;
+  playerHitByFloat: () => void;
+  botHitByFloat: (botId: string) => void;
+
   // Runtime config reload (optional)
   reloadBotOverrides?: () => Promise<void>;
 }
@@ -149,16 +159,19 @@ export const useParadeGame = create<ParadeGameState>()(
     playerColor: "beads", // Default color, reassigned on game start
     missedThrows: 0,
     botScores: [],
+    botPositions: {},
     botClaims: {},
     totalFloats: 10, // Start with 10 floats for level 1
     floatsPassed: 0,
     aggressiveNPCs: [],
-    helperBots: 0, // number of helper bots currently active
+    helperBots: 0 // number of helper bots currently active
     
     // Settings state
-    joystickEnabled: typeof window !== 'undefined' 
+    ,joystickEnabled: typeof window !== 'undefined' 
       ? localStorage.getItem('joystickEnabled') === 'true' 
       : false,
+    // Render settings (new): keep shadows enabled by default for compatibility.
+    settings: { enableShadows: true, quality: 'high' },
     
     // Monetization state
     coins: 0,
@@ -438,6 +451,7 @@ export const useParadeGame = create<ParadeGameState>()(
         playerColor: randomColor,
         missedThrows: 0,
         botScores: [],
+        botPositions: {},
         botClaims: {},
         totalFloats: 10,
         floatsPassed: 0,
@@ -669,6 +683,29 @@ export const useParadeGame = create<ParadeGameState>()(
         console.log(`Joystick controls ${newValue ? 'enabled' : 'disabled'}`);
         return { joystickEnabled: newValue };
       });
+    },
+    
+    // Track bot positions for collision checks
+    setBotPosition: (id: string, pos: { x: number; y: number; z: number }) => {
+      set((state) => ({ botPositions: { ...(state as any).botPositions, [id]: pos } }));
+    },
+    
+    // Called when player is hit by a float: penalize and make aggressive NPCs chase
+    playerHitByFloat: () => {
+      console.log('Player hit by float: -1 point and NPCs are alerted');
+      set((state) => ({
+        score: Math.max(0, state.score - 1),
+        aggressiveNPCs: state.aggressiveNPCs.map((npc) => ({ ...npc, isChasing: true, chaseEndTime: Date.now() + 5000 }))
+      }));
+    },
+    
+    // Called when a bot is hit by a float: penalize bot score and alert NPCs
+    botHitByFloat: (botId: string) => {
+      console.log(`Bot ${botId} hit by float: -1 point and NPCs alerted`);
+      set((state) => ({
+        botScores: state.botScores.map((b) => b.id === botId ? { ...b, catches: Math.max(0, b.catches - 1) } : b),
+        aggressiveNPCs: state.aggressiveNPCs.map((npc) => ({ ...npc, isChasing: true, chaseEndTime: Date.now() + 5000 }))
+      }));
     },
   }))
 );

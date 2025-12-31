@@ -1,8 +1,8 @@
-import { useRef, useEffect, useState } from "react";
-import { useFrame } from "@react-three/fiber";
-import { useParadeGame, type Collectible as CollectibleType } from "@/lib/stores/useParadeGame";
-import { TrajectoryHint } from "./TrajectoryHint";
-import { GlowingTrail } from "./GlowingTrail";
+import {useCallback, useEffect, useRef, useState} from "react";
+import {useFrame} from "@react-three/fiber";
+import {type Collectible as CollectibleType, useParadeGame} from "@/lib/stores/useParadeGame";
+import {TrajectoryHint} from "./TrajectoryHint";
+import {GlowingTrail} from "./GlowingTrail";
 import * as THREE from "three";
 
 interface CollectibleProps {
@@ -21,9 +21,10 @@ const COLLECTIBLE_COLORS = {
 };
 
 const GRAVITY = -15;
-const CATCH_RADIUS = 1.5;
+const CATCH_RADIUS = 2.0; // increased catch radius for easier pickup
 const GROUND_LEVEL = 0.5;
 const MIN_CATCH_HEIGHT = 0.5;
+const GROUND_PICKUP_WINDOW_MS = 1000; // allow pickup once on ground for 1 second
 
 export function Collectible({ collectible, playerPosition, onCatch }: CollectibleProps) {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -32,9 +33,16 @@ export function Collectible({ collectible, playerPosition, onCatch }: Collectibl
   const { updateCollectible, removeCollectible, incrementMisses } = useParadeGame();
   const hasBeenCaught = useRef(false);
   const [showHint, setShowHint] = useState(true);
-  const [timeOnGround, setTimeOnGround] = useState(0);
   const onGroundStartTime = useRef<number | null>(null);
   
+  // Memoized catch handler - keeps hooks at top-level and avoids reallocating inside frame loop
+  const handleCatch = useCallback((type: CollectibleType['type']) => {
+    onCatch(type);
+  }, [onCatch]);
+  
+  // Early return guard after hooks (safe to use conditionals here)
+  if (!collectible) return null;
+
   useEffect(() => {
     return () => {
       // Cleanup when component unmounts
@@ -48,7 +56,7 @@ export function Collectible({ collectible, playerPosition, onCatch }: Collectibl
     if (!meshRef.current || hasBeenCaught.current) return;
 
     // Get helper bot count
-    const { updateCollectible, removeCollectible, incrementMisses } = useParadeGame();
+    // Use the store functions captured above and read helperBots from the store state
     const helperBots = useParadeGame.getState().helperBots || 0;
 
     // Apply gravity
@@ -88,10 +96,9 @@ export function Collectible({ collectible, playerPosition, onCatch }: Collectibl
         onGroundStartTime.current = Date.now();
       }
       
-      // Check if been on ground for 5 seconds
+      // Check if been on ground too long (5s) -> remove
       const timeOnGroundMs = Date.now() - onGroundStartTime.current;
       if (timeOnGroundMs > 5000) {
-        // Count as a missed throw (not power-ups though)
         const isRegularItem = collectible.type === "beads" || collectible.type === "doubloon" || collectible.type === "cup" || collectible.type === "king_cake";
         if (isRegularItem) {
           incrementMisses();
@@ -131,7 +138,10 @@ export function Collectible({ collectible, playerPosition, onCatch }: Collectibl
     const distanceToPlayer = position.current.distanceTo(playerPosition);
     const isAboveGround = position.current.y >= MIN_CATCH_HEIGHT;
     const isInRange = distanceToPlayer < CATCH_RADIUS;
-    const isCatchable = isInRange && isAboveGround && position.current.y < 2;
+    // Catchable if in range and above minimum height OR recently on ground (within pickup window)
+    const timeOnGround = onGroundStartTime.current ? (Date.now() - onGroundStartTime.current) : 0;
+    const isGroundPickupWindow = onGroundStartTime.current !== null && timeOnGround <= GROUND_PICKUP_WINDOW_MS;
+    const isCatchable = isInRange && ((isAboveGround && position.current.y < 2) || isGroundPickupWindow);
     
     // Highlight if catchable
     if (isCatchable && !hasBeenCaught.current) {
@@ -140,7 +150,7 @@ export function Collectible({ collectible, playerPosition, onCatch }: Collectibl
       // Auto-catch when player is close
       if (distanceToPlayer < 0.8) {
         hasBeenCaught.current = true;
-        onCatch(collectible.type);
+        handleCatch(collectible.type);
         removeCollectible(collectible.id);
       }
     } else {
@@ -153,8 +163,10 @@ export function Collectible({ collectible, playerPosition, onCatch }: Collectibl
     }
   });
   
+  // Increased sizes for accessibility (easier to see for children and seniors)
+  const size = collectible.type === "cup" ? 0.5 : 0.45;
+  
   const color = COLLECTIBLE_COLORS[collectible.type];
-  const size = collectible.type === "cup" ? 0.3 : 0.25;
   
   return (
     <group>
@@ -187,7 +199,7 @@ export function Collectible({ collectible, playerPosition, onCatch }: Collectibl
         <GlowingTrail targetRef={meshRef} color={color} length={6} />
       )}
       
-      {/* Catchable highlight ring - optimized */}
+      {/* Catchable highlight ring - original behavior (slightly transparent, respects depth) */}
       <mesh position={[position.current.x, 0.05, position.current.z]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[CATCH_RADIUS * 0.8, CATCH_RADIUS, 16]} />
         <meshBasicMaterial 
