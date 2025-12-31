@@ -29,23 +29,10 @@ jobs:
       - name: Type check
         run: npm run check
 
-      - name: Auto-bump version and push
+      - name: Create release PR (no direct push to main)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
-          # Run the auto-bump script and push the commit & tag
-          node ./scripts/auto-bump-version.cjs --mode=auto --push
-
-      - name: Get latest tag
-        run: echo "TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
-
-      - name: Create GitHub Release
-        uses: actions/create-release@v1
-        with:
-          tag_name: ${{ env.TAG }}
-          release_name: Release ${{ env.TAG }}
-          body: |
-            Automated release created by CI. See docs/RELEASES.md for details.
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+          # Run the auto-bump script in PR mode; it will create a branch and open a PR
+          node ./scripts/auto-bump-version.cjs --mode=auto --pr
