@@ -6,6 +6,10 @@
   "scripts": {
     "db:seed": "node server/supabase/seed.cjs",
     "dev": "tsx server/index.ts",
+    "prebuild:prod": "node ./scripts/auto-bump-version.cjs --mode=auto",
+    "build:prod": "npm run prebuild:prod && npm run build",
+    "version:bump:visual": "node ./scripts/auto-bump-version.cjs --mode=visual",
+    "version:bump:overall": "node ./scripts/auto-bump-version.cjs --mode=overall",
     "dev:clean": "powershell -File ./scripts/start-dev.ps1 -LogPath ./dev-detached.log -Port 5000",
     "dev:ps1": "powershell -File ./scripts/start-dev.ps1 -LogPath ./dev-detached.log -Port 5000",
     "dev:sh": "./scripts/start-dev.sh",
