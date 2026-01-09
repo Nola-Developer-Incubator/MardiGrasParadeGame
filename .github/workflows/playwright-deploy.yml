@@ -1,0 +1,55 @@
+name: Playwright - build & deployed checks
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ gh-pages ]
+
+jobs:
+  build-and-test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install mgp deps
+        run: |
+          cd mgp-iteration-2
+          npm ci --legacy-peer-deps
+      - name: Build (production)
+        run: |
+          cd mgp-iteration-2
+          npm run build
+      - name: Serve built site
+        run: |
+          cd mgp-iteration-2
+          npx http-server ./dist/public -p 5173 -c-1 &
+          sleep 2
+      - name: Install Playwright browsers
+        run: |
+          cd mgp-iteration-2
+          npx playwright install --with-deps
+      - name: Run Playwright tests against built site
+        env:
+          PREVIEW_URL: http://127.0.0.1:5173
+        run: |
+          cd mgp-iteration-2
+          npx playwright test --project="Pixel 5" --config=playwright.config.ts
+
+  test-gh-pages:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Playwright against GH Pages
+        env:
+          PAGES_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+        run: |
+          cd mgp-iteration-2
+          npm ci --legacy-peer-deps
+          npx playwright install --with-deps
+          npx playwright test tests/playwright/deploy.spec.ts --project="Pixel 5" --config=playwright.config.ts --reporter=list
