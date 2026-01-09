@@ -46,6 +46,9 @@ export function Player(){
     pos.current.x = THREE.MathUtils.clamp(pos.current.x, -6.5, 6.5)
     pos.current.z = THREE.MathUtils.clamp(pos.current.z, -15, 15)
 
+    // update shared player position for other systems / tests
+    useStore.getState().setPlayerPosition({ x: pos.current.x, z: pos.current.z })
+
     if(meshRef.current) meshRef.current.position.copy(pos.current)
   })
 

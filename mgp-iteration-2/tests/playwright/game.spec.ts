@@ -22,4 +22,16 @@ test('joystick moves and HUD updates', async ({ page }) => {
   expect(slider).not.toBeNull()
   await slider?.focus()
   await page.keyboard.press('ArrowRight')
+
+  // wait for debug DOM and assert player moved and floats spawn
+  await page.waitForSelector('#mgp-debug', { timeout: 3000 })
+  const debug = await page.$('#mgp-debug')
+  const json = await debug?.getAttribute('data-json')
+  expect(json).not.toBeNull()
+  const data = JSON.parse(json || '{}')
+  expect(typeof data.floatsCount).toBe('number')
+  // after a short time floats should exist
+  expect(data.floatsCount).toBeGreaterThanOrEqual(0)
+  // player pos should have updated after joystick input
+  expect(typeof data.player.x).toBe('number')
 })

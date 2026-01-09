@@ -7,6 +7,8 @@ export const useStore = create((set,get) => ({
   joystickInput: { x:0, y:0 },
   handedness: 'left', // 'left' or 'right'
   coachMode: false,
+  playerPosition: { x: 0, z: 0 },
+  tutorialStep: 0,
 
   setJoystickEnabled: (v) => set({ joystickEnabled: v }),
   setFlipControls: (v) => set({ flipControls: v }),
@@ -14,6 +16,8 @@ export const useStore = create((set,get) => ({
   setJoystickInput: (i) => set({ joystickInput: i }),
   setHandedness: (h) => set({ handedness: h }),
   setCoachMode: (v) => set({ coachMode: v }),
+  setPlayerPosition: (p) => set({ playerPosition: p }),
+  setTutorialStep: (s) => set({ tutorialStep: s }),
 
   getMoveSpeedMultiplier: () => (get().coachMode ? 0.8 : 1.0)
 }))

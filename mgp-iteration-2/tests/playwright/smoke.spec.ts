@@ -19,6 +19,11 @@ test('joystick and HUD respond on mobile', async ({ page }) => {
   await page.waitForTimeout(200)
   await page.mouse.up()
 
+  // Ensure tutorial advanced past step 1 (Flip X instruction)
+  await page.waitForSelector('[data-testid="tutorial"]')
+  const tutorialText = await page.locator('[data-testid="tutorial"]').textContent()
+  expect(tutorialText).toContain('Flip "X"')
+
   // Ensure sensitivity control exists and is interactable
   const slider = await page.$('input[type="range"]')
   expect(slider).not.toBeNull()
