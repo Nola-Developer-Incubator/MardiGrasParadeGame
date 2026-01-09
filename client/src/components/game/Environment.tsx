@@ -20,6 +20,20 @@ export function Environment() {
         const res = await fetch(url, { method: 'HEAD' });
         if (!res.ok) {
           console.warn('Asphalt texture not found at', url, '— using generated fallback texture.');
+          try {
+            // Post client-side log to the server to aid debugging in CI/preview
+            fetch('/api/logs', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                kind: 'texture-missing',
+                url,
+                status: res.status,
+                page: typeof location !== 'undefined' ? location.href : undefined,
+                userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
+              }),
+            }).catch(() => {});
+          } catch (e) {}
           if (!cancelled) {
             // Do NOT use a generated canvas texture fallback (visible noisy tile). Fall back to a solid color material instead.
             createdFallback = null;
