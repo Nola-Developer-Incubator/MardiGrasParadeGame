@@ -51,12 +51,24 @@ export function SpawnManager(){
 
   return (
     <group>
-      {floats.map(f => (
-        <mesh key={f.id} position={[f.x, 0.25, f.z]}>
-          <sphereGeometry args={[0.28, 8, 8]} />
-          <meshStandardMaterial color={'#f97316'} emissive={'#f97316'} emissiveIntensity={0.2} />
-        </mesh>
-      ))}
+      {floats.map(f => {
+        // Simple LOD: use detailed mesh when near, sprite when far
+        const dist = Math.hypot(playerPosRef.current.x - f.x, playerPosRef.current.z - f.z)
+        if(dist < 4.0){
+          return (
+            <mesh key={f.id} position={[f.x, 0.25, f.z]} castShadow receiveShadow>
+              <sphereGeometry args={[0.28, 8, 8]} />
+              <meshStandardMaterial color={'#f97316'} emissive={'#f97316'} emissiveIntensity={0.2} />
+            </mesh>
+          )
+        }
+        // Far: lightweight sprite-like quad
+        return (
+          <sprite key={f.id} position={[f.x, 0.28, f.z]}>
+            <spriteMaterial color={'#f97316'} transparent opacity={0.9} sizeAttenuation={false} />
+          </sprite>
+        )
+      })}
     </group>
   )
 }
